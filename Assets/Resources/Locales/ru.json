@@ -1,0 +1,13 @@
+{
+  "texts":[
+    { "key": "Button:ConfirmDice", "value": "Принять" },
+    { "key": "Button:ConfirmTile", "value": "Принять" },
+
+    { "key": "Card:PlusOneToDice", "value": "+1 к значению кубика" },
+    { "key": "Card:PlusTwoToDice", "value": "+2 к значению кубика" },
+    { "key": "Card:RerollDice", "value": "Перебросить кубик" },
+
+    { "key": "Card:FlipTile", "value": "Перевернуть клетку" },
+    { "key": "Card:RedealTile", "value": "Пересдать клетку" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "texts":[
+    { "key": "Button:ConfirmDice", "value": "Confirm" },
+    { "key": "Button:ConfirmTile", "value": "Confirm" },
+
+    { "key": "Card:PlusOneToDice", "value": "+1 To Dice Value" },
+    { "key": "Card:PlusTwoToDice", "value": "+2 To Dice Value" },
+    { "key": "Card:RerollDice", "value": "Reroll The Dice" },
+
+    { "key": "Card:FlipTile", "value": "Flip The Tile" },
+    { "key": "Card:RedealTile", "value": "Redeal The Tile" }
+  ]
+}
