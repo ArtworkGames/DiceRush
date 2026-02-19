@@ -15,14 +15,20 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: cc15f1c66b26c9447ae9b23a19c29092
   m_SerializeEntries:
+  - m_GUID: 0802febb5001dff4395fff7a7f85aa04
+    m_Address: Windows
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 823924ffa9a6da341904a278bd3d9efb
-    m_Address: Gameplay/UI/Deck
+    m_Address: Game/Deck
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a058db47fef9b114bb2ef531a4177c82
-    m_Address: Gameplay/CellDrawer.prefab
+    m_Address: Game/CellDrawer.prefab
     m_ReadOnly: 0
     m_SerializedLabels:
     - default

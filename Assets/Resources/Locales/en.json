@@ -1,5 +1,6 @@
 {
   "texts":[
+    { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
 
@@ -8,6 +9,9 @@
     { "key": "Card:RerollDice", "value": "Reroll The Dice" },
 
     { "key": "Card:FlipTile", "value": "Flip The Tile" },
-    { "key": "Card:RedealTile", "value": "Redeal The Tile" }
+    { "key": "Card:RedealTile", "value": "Redeal The Tile" },
+
+    { "key": "ChestWindow:Tile", "value": "Chest" },
+    { "key": "LevelUpWindow:Tile", "value": "Level Up" }
   ]
 }

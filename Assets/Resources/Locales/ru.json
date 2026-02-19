@@ -1,5 +1,6 @@
 {
   "texts":[
+    { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
 
@@ -8,6 +9,9 @@
     { "key": "Card:RerollDice", "value": "Перебросить кубик" },
 
     { "key": "Card:FlipTile", "value": "Перевернуть клетку" },
-    { "key": "Card:RedealTile", "value": "Пересдать клетку" }
+    { "key": "Card:RedealTile", "value": "Пересдать клетку" },
+
+    { "key": "ChestWindow:Tile", "value": "Сундук" },
+    { "key": "LevelUpWindow:Tile", "value": "Новый уровень" }
   ]
 }

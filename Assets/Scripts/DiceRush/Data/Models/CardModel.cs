@@ -1,37 +1,65 @@
+using System.Linq;
+
 namespace StepanoffGames.DiceRush.Data.Models
 {
 	public enum CardKind
 	{
-		Undefined = 0,
-		Dice = 1,
-		Tile = 2,
-		Fight = 3,
+		Undefined,
+		Dice,
+		Tile,
+		Fight,
 	}
 
 	public enum CardType
 	{
-		Undefined = 0,
+		Undefined,
 
-		RerollDice = 1,
-		PlusOneToDice = 2,
-		PlusTwoToDice = 3,
+		RerollDice,
+		PlusOneToDice,
+		PlusTwoToDice,
 
-		RedealTile = 4,
-		FlipTile = 5,
+		FlipTile,
+		RedealTile,
 	}
 
 	public class CardModel
 	{
-		public CardKind Kind => _kind;
-		public CardType Type => _type;
-
-		private CardKind _kind;
-		private CardType _type;
-
-		public CardModel(CardKind kind, CardType type)
+		public static CardModel[] AllCards = new CardModel[]
 		{
-			_kind = kind;
-			_type = type;
+			new CardModel(CardKind.Dice, CardType.PlusOneToDice, 2),
+			new CardModel(CardKind.Dice, CardType.PlusTwoToDice, 2),
+			new CardModel(CardKind.Dice, CardType.RerollDice, 2),
+
+			new CardModel(CardKind.Tile, CardType.FlipTile, 2),
+			new CardModel(CardKind.Tile, CardType.FlipTile, 2),
+			new CardModel(CardKind.Tile, CardType.RedealTile, 2),
+		};
+
+		public static CardModel[] GetCards(CardKind kind)
+		{
+			return AllCards.Where(c => c.Kind == kind).ToArray();
+		}
+
+		public static CardModel GetCard(CardType type)
+		{
+			return AllCards.First(c => c.Type == type);
+		}
+
+		public CardKind Kind;
+		public CardType Type;
+		public int Cost;
+
+		public CardModel(CardKind kind, CardType type, int cost)
+		{
+			Kind = kind;
+			Type = type;
+			Cost = cost;
+		}
+
+		public CardModel Clone()
+		{
+			CardModel card = new CardModel(Kind, Type, Cost);
+			return card;
 		}
 	}
 }

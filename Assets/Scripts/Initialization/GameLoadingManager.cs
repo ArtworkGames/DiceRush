@@ -1,11 +1,10 @@
-using StepanoffGames.Localization;
 using Cysharp.Threading.Tasks;
+using StepanoffGames.DiceRush.Data;
+using StepanoffGames.Localization;
+using StepanoffGames.Scenes.Signals;
+using StepanoffGames.Signals;
 using UnityEngine;
 using UnityEngine.UI;
-using StepanoffGames.Signals;
-using StepanoffGames.Scenes.Signals;
-//using StepanoffGames.LiteralKnight.Data.Private;
-//using StepanoffGames.LiteralKnight.Data.Public;
 
 namespace StepanoffGames.Initialization
 {
@@ -26,7 +25,7 @@ namespace StepanoffGames.Initialization
 			_initializationWorker.Register(new AppSettingsManager());
 			_initializationWorker.Register(new LocalizationManager());
 			//_initializationWorker.Register(new PublicDataManager());
-			//_initializationWorker.Register(new PrivateDataManager());
+			_initializationWorker.Register(new DataManager());
 
 			await _initializationWorker.InitializeAllAsync();
 

@@ -16948,6 +16948,9 @@ GameObject:
   m_Component:
   - component: {fileID: 527030951}
   - component: {fileID: 527030952}
+  - component: {fileID: 527030955}
+  - component: {fileID: 527030956}
+  - component: {fileID: 527030957}
   - component: {fileID: 527030954}
   - component: {fileID: 527030953}
   m_Layer: 0
@@ -17011,11 +17014,8 @@ MonoBehaviour:
   - {fileID: 2035087778}
   - {fileID: 1336737779}
   _hudCamera: {fileID: 508955545}
-  _dice: {fileID: 1894116276}
-  _bag: {fileID: 793342547}
   _deck: {fileID: 1399803008}
   _playersCount: 4
-  _xpManager: {fileID: 527030954}
 --- !u!114 &527030953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17038,6 +17038,44 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cb90a5891ea7c14eb9638974e9459c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &527030955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527030950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a569c21e0da27b244825d3ee4662b6bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animation: {fileID: 5052899772178859959}
+--- !u!114 &527030956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527030950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88ecdfe2efc108c49b812068682b7028, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animation: {fileID: 8079047057667083830}
+--- !u!114 &527030957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 527030950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e649225662b60c24888fa70cf6e573e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &528389614
@@ -25145,17 +25183,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5841314769483198500, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
   m_PrefabInstance: {fileID: 8079047057667083829}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &793342547 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5889659452750440373, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
-  m_PrefabInstance: {fileID: 8079047057667083829}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88ecdfe2efc108c49b812068682b7028, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &793723728
 GameObject:
   m_ObjectHideFlags: 0
@@ -53075,6 +53102,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aba8bd96e8b9ed41859359a158560d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerIndex: 0
   _xpBarFill: {fileID: 756264421}
   _xpValue: {fileID: 1931918972}
   _levelValue: {fileID: 1295253910}
@@ -58950,17 +58978,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9033715134191009319, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
   m_PrefabInstance: {fileID: 5052899772178859958}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1894116276 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5932180371531232794, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
-  m_PrefabInstance: {fileID: 5052899772178859958}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7eec32f23cf412542ba23b5da308521e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1894240573 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7813185416111465757, guid: a45ab0664364e58499ca88467daee02c, type: 3}
@@ -67483,7 +67500,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2017938265804848752, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
       propertyPath: m_Name
-      value: Dice
+      value: DiceAnimation
       objectReference: {fileID: 0}
     - target: {fileID: 9033715134191009319, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -67530,6 +67547,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
+--- !u!114 &5052899772178859959 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7950129944879209165, guid: e90df3d0336b3d24c9cb92cbda8f9ce8, type: 3}
+  m_PrefabInstance: {fileID: 5052899772178859958}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5855995e72c4ba4439eca5265947cea4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &8079047057667083829
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67540,7 +67568,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 5670578030949017962, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
       propertyPath: m_Name
-      value: Bag
+      value: BagAnimation
       objectReference: {fileID: 0}
     - target: {fileID: 5841314769483198500, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
       propertyPath: m_LocalScale.x
@@ -67591,6 +67619,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
+--- !u!114 &8079047057667083830 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2746890423035266102, guid: 91ceb23eaa1322e4ba712993bf40ef7c, type: 3}
+  m_PrefabInstance: {fileID: 8079047057667083829}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629c5bcb5830e0944aed44e08dfea0dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

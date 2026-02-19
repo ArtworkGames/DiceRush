@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace StepanoffGames.UI.Windows
 {
@@ -119,11 +120,10 @@ namespace StepanoffGames.UI.Windows
 		private async UniTask InstantiateWindowAsync(BaseWindowBehaviour behaviour)
 		{
 			string prefabName = GetPrefabPath(behaviour.WindowName);
-			ResourceRequest request = Resources.LoadAsync(prefabName);
-			await UniTask.WaitUntil(() => request.isDone);
+			var handle = Addressables.LoadAssetAsync<GameObject>(prefabName);
+			await UniTask.WaitUntil(() => handle.IsDone);
 
-			GameObject prefab = (GameObject)request.asset;
-			GameObject instance = Instantiate(prefab, _windowsParent);
+			GameObject instance = Instantiate(handle.Result, _windowsParent);
 			instance.name = behaviour.WindowName;
 			instance.SetActive(false);
 
@@ -135,7 +135,7 @@ namespace StepanoffGames.UI.Windows
 
 		private string GetPrefabPath(string name)
 		{
-			return $"Windows/{name}";
+			return $"Windows/{name}.prefab";
 		}
 
 		private async UniTask TryOpenNextAsync()
