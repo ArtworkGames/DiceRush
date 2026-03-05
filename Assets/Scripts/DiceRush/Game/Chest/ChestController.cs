@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.Robot.UI.Windows.ConfirmWindow;
+using StepanoffGames.DiceRush.UI.Windows.ConfirmWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows.Signals;
@@ -61,12 +61,14 @@ namespace StepanoffGames.DiceRush.Game.Chest
 		private CardModel[] GetCards(PlayerController player)
 		{
 			CardModel[] diceCards = CardModel.GetCards(CardKind.Dice);
-			CardModel[] tileCards = CardModel.GetCards(CardKind.Tile);
+			CardModel[] bagCards = CardModel.GetCards(CardKind.Bag);
+			CardModel[] battleCards = CardModel.GetCards(CardKind.Battle);
 
 			CardModel diceCard = diceCards[Random.Range(0, diceCards.Length)];
-			CardModel tileCard = tileCards[Random.Range(0, tileCards.Length)];
+			CardModel bagCard = bagCards[Random.Range(0, bagCards.Length)];
+			CardModel battleCard = battleCards[Random.Range(0, battleCards.Length)];
 
-			CardModel[] cards = new CardModel[] { diceCard.Clone(), tileCard.Clone() };
+			CardModel[] cards = new CardModel[] { diceCard.Clone(), bagCard.Clone(), battleCard.Clone() };
 			return cards;
 		}
 	}

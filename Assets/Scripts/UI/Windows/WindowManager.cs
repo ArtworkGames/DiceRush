@@ -81,11 +81,11 @@ namespace StepanoffGames.UI.Windows
 				return;
 			}
 
-			BaseWindowBehaviour behaviour = CreateBehaviour(signal.BehaviourType, signal.WindowName, signal.Params, signal.Immediately);
+			BaseWindowBehaviour behaviour = CreateBehaviour(signal.BehaviourType, signal.WindowName, signal.Params, signal.Immediately, signal.Parent);
 			OpenWindowAsync(behaviour);
 		}
 
-		private BaseWindowBehaviour CreateBehaviour(Type behavioursType, string windowName, BaseWindowParams @params, bool immediately)
+		private BaseWindowBehaviour CreateBehaviour(Type behavioursType, string windowName, BaseWindowParams @params, bool immediately, Transform parent)
 		{
 			BaseWindowBehaviour behaviour;
 			if (behavioursType == null)
@@ -101,6 +101,7 @@ namespace StepanoffGames.UI.Windows
 			behaviour.WindowName = windowName;
 			behaviour.Params = @params;
 			behaviour.OpenImmediately = immediately;
+			behaviour.Parent = parent;
 			return behaviour;
 		}
 
@@ -123,7 +124,13 @@ namespace StepanoffGames.UI.Windows
 			var handle = Addressables.LoadAssetAsync<GameObject>(prefabName);
 			await UniTask.WaitUntil(() => handle.IsDone);
 
-			GameObject instance = Instantiate(handle.Result, _windowsParent);
+			Transform parent = _windowsParent;
+            if (behaviour.Parent != null)
+            {
+				parent = behaviour.Parent;
+			}
+
+            GameObject instance = Instantiate(handle.Result, parent);
 			instance.name = behaviour.WindowName;
 			instance.SetActive(false);
 

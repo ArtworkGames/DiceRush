@@ -1,19 +1,16 @@
-using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
-using StepanoffGames.DiceRush.Game;
 using StepanoffGames.UI.Windows;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
-namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
+namespace StepanoffGames.DiceRush.UI.Windows.ConfirmWindow
 {
 	public class LevelUpWindowParams : BaseWindowParams
 	{
-		public CardModel[] Cards;
-		public Action<CardModel> OnSelect;
+		public List<PerkModel> Perks;
+		public Action<PerkModel> OnSelect;
 	}
 
 	public class LevelUpWindow : BaseWindow<LevelUpWindowParams>
@@ -22,19 +19,24 @@ namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
 
 		[Space]
 		[SerializeField] private Button _okButton;
-		[SerializeField] private Transform _cardsParent;
+		[SerializeField] private GameObject _sourceItem;
 
-		private List<DeckCard> _cards;
-		private DeckCard _selectedCard;
+		private List<PerkItem> _items;
+		private PerkItem _selectedItem;
+
+		private void Awake()
+		{
+			_sourceItem.SetActive(false);
+		}
 
 		override protected void BeforeOpen()
 		{
-			_cards = new List<DeckCard>();
-			for (int i = 0; i < Params.Cards.Length; i++)
+			_items = new List<PerkItem>();
+			for (int i = 0; i < Params.Perks.Count; i++)
 			{
-				AddCard(Params.Cards[i]).Forget();
+				AddPerk(Params.Perks[i]);
 			}
-			//_okButton.interactable = false;
+			_okButton.interactable = false;
 		}
 
 		override protected void AfterOpen()
@@ -49,36 +51,31 @@ namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
 
 		override protected void AfterClose()
 		{
-			//Params.OnSelect?.Invoke(_selectedCard.Model);
-			Params.OnSelect?.Invoke(null);
+			Params.OnSelect?.Invoke(_selectedItem.Model);
 		}
 
-		private async UniTask AddCard(CardModel cardModel)
+		private void AddPerk(PerkModel perkModel)
 		{
-			string cardName = $"{cardModel.Type}Card";
-			string cardPath = $"Game/Deck/{cardName}.prefab";
-			var handle = Addressables.LoadAssetAsync<GameObject>(cardPath);
-			await UniTask.WaitUntil(() => handle.IsDone);
+			GameObject itemObject = Instantiate(_sourceItem, _sourceItem.transform.parent, false);
+			itemObject.name = $"PerkItem ({perkModel.Type})";
+			itemObject.SetActive(true);
 
-			GameObject cardObject = Instantiate(handle.Result, _cardsParent, false);
-			cardObject.name = cardName;
+			CanvasGroup cardCanvasGroup = itemObject.AddComponent<CanvasGroup>();
+			cardCanvasGroup.alpha = 0.5f;
 
-			//CanvasGroup cardCanvasGroup = cardObject.AddComponent<CanvasGroup>();
-			//cardCanvasGroup.alpha = 0.5f;
-
-			DeckCard card = cardObject.GetComponent<DeckCard>();
-			card.Model = cardModel;
-			//card.OnSelect += OnCardSelect;
-			_cards.Add(card);
+			PerkItem item = itemObject.GetComponent<PerkItem>();
+			item.SetModel(perkModel);
+			item.OnSelect += OnItemSelect;
+			_items.Add(item);
 		}
 
-		private void OnCardSelect(DeckCard card)
+		private void OnItemSelect(PerkItem item)
 		{
-			_selectedCard = card;
-			for (int i = 0; i < _cards.Count; i++)
+			_selectedItem = item;
+			for (int i = 0; i < _items.Count; i++)
 			{
-				CanvasGroup cardCanvasGroup = _cards[i].GetComponent<CanvasGroup>();
-				cardCanvasGroup.alpha = _cards[i] == card ? 1f : 0.5f;
+				CanvasGroup itemCanvasGroup = _items[i].GetComponent<CanvasGroup>();
+				itemCanvasGroup.alpha = _items[i] == item ? 1f : 0.5f;
 			}
 			_okButton.interactable = true;
 		}

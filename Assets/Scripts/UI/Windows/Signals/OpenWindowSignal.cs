@@ -1,5 +1,6 @@
 using StepanoffGames.Signals;
 using System;
+using UnityEngine;
 
 namespace StepanoffGames.UI.Windows.Signals
 {
@@ -9,6 +10,7 @@ namespace StepanoffGames.UI.Windows.Signals
 		public BaseWindowParams Params;
 		public bool Immediately;
 		public Type BehaviourType;
+		public Transform Parent;
 
 		public OpenWindowSignal(string windowName, bool immediately = false)
 		{

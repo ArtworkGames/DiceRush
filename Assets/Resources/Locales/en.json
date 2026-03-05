@@ -1,17 +1,74 @@
 {
   "texts":[
+    { "key": "ChestWindow:Title", "value": "Chest" },
+    { "key": "FightWindow:Title", "value": "Fight" },
+    { "key": "LevelUpWindow:Title", "value": "Level Up" },
+
+
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
 
-    { "key": "Card:PlusOneToDice", "value": "+1 To Dice Value" },
-    { "key": "Card:PlusTwoToDice", "value": "+2 To Dice Value" },
+
     { "key": "Card:RerollDice", "value": "Reroll The Dice" },
+    { "key": "Card:Plus1ToDice", "value": "+1 To Dice Value" },
+    { "key": "Card:Plus2ToDice", "value": "+2 To Dice Value" },
+    { "key": "Card:Minus1FromDice", "value": "-1 From Dice Value" },
+    { "key": "Card:Minus2FromDice", "value": "-2 From Dice Value" },
 
-    { "key": "Card:FlipTile", "value": "Flip The Tile" },
-    { "key": "Card:RedealTile", "value": "Redeal The Tile" },
+    { "key": "Card:RedrawToken", "value": "Redraw The Token" },
 
-    { "key": "ChestWindow:Tile", "value": "Chest" },
-    { "key": "LevelUpWindow:Tile", "value": "Level Up" }
+    { "key": "Card:Plus1ToHealth", "value": "+1 To Health" },
+    { "key": "Card:Plus2ToHealth", "value": "+2 To Health" },
+    { "key": "Card:Plus3ToHealth", "value": "+3 To Health" },
+    { "key": "Card:Plus1ToDefense", "value": "+1 To Defense" },
+    { "key": "Card:Plus2ToDefense", "value": "+2 To Defense" },
+    { "key": "Card:Plus3ToDefense", "value": "+3 To Defense" },
+    { "key": "Card:Plus1ToAttack", "value": "+1 To Attack" },
+    { "key": "Card:Plus2ToAttack", "value": "+2 To Attack" },
+    { "key": "Card:Plus3ToAttack", "value": "+3 To Attack" },
+
+
+    { "key": "Perk:FirstMultiplierX3:Title", "value": "Head Start" },
+    { "key": "Perk:FirstMultiplierX3:Description", "value": "The first extra move in a chain gives x3 instead of x2" },
+
+    { "key": "Perk:OneCardEvery3Move:Title", "value": "Accumulator" },
+    { "key": "Perk:OneCardEvery3Move:Description", "value": "Every 3rd extra move in a chain grants +1 card after the turn ends" },
+
+    { "key": "Perk:XpBonusForMultiplierX4:Title", "value": "Hot Streak" },
+    { "key": "Perk:XpBonusForMultiplierX4:Description", "value": "If the turn reached 4+ multipliers → gain +1 XP per action" },
+
+    { "key": "Perk:InstantCardEvery5Move:Title", "value": "Chain Rush" },
+    { "key": "Perk:InstantCardEvery5Move:Description", "value": "If the chain reaches 5+ multipliers → immediately gain +1 card" },
+
+    { "key": "Perk:CardsPerOfferPlus1:Title", "value": "Broader Choice I" },
+    { "key": "Perk:CardsPerOfferPlus1:Description", "value": "Each card offer contains +1 card" },
+
+    { "key": "Perk:CardsPerOfferPlus2:Title", "value": "Broader Choice II" },
+    { "key": "Perk:CardsPerOfferPlus2:Description", "value": "Each card offer contains +2 cards" },
+
+    { "key": "Perk:CardsPerOfferPlus3:Title", "value": "Broader Choice III" },
+    { "key": "Perk:CardsPerOfferPlus3:Description", "value": "Each card offer contains +3 cards" },
+
+    { "key": "Perk:HitPointsPlus1:Title", "value": "Thick Skin I" },
+    { "key": "Perk:HitPointsPlus1:Description", "value": "+1 to maximum Health" },
+
+    { "key": "Perk:HitPointsPlus2:Title", "value": "Thick Skin II" },
+    { "key": "Perk:HitPointsPlus2:Description", "value": "+2 to maximum Health" },
+
+    { "key": "Perk:HitPointsPlus3:Title", "value": "Thick Skin III" },
+    { "key": "Perk:HitPointsPlus3:Description", "value": "+3 to maximum Health" },
+
+    { "key": "Perk:OpponentsSkipMove:Title", "value": "Disarray" },
+    { "key": "Perk:OpponentsSkipMove:Description", "value": "All opponents skip their next turn" },
+
+    { "key": "Perk:SwitchPlacesWithFirstOpponent:Title", "value": "Leap Forward" },
+    { "key": "Perk:SwitchPlacesWithFirstOpponent:Description", "value": "Swap positions with the leading opponent" },
+
+    { "key": "Perk:OpponentsStartWithBackwardMove:Title", "value": "Wrong Footing" },
+    { "key": "Perk:OpponentsStartWithBackwardMove:Description", "value": "At the start of the run, all opponents fall into traps" },
+
+    { "key": "Perk:Take3Cards:Title", "value": "Full Hand" },
+    { "key": "Perk:Take3Cards:Description", "value": "Immediately draw 3 cards" }
   ]
 }

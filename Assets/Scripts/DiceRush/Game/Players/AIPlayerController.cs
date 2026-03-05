@@ -12,36 +12,22 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		override protected async UniTask<int> RollDice(CellType cellType)
 		{
-			//await UniTask.Yield();
-			await UniTask.WaitForSeconds(2f);
-
 			int diceValue = _dice.GetValue(this);
+			diceValue = await _deck.ApplyDiceRoll(this, diceValue);
+
 			return diceValue;
 		}
 
-		//override protected async UniTask<int> ConfirmDiceRoll(int diceValue)
-		//{
-		//	await UniTask.Yield();
-		//	return diceValue;
-		//}
-
-		//override protected async UniTask AfterMoveToCell(CellType cellType)
-		//{
-		//	await UniTask.Yield();
-		//}
-
-		override protected async UniTask<int> SelectNextDirection()
+		override protected async UniTask<int> SelectNextDirection(int diceValue, int cellsPassed)
 		{
-			//await UniTask.Yield();
 			await UniTask.WaitForSeconds(1f);
 
 			int direction = Random.Range(0, _avatar.CurrentPoint.NextPoints.Count);
 			return direction;
 		}
 
-		override protected async UniTask<int> SelectPrevDirection()
+		override protected async UniTask<int> SelectPrevDirection(int diceValue, int cellsPassed)
 		{
-			//await UniTask.Yield();
 			await UniTask.WaitForSeconds(1f);
 
 			int direction = Random.Range(0, _avatar.CurrentPoint.PrevPoints.Count);
@@ -58,21 +44,13 @@ namespace StepanoffGames.DiceRush.Game.Players
 			await UniTask.Yield();
 		}
 
-		override protected async UniTask<CellType> DealTile()
+		override protected async UniTask<CellType> DrawToken()
 		{
-			//await UniTask.Yield();
-			await UniTask.WaitForSeconds(2f);
+			CellType cellType = _bag.GetCellType(this);
+			cellType = await _deck.ApplyTokenDraw(this, cellType);
 
-			bool hasNearMoveBackwardCell = ((Cell)_avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveBackward);
-			CellType tileType = _bag.GetTile(this).FrontType;
-			return tileType;
+			return cellType;
 		}
-
-		//override protected async UniTask<CellType> ConfirmTileTake(CellType tileType, bool hasNearMoveBackwardCell)
-		//{
-		//	await UniTask.Yield();
-		//	return tileType;
-		//}
 
 		override protected async UniTask OpenChest()
 		{
@@ -84,7 +62,6 @@ namespace StepanoffGames.DiceRush.Game.Players
 		override protected async UniTask BeforeMoveToNextPortal(Cell portalCell)
 		{
 			await UniTask.Yield();
-			//await UniTask.WaitForSeconds(1f);
 		}
 	}
 }

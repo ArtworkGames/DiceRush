@@ -44,6 +44,9 @@ namespace StepanoffGames.DiceRush.Game
 		public List<Transform> PlayerPositions => _playerPositions;		
 		public MapPoint MoveToPoint => _moveToPoint;
 
+		public int Index => _index;
+		private int _index;
+
 		public bool IsLocked => _isLocked;
 		private bool _isLocked;
 
@@ -98,6 +101,11 @@ namespace StepanoffGames.DiceRush.Game
 			positionObject.transform.position = pos;
 
 			return positionObject.transform;
+		}
+
+		public void SetIndex(int index)
+		{
+			_index = index;
 		}
 
 		public void SetLocked(bool locked)

@@ -1,8 +1,11 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Bag;
+using StepanoffGames.DiceRush.Game.Battle;
 using StepanoffGames.DiceRush.Game.Chest;
+using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Dice;
+using StepanoffGames.DiceRush.Game.Fork;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
@@ -17,27 +20,41 @@ namespace StepanoffGames.DiceRush.Game.Players
 		public PlayerAvatar Avatar => _avatar;
 		protected PlayerAvatar _avatar;
 
+		protected LevelManager _level;
+		protected Map _map;
 		protected DiceController _dice;
 		protected BagController _bag;
+		protected DeckController _deck;
+		protected ForkController _fork;
 		protected ChestController _chest;
+		protected BattleController _battle;
 
 		protected bool _isSkipNextMove;
 
-		public PlayerController(PlayerModel model, PlayerAvatar view)
+		public PlayerController(PlayerModel model, PlayerAvatar avatar)
 		{
 			_model = model;
-			_avatar = view;
+			_avatar = avatar;
 
+			_level = ServiceLocator.Get<LevelManager>();
+			_map = ServiceLocator.Get<Map>();
 			_dice = ServiceLocator.Get<DiceController>();
 			_bag = ServiceLocator.Get<BagController>();
+			_deck = ServiceLocator.Get<DeckController>();
+			_fork = ServiceLocator.Get<ForkController>();
 			_chest = ServiceLocator.Get<ChestController>();
+			_battle = ServiceLocator.Get<BattleController>();
 		}
 
-		public void Destroy()
+		virtual public void Destroy()
 		{
+			_level = null;
+			_map = null;
 			_dice = null;
 			_bag = null;
+			_deck = null;
 			_chest = null;
+			_battle = null;
 		}
 
 		public async UniTask Turn()
@@ -73,7 +90,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					}
 					else if (_avatar.CurrentPoint.NextPoints.Count > 1)
 					{
-						int nextIndex = await SelectNextDirection();
+						int nextIndex = await SelectNextDirection(diceValue, i);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.NextPoints[nextIndex]);
 					}
 					else
@@ -124,7 +141,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					}
 					else if (_avatar.CurrentPoint.PrevPoints.Count > 1)
 					{
-						int prevIndex = await SelectPrevDirection();
+						int prevIndex = await SelectPrevDirection(diceValue, i);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.PrevPoints[prevIndex]);
 					}
 					else
@@ -164,7 +181,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					isJustDefinedCell = true;
 					((Cell)_avatar.CurrentPoint).SetLocked(true);
 
-					CellType tileType = await DealTile();
+					CellType tileType = await DrawToken();
 					((Cell)_avatar.CurrentPoint).SetType(tileType);
 
 					((Cell)_avatar.CurrentPoint).SetLocked(false);
@@ -192,6 +209,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 						break;
 
 					case CellType.Enemy:
+						await Battle();
 						await _avatar.MoveToCurrentCellPlayerPosition();
 						await UniTask.WaitForSeconds(1f);
 						break;
@@ -233,7 +251,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					case CellType.Portal3:
 					case CellType.Portal4:
 					case CellType.Portal5:
-						Cell otherCell = Level.Instance.Map.GetOtherCellSameTypeClosestToFinish((Cell)_avatar.CurrentPoint);
+						Cell otherCell = _map.GetOtherCellSameTypeClosestToFinish((Cell)_avatar.CurrentPoint);
 						if (otherCell != null)
 						{
 							//await Level.Instance.Camera.FocusOnCell(otherCell);
@@ -242,9 +260,9 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 							await BeforeMoveToNextPortal(otherCell);
 
-							SignalBus.Publish(new PlayerMoveToPortalStartedSignal(this));
-
 							_avatar.SetToCellCenterPosition(otherCell);
+
+							SignalBus.Publish(new PlayerPortalPassedSignal(this));
 
 							//await UniTask.WaitForSeconds(1f);
 						}
@@ -262,13 +280,13 @@ namespace StepanoffGames.DiceRush.Game.Players
 			return 0;
 		}
 
-		virtual protected async UniTask<int> SelectNextDirection()
+		virtual protected async UniTask<int> SelectNextDirection(int diceValue, int cellsPassed)
 		{
 			await UniTask.Yield();
 			return 0;
 		}
 
-		virtual protected async UniTask<int> SelectPrevDirection()
+		virtual protected async UniTask<int> SelectPrevDirection(int diceValue, int cellsPassed)
 		{
 			await UniTask.Yield();
 			return 0;
@@ -284,13 +302,18 @@ namespace StepanoffGames.DiceRush.Game.Players
 			await UniTask.Yield();
 		}
 
-		virtual protected async UniTask<CellType> DealTile()
+		virtual protected async UniTask<CellType> DrawToken()
 		{
 			await UniTask.Yield();
 			return CellType.Empty;
 		}
 
 		virtual protected async UniTask OpenChest()
+		{
+			await UniTask.Yield();
+		}
+
+		virtual protected async UniTask Battle()
 		{
 			await UniTask.Yield();
 		}

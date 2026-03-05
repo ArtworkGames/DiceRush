@@ -1,130 +1,194 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.DiceRush.UI.Components.Bag;
 using StepanoffGames.Services;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Bag
 {
-	public class CellTile
-	{
-		public CellType FrontType;
-		public CellType BackType;
-
-		public CellTile(CellType frontType, CellType backType)
-		{
-			FrontType = frontType;
-			BackType = backType;
-		}
-	}
-
 	public class BagController : MonoBehaviour, IService
 	{
 		[SerializeField] private BagAnimation _animation;
-		//[SerializeField] private BagTile _handTile;
-		//[SerializeField] private BagTile _tile;
+		[SerializeField] private BagPanel _panel;
 
-		public CellTile TakenTile => _takenTile;
+		private LevelManager _level;
 
-		private List<CellTile> _tilesSet;
-
-		private CellTile _takenTile;
+		private CellType _cellType;
 		private bool _animationFinished;
 
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
+
+			_level = ServiceLocator.Get<LevelManager>();
 		}
 
 		private void Start()
 		{
-			_animation.OnShowTile += OnShowTile;
+			_animation.OnShowToken += OnAnimationShowToken;
 			_animation.OnAnimationFinished += OnAnimationFinished;
 		}
 
 		private void OnDestroy()
 		{
 			ServiceLocator.Unregister<BagController>();
+
+			_level = null;
 		}
 
-		//public async UniTask<CellType> Deal(bool hasNearMoveBackwardCell)
-		public async UniTask<CellType> Deal(PlayerController player)
+		public async UniTask<CellType> Draw(PlayerController player)
 		{
-			_takenTile = GetTile(player);
+			List<CellType> cellTypes = new List<CellType>();
+			_cellType = GetCellType(player, ref cellTypes);
+
+			_panel.ShowTokens(cellTypes);
 
 			_animationFinished = false;
-			_animation.Take();
+			_animation.Draw();
 
 			await UniTask.WaitUntil(() => _animationFinished);
 
-			return _takenTile.FrontType;
+			return _cellType;
 		}
 
 		public void Confirm()
 		{
 			_animation.Confirm();
+			_panel.HideTokens();
 		}
 
-		//public CellTile GetTile(bool hasNearMoveBackwardCell)
-		public CellTile GetTile(PlayerController player)
+		public CellType GetCellType(PlayerController player)
 		{
+			List<CellType> cellTypes = new List<CellType>();
+			_cellType = GetCellType(player, ref cellTypes);
+			return _cellType;
+		}
+
+		private CellType GetCellType(PlayerController player, ref List<CellType> cellTypes)
+		{
+			int playerCellIndex = ((Cell)player.Avatar.CurrentPoint).Index;
+
+			string str = $"{playerCellIndex} [";
+
+			List<int> otherPlayerCellIndexes = new List<int>();
+			for (int i = 0; i < _level.Players.Count; i++)
+			{
+				if (player != _level.Players[i])
+				{
+					int cellIndex = ((Cell)_level.Players[i].Avatar.CurrentPoint).Index;
+					otherPlayerCellIndexes.Add(cellIndex);
+
+					str += $"{cellIndex}, ";
+				}
+			}
+			
+			str += "]";
+
+			bool isPlayerInFrontOfAll = true;
+			bool isPlayerInBackOfAll = true;
+			int frontDistance = 1000;
+			int backDistance = 1000;
+			for (int i = 0; i < otherPlayerCellIndexes.Count; i++)
+			{
+				if (otherPlayerCellIndexes[i] >= playerCellIndex) isPlayerInFrontOfAll = false;
+				if (otherPlayerCellIndexes[i] <= playerCellIndex) isPlayerInBackOfAll = false;
+				frontDistance = Mathf.Min(frontDistance, playerCellIndex - otherPlayerCellIndexes[i]);
+				backDistance = Mathf.Min(backDistance, otherPlayerCellIndexes[i] - playerCellIndex);
+			}
+			int frontCount = frontDistance / 7;
+			int backCount = backDistance / 7;
+
+			if (player.Model.Type == Data.Models.PlayerType.HI)
+			{
+				Debug.Log(
+					$"{str} | isPlayerInFrontOfAll = {isPlayerInFrontOfAll}, frontDistance = {frontDistance}, frontCount = {frontCount}, " +
+					$"isPlayerInBackOfAll = {isPlayerInBackOfAll}, backDistance = {backDistance}, backCount = {backCount}"
+				);
+			}
+
 			bool hasNearPortalCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.Portal1);
 			bool hasNearMoveForwardCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveForward);
 			bool hasNearMoveBackwardCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveBackward);
 
-			List<CellTile> tiles = new List<CellTile>();
+			cellTypes = new List<CellType>();
 
-			//tiles.Add(new CellTile(CellType.Reward, CellType.Enemy));
-			tiles.Add(new CellTile(CellType.Reward, CellType.Enemy));
-			tiles.Add(new CellTile(CellType.Reward, CellType.Enemy));
+			cellTypes.Add(CellType.Reward);
+			cellTypes.Add(CellType.Reward);
+			cellTypes.Add(CellType.Reward);
 
-			tiles.Add(new CellTile(CellType.Enemy, CellType.Reward));
-			tiles.Add(new CellTile(CellType.Enemy, CellType.Reward));
-			tiles.Add(new CellTile(CellType.Enemy, CellType.Reward));
+			cellTypes.Add(CellType.Enemy);
+			cellTypes.Add(CellType.Enemy);
+			cellTypes.Add(CellType.Enemy);
 
-			tiles.Add(new CellTile(CellType.MoveForward, CellType.Reward));
-			tiles.Add(new CellTile(CellType.MoveForward, CellType.Reward));
+			cellTypes.Add(CellType.MoveForward);
+			cellTypes.Add(CellType.MoveForward);
+
 			if (!hasNearMoveForwardCell)
 			{
-				tiles.Add(new CellTile(CellType.MoveForward, CellType.Reward));
-				tiles.Add(new CellTile(CellType.MoveForward, CellType.Reward));
+				cellTypes.Add(CellType.MoveForward);
+				cellTypes.Add(CellType.MoveForward);
+			}
+			if (isPlayerInBackOfAll)
+			{
+				for (int i = 0; i < backCount; i++)
+				{
+					cellTypes.Add(CellType.MoveForward);
+				}
 			}
 
 			if (!hasNearMoveBackwardCell)
 			{
-				tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
-				tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
-				tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
-				tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
-				tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
-				//tiles.Add(new CellTile(CellType.MoveBackward, CellType.Enemy));
+				cellTypes.Add(CellType.MoveBackward);
+				cellTypes.Add(CellType.MoveBackward);
+				cellTypes.Add(CellType.MoveBackward);
+				cellTypes.Add(CellType.MoveBackward);
+				//cellTypes.Add(CellType.MoveBackward);
+
+				if (isPlayerInFrontOfAll)
+				{
+					for (int i = 0; i < frontCount; i++)
+					{
+						cellTypes.Add(CellType.MoveBackward);
+					}
+				}
 			}
 
-			tiles.Add(new CellTile(CellType.Portal1, CellType.Enemy));
-			//tiles.Add(new CellTile(CellType.Portal1, CellType.Enemy));
+			cellTypes.Add(CellType.Portal1);
 			if (!hasNearPortalCell)
 			{
-				tiles.Add(new CellTile(CellType.Portal1, CellType.Enemy));
-				tiles.Add(new CellTile(CellType.Portal1, CellType.Enemy));
+				cellTypes.Add(CellType.Portal1);
+				cellTypes.Add(CellType.Portal1);
+			}
+			if (isPlayerInFrontOfAll)
+			{
+				for (int i = 0; i < frontCount; i++)
+				{
+					cellTypes.Add(CellType.Portal1);
+				}
+			}
+			if (isPlayerInBackOfAll)
+			{
+				for (int i = 0; i < backCount; i++)
+				{
+					cellTypes.Add(CellType.Portal1);
+				}
 			}
 
-			int index = Random.Range(0, tiles.Count);
-			CellTile tile = tiles[index];
+			int index = Random.Range(0, cellTypes.Count);
+			CellType cellType = cellTypes[index];
 
-			return tile;
+			return cellType;
 		}
 
-		public void ShowTile(CellType type)
+		public void ShowToken(CellType cellType)
 		{
-			_animation.SetTile(type);
-			//_handTile.UpdateView(type);
-			//_tile.UpdateView(type);
+			_animation.SetCellType(cellType);
 		}
 
-		private void OnShowTile()
+		private void OnAnimationShowToken()
 		{
-			//_animation.SetTile(_takenTile.FrontType);
-			ShowTile(_takenTile.FrontType);
+			ShowToken(_cellType);
 		}
 
 		private void OnAnimationFinished()

@@ -1,13 +1,15 @@
 ﻿using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
-using StepanoffGames.Robot.UI.Windows.ConfirmWindow;
+using StepanoffGames.DiceRush.UI.Windows.ConfirmWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows.Signals;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Xp
@@ -15,6 +17,8 @@ namespace StepanoffGames.DiceRush.Game.Xp
 	public class XpManager : MonoBehaviour, IService
 	{
 		private DataManager _dataManager;
+		private LevelManager _levelManager;
+		private PerksManager _perksManager;
 
 		private float baseXp = 20f;
 		private float power = 1.5f;
@@ -27,13 +31,15 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		private void Start()
 		{
 			_dataManager = ServiceLocator.Get<DataManager>();
+			_levelManager = ServiceLocator.Get<LevelManager>();
+			_perksManager = ServiceLocator.Get<PerksManager>();
 
 			SignalBus.Subscribe<TurnStartedSignal>(OnMoveStarted);
 			SignalBus.Subscribe<TurnEndedSignal>(OnMoveEnded);
 
 			SignalBus.Subscribe<PlayerMoveStartedSignal>(OnPlayerMoveStarted);
-			SignalBus.Subscribe<PlayerMoveToPortalStartedSignal>(OnPlayerMoveToPortalStarted);
 			SignalBus.Subscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
+			SignalBus.Subscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
 		}
 
 		private void OnDestroy()
@@ -41,13 +47,15 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			ServiceLocator.Unregister<XpManager>();
 
 			_dataManager = null;
+			_levelManager = null;
+			_perksManager = null;
 
 			SignalBus.Unsubscribe<TurnStartedSignal>(OnMoveStarted);
 			SignalBus.Unsubscribe<TurnEndedSignal>(OnMoveEnded);
 
 			SignalBus.Unsubscribe<PlayerMoveStartedSignal>(OnPlayerMoveStarted);
-			SignalBus.Unsubscribe<PlayerMoveToPortalStartedSignal>(OnPlayerMoveToPortalStarted);
 			SignalBus.Unsubscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
+			SignalBus.Unsubscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
 		}
 
 		private void OnMoveStarted(TurnStartedSignal signal)
@@ -65,7 +73,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			IncMultiplier(signal.Player.Model);
 		}
 
-		private void OnPlayerMoveToPortalStarted(PlayerMoveToPortalStartedSignal signal)
+		private void OnPlayerPortalPassed(PlayerPortalPassedSignal signal)
 		{
 			IncMultiplier(signal.Player.Model);
 		}
@@ -91,14 +99,14 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			}
 		}
 
-		private void IncMultiplier(PlayerModel playerModel)
+		public void IncMultiplier(PlayerModel playerModel)
 		{
 			playerModel.XpMultiplier += 1;
 
 			SignalBus.Publish(new XpMultiplierChangedSignal(playerModel));
 		}
 
-		private void AddMoveXp(PlayerModel playerModel, int xp)
+		public void AddMoveXp(PlayerModel playerModel, int xp)
 		{
 			if (xp == 0) return;
 
@@ -130,7 +138,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 					int newLevels = player.Level - oldLevel;
 					for (int j = 0; j < newLevels; j++)
 					{
-						AddCards(player);
+						AddPerk(player).Forget();
 					}
 
 					player.IsXpAdditionCompleted = true;
@@ -142,51 +150,54 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		public async UniTask LevelUp(PlayerModel player)
 		{
-			CardModel[] cards = GetCards(player);
+			List<PerkModel> perks = GetPerksOffer(player);
+			if (perks.Count == 0) return;
 
 			bool levelUpWindowClosed = false;
+			PerkModel selectedPerk = null;
+
 			SignalBus.Publish(new OpenWindowSignal(LevelUpWindow.PrefabName, new LevelUpWindowParams()
 			{
-				Cards = cards,
-				OnSelect = (CardModel card) =>
+				Perks = perks,
+				OnSelect = (PerkModel perk) =>
 				{
-					//player.Model.Deck.AddCard(card);
-
-					for (int i = 0; i < cards.Length; i++)
-					{
-						player.Deck.AddCard(cards[i]);
-					}
-
+					selectedPerk = perk;
 					levelUpWindowClosed = true;
 				}
 			}));
 
 			await UniTask.WaitUntil(() => levelUpWindowClosed);
-		}
 
-		private void AddCards(PlayerModel player)
-		{
-			CardModel[] cards = GetCards(player);
-
-			//CardModel card = cards[Random.Range(0, cards.Length)];
-			//player.Model.Deck.AddCard(card);
-
-			for (int i = 0; i < cards.Length; i++)
+			if (!selectedPerk.IsSingleUse)
 			{
-				player.Deck.AddCard(cards[i]);
+				player.PerksSet.AddPerk(selectedPerk);
+				_perksManager.ShowPerks(player);
 			}
+
+			PlayerController playerController = _levelManager.GetPlayer(player);
+			await _perksManager.UsePerk(playerController, selectedPerk);
 		}
 
-		private CardModel[] GetCards(PlayerModel player)
+		private async UniTask AddPerk(PlayerModel player)
 		{
-			CardModel[] diceCards = CardModel.GetCards(CardKind.Dice);
-			CardModel[] tileCards = CardModel.GetCards(CardKind.Tile);
+			List<PerkModel> perks = GetPerksOffer(player);
+			if (perks.Count == 0) return;
 
-			CardModel diceCard = diceCards[Random.Range(0, diceCards.Length)];
-			CardModel tileCard = tileCards[Random.Range(0, tileCards.Length)];
+			PerkModel selectedPerk = perks[Random.Range(0, perks.Count)];
 
-			CardModel[] cards = new CardModel[] { diceCard.Clone(), tileCard.Clone() };
-			return cards;
+			if (!selectedPerk.IsSingleUse)
+			{
+				player.PerksSet.AddPerk(selectedPerk);
+			}
+
+			PlayerController playerController = _levelManager.GetPlayer(player);
+			await _perksManager.ApplyPerk(playerController, selectedPerk);
+		}
+
+		private List<PerkModel> GetPerksOffer(PlayerModel player)
+		{
+			List<PerkModel> perks = _perksManager.GetPerksOffer(player);
+			return perks;
 		}
 
 		public async UniTask CheckXpAdditionCompleted()

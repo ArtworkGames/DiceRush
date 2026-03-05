@@ -310,8 +310,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _animator: {fileID: 3480727666700326870}
-  _handTile: {fileID: 5674009383920540387}
-  _tile: {fileID: 1492713911572413627}
+  _handToken: {fileID: 5674009383920540387}
+  _token: {fileID: 1492713911572413627}
 --- !u!95 &3480727666700326870
 Animator:
   serializedVersion: 7
@@ -586,7 +586,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2834489024352279576, guid: 484163e7e119f0643bb0c5e8b4453dc5, type: 3}
       propertyPath: m_Name
-      value: Tile
+      value: Token
       objectReference: {fileID: 0}
     - target: {fileID: 9092964883912010721, guid: 484163e7e119f0643bb0c5e8b4453dc5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -659,7 +659,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2834489024352279576, guid: 484163e7e119f0643bb0c5e8b4453dc5, type: 3}
       propertyPath: m_Name
-      value: HandTile
+      value: HandToken
       objectReference: {fileID: 0}
     - target: {fileID: 9092964883912010721, guid: 484163e7e119f0643bb0c5e8b4453dc5, type: 3}
       propertyPath: m_LocalPosition.x

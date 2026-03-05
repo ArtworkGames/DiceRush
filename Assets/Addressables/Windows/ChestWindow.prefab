@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c4f3866e70950043bbf868df17b99e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _localeKey: ChestWindow:Tile
+  _localeKey: ChestWindow:Title
 --- !u!222 &6561018096446989750
 CanvasRenderer:
   m_ObjectHideFlags: 0

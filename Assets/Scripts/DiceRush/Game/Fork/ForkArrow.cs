@@ -1,8 +1,11 @@
+using StepanoffGames.Cameras.Signals;
+using StepanoffGames.Services;
+using StepanoffGames.Signals;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace StepanoffGames.DiceRush.Game
+namespace StepanoffGames.DiceRush.Game.Fork
 {
 	public class ForkArrow : MonoBehaviour
 	{
@@ -11,8 +14,19 @@ namespace StepanoffGames.DiceRush.Game
 		[SerializeField] private MeshRenderer _meshRenderer;
 
 		public int Id => _id;
-
 		private int _id;
+
+		private LevelManager _level;
+
+		private void Start()
+		{
+			_level = ServiceLocator.Get<LevelManager>();
+		}
+
+		private void OnDestroy()
+		{
+			_level = null;
+		}
 
 		public void Init(int id, Vector3 position, Vector3 cellCenter, Material material)
 		{
@@ -32,7 +46,7 @@ namespace StepanoffGames.DiceRush.Game
 			if (Mouse.current.leftButton.wasPressedThisFrame)
 			{
 				Vector2 mousePos = Mouse.current.position.ReadValue();
-				Ray ray = Level.Instance.Camera.Camera.ScreenPointToRay(mousePos);
+				Ray ray = _level.Camera.Camera.ScreenPointToRay(mousePos);
 
 				if (Physics.Raycast(ray, out RaycastHit hit))
 				{

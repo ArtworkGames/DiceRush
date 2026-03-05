@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
-using StepanoffGames.DiceRush.Game;
+using StepanoffGames.DiceRush.UI.Components.Deck;
 using StepanoffGames.UI.Windows;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
-namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
+namespace StepanoffGames.DiceRush.UI.Windows.ConfirmWindow
 {
 	public class ChestWindowParams : BaseWindowParams
 	{
@@ -24,12 +24,12 @@ namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
 		[SerializeField] private Button _okButton;
 		[SerializeField] private Transform _cardsParent;
 
-		private List<DeckCard> _cards;
-		private DeckCard _selectedCard;
+		private List<DeckPanelCard> _cards;
+		private DeckPanelCard _selectedCard;
 
 		override protected void BeforeOpen()
 		{
-			_cards = new List<DeckCard>();
+			_cards = new List<DeckPanelCard>();
 			for (int i = 0; i < Params.Cards.Length; i++)
 			{
 				AddCard(Params.Cards[i]).Forget();
@@ -66,13 +66,13 @@ namespace StepanoffGames.Robot.UI.Windows.ConfirmWindow
 			//CanvasGroup cardCanvasGroup = cardObject.AddComponent<CanvasGroup>();
 			//cardCanvasGroup.alpha = 0.5f;
 
-			DeckCard card = cardObject.GetComponent<DeckCard>();
+			DeckPanelCard card = cardObject.GetComponent<DeckPanelCard>();
 			card.Model = cardModel;
 			//card.OnSelect += OnCardSelect;
 			_cards.Add(card);
 		}
 
-		private void OnCardSelect(DeckCard card)
+		private void OnCardSelect(DeckPanelCard card)
 		{
 			_selectedCard = card;
 			for (int i = 0; i < _cards.Count; i++)

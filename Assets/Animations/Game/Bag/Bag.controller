@@ -58,7 +58,7 @@ AnimatorController:
   m_Name: Bag
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: Take
+  - m_Name: Draw
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -90,7 +90,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Take
+  m_Name: Draw
   m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
@@ -147,7 +147,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: Take
+    m_ConditionEvent: Draw
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 20304778298102747}

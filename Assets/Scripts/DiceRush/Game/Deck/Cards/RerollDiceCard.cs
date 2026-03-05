@@ -4,32 +4,30 @@ using StepanoffGames.DiceRush.Game.Dice;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
 
-namespace StepanoffGames.DiceRush.Game
+namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
-	public class RerollDiceCard : DiceCard
+	public class RerollDiceCard : Card
 	{
-		//override protected int GetNewDiceValue(PlayerController player, int diceValue)
-		//{
-		//	DiceController dice = ServiceLocator.Get<DiceController>();
-		//	return dice.GetValue();
-		//}
+		public RerollDiceCard(CardModel model) : base(model)
+		{
+		}
 
 		override public async UniTask<int> UseForDice(PlayerController player, int diceValue)
 		{
 			DiceController dice = ServiceLocator.Get<DiceController>();
 
-			if (player.Model.Type == PlayerType.HI)
-			{
-				dice.Confirm();
+			dice.Confirm();
+			await UniTask.NextFrame();
 
-				await UniTask.NextFrame();
+			diceValue = await dice.Roll(player);
 
-				diceValue = await dice.Roll(player);
-			}
-			else
-			{
-				diceValue = dice.GetValue(player);
-			}
+			return diceValue;
+		}
+
+		override public int ApplyForDice(PlayerController player, int diceValue)
+		{
+			DiceController dice = ServiceLocator.Get<DiceController>();
+			diceValue = dice.GetValue(player);
 
 			return diceValue;
 		}

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.DiceRush.UI.Components.Dice;
 using StepanoffGames.Services;
 using UnityEngine;
 
@@ -52,7 +53,6 @@ namespace StepanoffGames.DiceRush.Game.Dice
 
 		public void ShowValue(int value)
 		{
-			//_value = value;
 			_animation.SetValue(value);
 		}
 

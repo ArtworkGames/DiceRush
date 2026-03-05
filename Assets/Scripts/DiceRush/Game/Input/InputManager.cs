@@ -1,3 +1,4 @@
+using StepanoffGames.Services;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,6 +14,18 @@ namespace StepanoffGames.DiceRush.Game
 		//private float touchTime;
 
 		private IInputReceiver pressedHUDInputReceiver;
+
+		private LevelManager _level;
+
+		private void Start()
+		{
+			_level = ServiceLocator.Get<LevelManager>();
+		}
+
+		private void OnDestroy()
+		{
+			_level = null;
+		}
 
 		private void Update()
 		{
@@ -57,7 +70,7 @@ namespace StepanoffGames.DiceRush.Game
 		private IInputReceiver GetHUDInputReceiver()
 		{
 			Vector2 mousePos = Mouse.current.position.ReadValue();
-			Ray ray = Level.Instance.HUDCamera.ScreenPointToRay(mousePos);
+			Ray ray = _level.HUDCamera.ScreenPointToRay(mousePos);
 
 			RaycastHit2D[] hits = Physics2D.RaycastAll(ray.origin, ray.direction);
 

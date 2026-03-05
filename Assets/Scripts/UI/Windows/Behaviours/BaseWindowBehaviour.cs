@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace StepanoffGames.UI.Windows.Behaviours
 {
@@ -20,6 +21,7 @@ namespace StepanoffGames.UI.Windows.Behaviours
 		public string WindowName;
 		public BaseWindow Window;
 		public BaseWindowParams Params;
+		public Transform Parent;
 
 		public WindowState State { get; private set; }
 

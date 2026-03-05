@@ -1,10 +1,13 @@
+using StepanoffGames.Services;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace StepanoffGames.DiceRush.Game
 {
-	public class Map : MonoBehaviour
+	public class Map : MonoBehaviour, IService
 	{
 		public Action OnInited;
 
@@ -14,7 +17,10 @@ namespace StepanoffGames.DiceRush.Game
 		public Cell[] Cells => _cells;
 		public Cell StartCell => _startCell;
 
-		//private List<CellType> _deck;
+		private void Awake()
+		{
+			ServiceLocator.Register(this);
+		}
 
 		private void Start()
 		{
@@ -29,22 +35,39 @@ namespace StepanoffGames.DiceRush.Game
 				}
 			}
 
-			//FillDeck();
+			if (_startCell != null)
+			{
+				SetCellIndex(_startCell, 0);
+			}
 
 			OnInited?.Invoke();
 		}
 
-		//public Cell GetPrevCell(Cell forCell)
-		//{
-		//	for (int i = 0; i < _cells.Length; i++)
-		//	{
-		//		if (_cells[i].NextCell == forCell)
-		//		{
-		//			return _cells[i];
-		//		}
-		//	}
-		//	return null;
-		//}
+		private void OnDestroy()
+		{
+			ServiceLocator.Unregister<Map>();
+		}
+
+		private void SetCellIndex(MapPoint point, int index)
+		{
+			if (point is Cell)
+			{
+				if (((Cell)point).Index == 0)
+				{
+					((Cell)point).SetIndex(index);
+					index++;
+				}
+				else
+				{
+					return;
+				}
+			}
+
+			for (int i = 0; i < point.NextPoints.Count; i++)
+			{
+				SetCellIndex(point.NextPoints[i], index);
+			}
+		}
 
 		public Cell GetOtherCellSameType(Cell forCell)
 		{
@@ -70,54 +93,5 @@ namespace StepanoffGames.DiceRush.Game
 			}
 			return cell;
 		}
-
-		//private void FillDeck()
-		//{
-		//	_deck = new List<CellType>();
-
-		//	for (int i = 0; i < 26; i++)
-		//	{
-		//		_deck.Add(CellType.Regular);
-		//	}
-		//	for (int i = 0; i < 20; i++)
-		//	{
-		//		_deck.Add(CellType.MoveForward);
-		//	}
-		//	for (int i = 0; i < 20; i++)
-		//	{
-		//		_deck.Add(CellType.MoveBackward);
-		//	}
-		//	for (int i = 0; i < 20; i++)
-		//	{
-		//		_deck.Add(CellType.Portal1);
-		//	}
-		//	//for (int i = 0; i < 2; i++)
-		//	//{
-		//	//	_deck.Add(CellType.Portal2);
-		//	//}
-		//	//for (int i = 0; i < 2; i++)
-		//	//{
-		//	//	_deck.Add(CellType.Portal3);
-		//	//}
-		//	//for (int i = 0; i < 2; i++)
-		//	//{
-		//	//	_deck.Add(CellType.Portal4);
-		//	//}
-		//	//for (int i = 0; i < 2; i++)
-		//	//{
-		//	//	_deck.Add(CellType.Portal5);
-		//	//}
-		//}
-
-		//public CellType GetNextTypeFromDeck()
-		//{
-		//	if (_deck.Count == 0) return CellType.Regular;
-
-		//	int index = UnityEngine.Random.Range(0, _deck.Count);
-		//	CellType type = _deck[index];
-		//	_deck.RemoveAt(index);
-
-		//	return type;
-		//}
 	}
 }

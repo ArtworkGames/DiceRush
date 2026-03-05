@@ -1,17 +1,74 @@
 {
   "texts":[
+    { "key": "ChestWindow:Title", "value": "Сундук" },
+    { "key": "FightWindow:Title", "value": "Бой" },
+    { "key": "LevelUpWindow:Title", "value": "Новый уровень" },
+
+
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
 
-    { "key": "Card:PlusOneToDice", "value": "+1 к значению кубика" },
-    { "key": "Card:PlusTwoToDice", "value": "+2 к значению кубика" },
+
     { "key": "Card:RerollDice", "value": "Перебросить кубик" },
+    { "key": "Card:Plus1ToDice", "value": "+1 к значению кубика" },
+    { "key": "Card:Plus2ToDice", "value": "+2 к значению кубика" },
+    { "key": "Card:Minus1FromDice", "value": "-1 от значения кубика" },
+    { "key": "Card:Minus2FromDice", "value": "-2 от значения кубика" },
 
-    { "key": "Card:FlipTile", "value": "Перевернуть клетку" },
-    { "key": "Card:RedealTile", "value": "Пересдать клетку" },
+    { "key": "Card:RedrawToken", "value": "Пересдать токен" },
 
-    { "key": "ChestWindow:Tile", "value": "Сундук" },
-    { "key": "LevelUpWindow:Tile", "value": "Новый уровень" }
+    { "key": "Card:Plus1ToHealth", "value": "+1 к здоровью" },
+    { "key": "Card:Plus2ToHealth", "value": "+2 к здоровью" },
+    { "key": "Card:Plus3ToHealth", "value": "+3 к здоровью" },
+    { "key": "Card:Plus1ToDefense", "value": "+1 к защите" },
+    { "key": "Card:Plus2ToDefense", "value": "+2 к защите" },
+    { "key": "Card:Plus3ToDefense", "value": "+3 к защите" },
+    { "key": "Card:Plus1ToAttack", "value": "+1 к атаке" },
+    { "key": "Card:Plus2ToAttack", "value": "+2 к атаке" },
+    { "key": "Card:Plus3ToAttack", "value": "+3 к атаке" },
+
+
+    { "key": "Perk:FirstMultiplierX3:Title", "value": "Разгон" },
+    { "key": "Perk:FirstMultiplierX3:Description", "value": "Первый доп. ход в серии даёт x3 вместо x2" },
+
+    { "key": "Perk:OneCardEvery3Move:Title", "value": "Накопитель" },
+    { "key": "Perk:OneCardEvery3Move:Description", "value": "Каждый 3-й доп. ход в серии даёт +1 карту после завершения хода" },
+
+    { "key": "Perk:XpBonusForMultiplierX4:Title", "value": "Горячая серия" },
+    { "key": "Perk:XpBonusForMultiplierX4:Description", "value": "Если в ходу было 4+ множителя → +1 XP за каждое действие" },
+
+    { "key": "Perk:InstantCardEvery5Move:Title", "value": "Цепной азарт" },
+    { "key": "Perk:InstantCardEvery5Move:Description", "value": "Если серия достигла 5+ множителя → немедленно +1 карта" },
+
+    { "key": "Perk:CardsPerOfferPlus1:Title", "value": "Широкий выбор I" },
+    { "key": "Perk:CardsPerOfferPlus1:Description", "value": "В каждом предложении карт +1 карта" },
+
+    { "key": "Perk:CardsPerOfferPlus2:Title", "value": "Широкий выбор II" },
+    { "key": "Perk:CardsPerOfferPlus2:Description", "value": "В каждом предложении карт +2 карты" },
+
+    { "key": "Perk:CardsPerOfferPlus3:Title", "value": "Широкий выбор III" },
+    { "key": "Perk:CardsPerOfferPlus3:Description", "value": "В каждом предложении карт +3 карты" },
+
+    { "key": "Perk:HitPointsPlus1:Title", "value": "Крепче кожи I" },
+    { "key": "Perk:HitPointsPlus1:Description", "value": "+1 к максимуму здоровья" },
+
+    { "key": "Perk:HitPointsPlus2:Title", "value": "Крепче кожи II" },
+    { "key": "Perk:HitPointsPlus2:Description", "value": "+2 к максимуму здоровья" },
+
+    { "key": "Perk:HitPointsPlus3:Title", "value": "Крепче кожи III" },
+    { "key": "Perk:HitPointsPlus3:Description", "value": "+3 к максимуму здоровья" },
+
+    { "key": "Perk:OpponentsSkipMove:Title", "value": "Замешательство" },
+    { "key": "Perk:OpponentsSkipMove:Description", "value": "Все соперники пропускают следующий ход" },
+
+    { "key": "Perk:SwitchPlacesWithFirstOpponent:Title", "value": "Рывок вперёд" },
+    { "key": "Perk:SwitchPlacesWithFirstOpponent:Description", "value": "Меняетесь местами с лидером" },
+
+    { "key": "Perk:OpponentsStartWithBackwardMove:Title", "value": "Не с той ноги" },
+    { "key": "Perk:OpponentsStartWithBackwardMove:Description", "value": "В начале забега все соперники попадают в ловушки" },
+
+    { "key": "Perk:Take3Cards:Title", "value": "Полная рука" },
+    { "key": "Perk:Take3Cards:Description", "value": "Немедленно взять 3 карты" }
   ]
 }

@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using StepanoffGames.DiceRush.Game.Path;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.Services;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game
@@ -27,6 +29,18 @@ namespace StepanoffGames.DiceRush.Game
 		//private float focusOnBackOfPlayerDistance = -40f;
 		//private float focusOnBackOfPlayerTime = 1f;
 
+		private PathController _path;
+
+		private void Start()
+		{
+			_path = ServiceLocator.Get<PathController>();
+		}
+
+		private void OnDestroy()
+		{
+			_path = null;
+		}
+
 		public async UniTask FocusOnPlayer(PlayerAvatar player)
 		{
 			Vector3 pos = player.transform.position;
@@ -43,15 +57,15 @@ namespace StepanoffGames.DiceRush.Game
 			await Move(pos, focusOnCellDistance, focusOnCellTime);
 		}
 
-		public async UniTask FocusOnWayMarkers(PlayerAvatar player)
+		public async UniTask FocusOnPathMarkers(PlayerAvatar player)
 		{
 			Vector3 pos = player.CurrentPoint.transform.position;
 			int count = 1;
-			for (int i = 0; i < Level.Instance.Way.Markers.Count; i++)
+			for (int i = 0; i < _path.Markers.Count; i++)
 			{
-				if (Level.Instance.Way.Markers[i] != null && Level.Instance.Way.Markers[i].Cell != null)
+				if (_path.Markers[i] != null && _path.Markers[i].Cell != null)
 				{
-					pos += Level.Instance.Way.Markers[i].Cell.transform.position;
+					pos += _path.Markers[i].Cell.transform.position;
 					count++;
 				}
 			}
