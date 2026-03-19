@@ -39,7 +39,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 
 		public int Health;
 		public int BaseAttack;
-		public int MaxAttack;
+		//public int AttackDelta;
 
 		public float FromPosition;
 		public float ToPosition;

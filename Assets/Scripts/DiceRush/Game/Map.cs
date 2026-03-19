@@ -69,29 +69,54 @@ namespace StepanoffGames.DiceRush.Game
 			}
 		}
 
-		public Cell GetOtherCellSameType(Cell forCell)
+		public void ResetUsedCells()
 		{
 			for (int i = 0; i < _cells.Length; i++)
 			{
-				if (_cells[i].Type == forCell.Type && _cells[i] != forCell)
-				{
-					return _cells[i];
-				}
+				_cells[i].SetUsed(false);
 			}
-			return null;
 		}
 
-		public Cell GetOtherCellSameTypeClosestToFinish(Cell forCell)
+		public Cell GetOtherPortal(Cell currentPortal)
 		{
-			Cell cell = null;
+			Cell otherPortal = null;
+			int cellIndex = 0;
 			for (int i = 0; i < _cells.Length; i++)
 			{
-				if (_cells[i].Type == forCell.Type && _cells[i] != forCell)
+				if (_cells[i].Type == CellType.Portal && _cells[i] != currentPortal &&
+					_cells[i].Index > cellIndex &&
+					!_cells[i].IsUsed && !_cells[i].IsLocked)
 				{
-					cell = _cells[i];
+					cellIndex = _cells[i].Index;
+					otherPortal = _cells[i];
 				}
 			}
-			return cell;
+			return otherPortal;
 		}
+
+		//public Cell GetOtherCellSameType(Cell forCell)
+		//{
+		//	for (int i = 0; i < _cells.Length; i++)
+		//	{
+		//		if (_cells[i].Type == forCell.Type && _cells[i] != forCell)
+		//		{
+		//			return _cells[i];
+		//		}
+		//	}
+		//	return null;
+		//}
+
+		//public Cell GetOtherCellSameTypeClosestToFinish(Cell forCell)
+		//{
+		//	Cell cell = null;
+		//	for (int i = 0; i < _cells.Length; i++)
+		//	{
+		//		if (_cells[i].Type == forCell.Type && _cells[i] != forCell)
+		//		{
+		//			cell = _cells[i];
+		//		}
+		//	}
+		//	return cell;
+		//}
 	}
 }

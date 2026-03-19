@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
+using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
@@ -34,7 +35,7 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 
 		override public async UniTask UseForBattle(PlayerController player)
 		{
-			player.Model.Health += _healthDelta;
+			player.Model.Health = Mathf.Min(player.Model.Health + _healthDelta, player.Model.MaxHealth);
 			player.Model.Defense += _defenseDelta;
 			player.Model.Attack += _attackDelta;
 
@@ -43,7 +44,7 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 
 		override public void ApplyForBattle(PlayerController player)
 		{
-			player.Model.Health += _healthDelta;
+			player.Model.Health = Mathf.Min(player.Model.Health + _healthDelta, player.Model.MaxHealth);
 			player.Model.Defense += _defenseDelta;
 			player.Model.Attack += _attackDelta;
 		}

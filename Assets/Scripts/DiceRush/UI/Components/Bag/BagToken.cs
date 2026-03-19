@@ -17,7 +17,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Bag
 			_enemy.SetActive(type == CellType.Enemy);
 			_moveForward.SetActive(type == CellType.MoveForward);
 			_moveBackward.SetActive(type == CellType.MoveBackward);
-			_portal.SetActive(type == CellType.Portal1);
+			_portal.SetActive(type == CellType.Portal);
 		}
 	}
 }

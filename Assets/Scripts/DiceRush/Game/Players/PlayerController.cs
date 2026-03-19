@@ -20,14 +20,14 @@ namespace StepanoffGames.DiceRush.Game.Players
 		public PlayerAvatar Avatar => _avatar;
 		protected PlayerAvatar _avatar;
 
-		protected LevelManager _level;
+		protected LevelManager _levelManager;
 		protected Map _map;
-		protected DiceController _dice;
-		protected BagController _bag;
-		protected DeckController _deck;
-		protected ForkController _fork;
-		protected ChestController _chest;
-		protected BattleController _battle;
+		protected DiceController _diceController;
+		protected BagController _bagController;
+		protected DeckController _deckController;
+		protected ForkController _forkController;
+		protected ChestController _chestController;
+		protected BattleController _battleController;
 
 		protected bool _isSkipNextMove;
 
@@ -36,33 +36,36 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_model = model;
 			_avatar = avatar;
 
-			_level = ServiceLocator.Get<LevelManager>();
+			_levelManager = ServiceLocator.Get<LevelManager>();
 			_map = ServiceLocator.Get<Map>();
-			_dice = ServiceLocator.Get<DiceController>();
-			_bag = ServiceLocator.Get<BagController>();
-			_deck = ServiceLocator.Get<DeckController>();
-			_fork = ServiceLocator.Get<ForkController>();
-			_chest = ServiceLocator.Get<ChestController>();
-			_battle = ServiceLocator.Get<BattleController>();
+			_diceController = ServiceLocator.Get<DiceController>();
+			_bagController = ServiceLocator.Get<BagController>();
+			_deckController = ServiceLocator.Get<DeckController>();
+			_forkController = ServiceLocator.Get<ForkController>();
+			_chestController = ServiceLocator.Get<ChestController>();
+			_battleController = ServiceLocator.Get<BattleController>();
 		}
 
 		virtual public void Destroy()
 		{
-			_level = null;
+			_model = null;
+			_avatar = null;
+
+			_levelManager = null;
 			_map = null;
-			_dice = null;
-			_bag = null;
-			_deck = null;
-			_chest = null;
-			_battle = null;
+			_diceController = null;
+			_bagController = null;
+			_deckController = null;
+			_chestController = null;
+			_battleController = null;
 		}
 
 		public async UniTask Turn()
 		{
-			await MoveForward();
+			await MoveForward(true);
 		}
 
-		public async UniTask MoveForward()
+		public async UniTask MoveForward(bool isFirst = false)
 		{
 			if (_isSkipNextMove)
 			{
@@ -77,8 +80,9 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 			SignalBus.Publish(new PlayerMoveStartedSignal(this));
 
-			CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
-			int diceValue = await RollDice(cellType);
+			//CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
+			//bool isMoveForward = isFirst || cellType != CellType.MoveBackward;
+			int diceValue = await RollDice(true);
 
 			for (int i = 0; i < diceValue; i++)
 			{
@@ -128,8 +132,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 			SignalBus.Publish(new PlayerMoveStartedSignal(this));
 
-			CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
-			int diceValue = await RollDice(cellType);
+			//CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
+			int diceValue = await RollDice(false);
 
 			for (int i = 0; i < diceValue; i++)
 			{
@@ -166,115 +170,127 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		private async UniTask CheckCurrentCell()
 		{
+			if (!(_avatar.CurrentPoint is Cell)) return;
+
+			Cell currentCell = (Cell)_avatar.CurrentPoint;
 			bool isJustDefinedCell = false;
-			if (_avatar.CurrentPoint is Cell && ((Cell)_avatar.CurrentPoint).Type == CellType.Empty)
+
+			//if (currentCell.Type == CellType.Empty)
+			//{
+			//	if (currentCell.IsLocked)
+			//	{
+			//		await BeforeWaitForCellToUnlock();
+
+			//		await UniTask.WaitWhile(() => currentCell.IsLocked);
+			//	}
+			//	else
+			//	{
+			//		isJustDefinedCell = true;
+			//		currentCell.SetLocked(true);
+
+			//		CellType tileType = await DrawToken();
+			//		currentCell.SetType(tileType);
+
+			//		currentCell.SetLocked(false);
+			//	}
+			//}
+
+			//if (currentCell.IsUsed)
+			//{
+			//	await _avatar.MoveToCurrentCellPlayerPosition();
+			//	await UniTask.WaitForSeconds(1f);
+			//	return;
+			//}
+
+			if (currentCell.IsUsed || currentCell.IsLocked)
 			{
-				if (((Cell)_avatar.CurrentPoint).IsLocked)
-				{
-					await BeforeWaitForCellToUnlock();
-
-					await UniTask.WaitWhile(() => ((Cell)_avatar.CurrentPoint).IsLocked);
-
-				}
-				else
-				{
-					isJustDefinedCell = true;
-					((Cell)_avatar.CurrentPoint).SetLocked(true);
-
-					CellType tileType = await DrawToken();
-					((Cell)_avatar.CurrentPoint).SetType(tileType);
-
-					((Cell)_avatar.CurrentPoint).SetLocked(false);
-				}
+				await _avatar.MoveToCurrentCellPlayerPosition();
+				await UniTask.WaitForSeconds(1f);
+				return;
 			}
 
-			if (_avatar.CurrentPoint is Cell)
+			if (currentCell.Type == CellType.Empty)
 			{
-				switch (((Cell)_avatar.CurrentPoint).Type)
-				{
-					case CellType.Start:
-					case CellType.Finish:
-					case CellType.Regular:
-						await _avatar.MoveToCurrentCellPlayerPosition();
-						await UniTask.WaitForSeconds(1f);
-						break;
+				isJustDefinedCell = true;
+				currentCell.SetLocked(true);
 
-					case CellType.Reward:
-						if (isJustDefinedCell)
-						{
-							await OpenChest();
-						}
-						await _avatar.MoveToCurrentCellPlayerPosition();
-						await UniTask.WaitForSeconds(1f);
-						break;
+				CellType tileType = await DrawToken();
+				currentCell.SetType(tileType);
 
-					case CellType.Enemy:
-						await Battle();
-						await _avatar.MoveToCurrentCellPlayerPosition();
-						await UniTask.WaitForSeconds(1f);
-						break;
+				currentCell.SetLocked(false);
+			}
 
-					//case CellType.MoveToForward:
-					//case CellType.MoveToBackward:
-					//	if (((Cell)_avatar.CurrentPoint).MoveToPoint != null)
+			currentCell.SetUsed(true);
+
+			switch (currentCell.Type)
+			{
+				case CellType.Start:
+				case CellType.Finish:
+				case CellType.Regular:
+					await _avatar.MoveToCurrentCellPlayerPosition();
+					await UniTask.WaitForSeconds(1f);
+					break;
+
+				case CellType.Reward:
+					if (isJustDefinedCell)
+					{
+						await OpenChest();
+					}
+					await _avatar.MoveToCurrentCellPlayerPosition();
+					await UniTask.WaitForSeconds(1f);
+					break;
+
+				case CellType.Enemy:
+					await Battle();
+					await _avatar.MoveToCurrentCellPlayerPosition();
+					await UniTask.WaitForSeconds(1f);
+					break;
+
+				case CellType.MoveForward:
+					await MoveForward();
+					break;
+
+				case CellType.MoveBackward:
+					await MoveBackward();
+					break;
+
+				case CellType.Portal:
+					//Cell otherCell = _map.GetOtherCellSameTypeClosestToFinish((Cell)_avatar.CurrentPoint);
+
+					//Cell otherPortal = null;
+					//int cellIndex = 0;
+					//for (int i = 0; i < _map.Cells.Length; i++)
+					//{
+					//	if (_map.Cells[i].Type == CellType.Portal && !_map.Cells[i].IsUsed && _map.Cells[i] != _avatar.CurrentPoint && _map.Cells[i].Index > cellIndex)
 					//	{
-					//		do
-					//		{
-					//			await _avatar.MoveToPoint(((Cell)_avatar.CurrentPoint).MoveToPoint);
-					//		}
-					//		while (!(_avatar.CurrentPoint is Cell));
-
-					//		await CheckCurrentCell();
+					//		cellIndex = _map.Cells[i].Index;
+					//		otherPortal = _map.Cells[i];
 					//	}
-					//	break;
+					//}
 
-					//case CellType.SkipMove:
-					//	_isSkipNextMove = true;
-					//	await _avatar.MoveToCurrentCellPlayerPosition();
-					//	await UniTask.WaitForSeconds(1f);
-					//	break;
+					Cell otherPortal = _map.GetOtherPortal(currentCell);
 
-					//case CellType.ExtraMove:
-					//	await MoveForward();
-					//	break;
+					if (otherPortal != null)
+					{
+						otherPortal.SetLocked(true);
 
-					case CellType.MoveForward:
-						await MoveForward();
-						break;
+						await BeforeMoveToNextPortal(otherPortal);
 
-					case CellType.MoveBackward:
-						await MoveBackward();
-						break;
+						otherPortal.SetUsed(true);
+						otherPortal.SetLocked(false);
 
-					case CellType.Portal1:
-					case CellType.Portal2:
-					case CellType.Portal3:
-					case CellType.Portal4:
-					case CellType.Portal5:
-						Cell otherCell = _map.GetOtherCellSameTypeClosestToFinish((Cell)_avatar.CurrentPoint);
-						if (otherCell != null)
-						{
-							//await Level.Instance.Camera.FocusOnCell(otherCell);
+						_avatar.SetToCellCenterPosition(otherPortal);
 
-							//await UniTask.WaitForSeconds(0.5f);
+						SignalBus.Publish(new PlayerPortalPassedSignal(this));
+					}
 
-							await BeforeMoveToNextPortal(otherCell);
-
-							_avatar.SetToCellCenterPosition(otherCell);
-
-							SignalBus.Publish(new PlayerPortalPassedSignal(this));
-
-							//await UniTask.WaitForSeconds(1f);
-						}
-						//await _view.MoveToCellPlayerPosition();
-						_avatar.MoveToCurrentCellPlayerPosition().Forget();
-						await UniTask.WaitForSeconds(1f);
-						break;
-				}
+					_avatar.MoveToCurrentCellPlayerPosition().Forget();
+					await UniTask.WaitForSeconds(1f);
+					break;
 			}
 		}
 
-		virtual protected async UniTask<int> RollDice(CellType cellType)
+		virtual protected async UniTask<int> RollDice(bool isMoveForward)
 		{
 			await UniTask.Yield();
 			return 0;

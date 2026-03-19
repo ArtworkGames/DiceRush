@@ -2,11 +2,13 @@
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Perks.Perks;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
 using StepanoffGames.DiceRush.UI.Components.Perks;
+using StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup;
+using StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
+using StepanoffGames.UI.Windows.Signals;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,11 +18,17 @@ namespace StepanoffGames.DiceRush.Game.Perks
 	{
 		[SerializeField] private PerksPanel _panel;
 
+		public PerksPanel Panel => _panel;
+
+		private Dictionary<PerkType, FlyingPerkTarget> _flyingPerkTargets;
+
 		private LevelManager _levelManager;
 
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
+
+			_flyingPerkTargets = new Dictionary<PerkType, FlyingPerkTarget>();
 		}
 
 		private void Start()
@@ -28,7 +36,6 @@ namespace StepanoffGames.DiceRush.Game.Perks
 			_levelManager = ServiceLocator.Get<LevelManager>();
 
 			SignalBus.Subscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
-			SignalBus.Subscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 		}
 
 		private void OnDestroy()
@@ -38,7 +45,6 @@ namespace StepanoffGames.DiceRush.Game.Perks
 			_levelManager = null;
 
 			SignalBus.Unsubscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
-			SignalBus.Unsubscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 		}
 
 		public List<PerkModel> GetPerksOffer(PlayerModel player)
@@ -56,8 +62,10 @@ namespace StepanoffGames.DiceRush.Game.Perks
 			// то фиксированно добавляем перк пополнения карт
 			List<CardModel> deckCards = player.Deck.GetCards(CardKind.Dice);
 			List<CardModel> bagCards = player.Deck.GetCards(CardKind.Bag);
-			if (player.Type == PlayerType.HI) Debug.Log($"[PerksOffer] Deck Cards = {deckCards.Count}, Bag Cards = {bagCards.Count}");
-			if (deckCards.Count < player.CardsPerOffer || bagCards.Count < player.CardsPerOffer)
+			List<CardModel> battleCards = player.Deck.GetCards(CardKind.Battle);
+
+			if (player.Type == PlayerType.HI) Debug.Log($"[PerksOffer] Deck Cards = {deckCards.Count}, Bag Cards = {bagCards.Count}, Battle Cards = {battleCards.Count}");
+			if (deckCards.Count < player.CardsPerOffer || bagCards.Count < player.CardsPerOffer || battleCards.Count < player.CardsPerOffer)
 			{
 				if (player.Type == PlayerType.HI) Debug.Log($"[PerksOffer] Add Perk = {PerkType.Take3Cards}");
 				perkTypes.Add(PerkType.Take3Cards);
@@ -79,14 +87,12 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 				// если указан требуемый перк у игрока и если у игрока нет этого перка, то пропускаем
 				if (perk.RequiredType != PerkType.Undefined && !playerPerkTypes.Contains(perk.RequiredType)) continue;
-				// если у игрока недостаточный уровень, то пропускаем
-				if (perk.StartFromLevel > player.Level) continue;
 
 				rndPerkTypes.Add(perk.Type);
 			}
 
 			int perksCount = 3 - perkTypes.Count;
-			for(int i = 0; i < perksCount; i++)
+			for (int i = 0; i < perksCount; i++)
 			{
 				if (rndPerkTypes.Count > 0)
 				{
@@ -111,39 +117,71 @@ namespace StepanoffGames.DiceRush.Game.Perks
 			return perks;
 		}
 
-		public async UniTask UsePerk(PlayerController player, PerkModel perkModel)
+		//public async UniTask UsePerk(PlayerController player, PerkModel perkModel)
+		//{
+		//	Perk perk = GetPerkByModel(perkModel);
+		//	if (perk != null)
+		//	{
+		//		await perk.Use(player);
+		//	}
+		//}
+
+		//public async UniTask ApplyPerk(PlayerController player, PerkModel perkModel)
+		//{
+		//	Perk perk = GetPerkByModel(perkModel);
+		//	if (perk != null)
+		//	{
+		//		await perk.Apply(player);
+		//	}
+		//}
+
+		public async UniTask SelectPerk(PlayerModel player)
 		{
-			Perk perk = GetPerkByModel(perkModel);
-			if (perk != null)
+			List<PerkModel> perks = GetPerksOffer(player);
+			if (perks.Count == 0) return;
+
+			bool levelUpWindowClosed = false;
+			PerkModel selectedPerk = null;
+
+			SignalBus.Publish(new OpenWindowSignal(SelectPerkWindow.PrefabName, new SelectPerkWindowParams()
 			{
-				await perk.Use(player);
+				Perks = perks,
+				OnSelect = (PerkModel perk) =>
+				{
+					selectedPerk = perk;
+					levelUpWindowClosed = true;
+				}
+			}));
+
+			await UniTask.WaitUntil(() => levelUpWindowClosed);
+
+			if (selectedPerk.Usage != PerkUsage.OneTime)
+			{
+				player.PerksSet.AddPerk(selectedPerk);
+			}
+
+			if (selectedPerk.Usage != PerkUsage.Multiple)
+			{
+				await ApplyPerk(player, selectedPerk.Type);
 			}
 		}
 
-		public async UniTask ApplyPerk(PlayerController player, PerkModel perkModel)
+		public async UniTask AddPerk(PlayerModel player)
 		{
-			Perk perk = GetPerkByModel(perkModel);
-			if (perk != null)
+			List<PerkModel> perks = GetPerksOffer(player);
+			if (perks.Count == 0) return;
+
+			PerkModel selectedPerk = perks[Random.Range(0, perks.Count)];
+
+			if (selectedPerk.Usage != PerkUsage.OneTime)
 			{
-				await perk.Apply(player);
+				player.PerksSet.AddPerk(selectedPerk);
 			}
-		}
 
-		private Perk GetPerkByModel(PerkModel perkModel)
-		{
-			Perk perk = null;
-			switch (perkModel.Type)
+			if (selectedPerk.Usage != PerkUsage.Multiple)
 			{
-				case PerkType.FirstMultiplierX3: perk = new IncXpMultiplierPerk(perkModel); break;
-				case PerkType.XpBonusForMultiplierX4: perk = new XpBonusForMultiplierPerk(perkModel); break;
-
-				case PerkType.CardsPerOfferPlus1:
-				case PerkType.CardsPerOfferPlus2:
-				case PerkType.CardsPerOfferPlus3: perk = new IncCardsPerOfferPerk(perkModel); break;
-
-				case PerkType.Take3Cards: perk = new Take3CardsPerk(perkModel); break;
+				await ApplyPerk(player, selectedPerk.Type);
 			}
-			return perk;
 		}
 
 		public void ShowPerks(PlayerModel player)
@@ -153,29 +191,135 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 		private void OnXpMultiplierChanged(XpMultiplierChangedSignal signal)
 		{
-			PerkModel perkModel = signal.Player.PerksSet.GetPerk(PerkType.FirstMultiplierX3);
+			if (signal.Player.Type == PlayerType.HI)
+			{
+				UsePlayerPerk(signal.Player, PerkType.FirstMultiplierX3).Forget();
+				UsePlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier).Forget();
+				UsePlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5).Forget();
+			}
+			else
+			{
+				ApplyPlayerPerk(signal.Player, PerkType.FirstMultiplierX3).Forget();
+				ApplyPlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier).Forget();
+				ApplyPlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5).Forget();
+			}
+		}
+
+		public async UniTask UseForBattleRoundStarted(PlayerModel player)
+		{
+			await UsePlayerPerk(player, PerkType.IncreaseFirstDefenseBy1);
+		}
+
+		public async UniTask UseForPlayerWonBattle(PlayerModel player)
+		{
+			await UsePlayerPerk(player, PerkType.Restore1HealthAfterVictory);
+		}
+
+		private async UniTask UsePlayerPerk(PlayerModel player, PerkType perkType)
+		{
+			PerkModel perkModel = player.PerksSet.GetPerk(perkType);
 			if (perkModel != null)
 			{
 				Perk perk = GetPerkByModel(perkModel);
 				if (perk != null)
 				{
-					PlayerController playerController = _levelManager.GetPlayer(signal.Player);
-					perk.Apply(playerController).Forget();
+					PlayerController playerController = _levelManager.GetPlayer(player);
+					bool result = await perk.Use(playerController);
+
+					if (result)
+					{
+						PerkIconItem perksPanelItem = _panel.GetPerkItem(perkType);
+						FlyingPerkTarget flyingPerkTarget = GetFlyingPerkTarget(perkType);
+
+						if (perksPanelItem != null && flyingPerkTarget != null)
+						{
+							bool isCompleted = false;
+							FlyingIconPopup.Show(perksPanelItem.IconObject, flyingPerkTarget.transform, null, () =>
+							{
+								isCompleted = true;
+							});
+
+							await UniTask.WaitUntil(() => isCompleted);
+						}
+					}
 				}
 			}
 		}
 
-		private void OnPlayerCellPassed(PlayerCellPassedSignal signal)
+		private async UniTask ApplyPlayerPerk(PlayerModel player, PerkType perkType)
 		{
-			PerkModel perkModel = signal.Player.Model.PerksSet.GetPerk(PerkType.XpBonusForMultiplierX4);
+			PerkModel perkModel = player.PerksSet.GetPerk(perkType);
 			if (perkModel != null)
 			{
 				Perk perk = GetPerkByModel(perkModel);
 				if (perk != null)
 				{
-					perk.Apply(signal.Player).Forget();
+					PlayerController playerController = _levelManager.GetPlayer(player);
+					bool result = await perk.Apply(playerController);
 				}
 			}
+		}
+
+		private async UniTask ApplyPerk(PlayerModel player, PerkType perkType)
+		{
+			PerkModel perkModel = PerkModel.GetPerk(perkType);
+			Perk perk = GetPerkByModel(perkModel);
+			if (perk != null)
+			{
+				PlayerController playerController = _levelManager.GetPlayer(player);
+				bool result = await perk.Apply(playerController);
+			}
+		}
+
+		private Perk GetPerkByModel(PerkModel perkModel)
+		{
+			Perk perk = null;
+			switch (perkModel.Type)
+			{
+				case PerkType.FirstMultiplierX3: perk = new IncMultiplierPerk(perkModel); break;
+				case PerkType.XpBonusForEachMultiplier: perk = new XpBonusForMultiplierPerk(perkModel); break;
+				case PerkType.OneCardForMultiplierX5: perk = new CardsForMultiplierPerk(perkModel); break;
+
+				case PerkType.CardsPerOfferPlus1:
+				case PerkType.CardsPerOfferPlus2:
+				case PerkType.CardsPerOfferPlus3: perk = new IncCardsPerOfferPerk(perkModel); break;
+
+				case PerkType.IncreaseFirstDefenseBy1:
+				case PerkType.Restore1HealthAfterVictory: perk = new ChangeBattleStatsPerk(perkModel); break;
+
+				case PerkType.Take3Cards: perk = new TakeCardsPerk(perkModel); break;
+			}
+			return perk;
+		}
+
+		public void RegisterFlyingPerkTarget(FlyingPerkTarget flyingPerkTarget)
+		{
+			if (_flyingPerkTargets.ContainsKey(flyingPerkTarget.PerkType))
+			{
+				_flyingPerkTargets[flyingPerkTarget.PerkType] = flyingPerkTarget;
+			}
+			else
+			{
+				_flyingPerkTargets.Add(flyingPerkTarget.PerkType, flyingPerkTarget);
+			}
+		}
+
+		public void UnregisterFlyingPerkTarget(FlyingPerkTarget flyingPerkTarget)
+		{
+			if (_flyingPerkTargets.ContainsKey(flyingPerkTarget.PerkType) &&
+				_flyingPerkTargets[flyingPerkTarget.PerkType] == flyingPerkTarget)
+			{
+				_flyingPerkTargets.Remove(flyingPerkTarget.PerkType);
+			}
+		}
+
+		public FlyingPerkTarget GetFlyingPerkTarget(PerkType perkType)
+		{
+			if (_flyingPerkTargets.ContainsKey(perkType))
+			{
+				return _flyingPerkTargets[perkType];
+			}
+			return null;
 		}
 	}
 }

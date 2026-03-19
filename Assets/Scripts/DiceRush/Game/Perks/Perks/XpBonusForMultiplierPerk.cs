@@ -15,31 +15,28 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 		{
 			switch (model.Type)
 			{
-				case PerkType.XpBonusForMultiplierX4:
-					_xpMultiplier = 4;
+				case PerkType.XpBonusForEachMultiplier:
+					_xpMultiplier = 2;
 					_xpBonus = 1;
 					break;
 			}
 		}
 
-		override public async UniTask Use(PlayerController player)
+		override public async UniTask<bool> Use(PlayerController player)
 		{
-			if (player.Model.XpMultiplier >= _xpMultiplier)
-			{
-				XpManager xpManager = ServiceLocator.Get<XpManager>();
-				xpManager.AddMoveXp(player.Model, _xpBonus);
-			}
-			await UniTask.Yield();
+			return await Apply(player);
 		}
 
-		override public async UniTask Apply(PlayerController player)
+		override public async UniTask<bool> Apply(PlayerController player)
 		{
 			if (player.Model.XpMultiplier >= _xpMultiplier)
 			{
 				XpManager xpManager = ServiceLocator.Get<XpManager>();
 				xpManager.AddMoveXp(player.Model, _xpBonus);
+				return true;
 			}
 			await UniTask.Yield();
+			return false;
 		}
 	}
 }

@@ -27,7 +27,10 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			_textLocalizer.Localize(key);
 
 			Button button = GetComponent<Button>();
-			button.onClick.AddListener(OnButtonClick);
+            if (button != null)
+            {
+				button.onClick.AddListener(OnButtonClick);
+            }
 		}
 
 		private void OnDestroy()

@@ -5,7 +5,7 @@ using StepanoffGames.UI.Popups.Signals;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.InputSystem.OnScreen.OnScreenStick;
+using UnityEngine.AddressableAssets;
 
 namespace StepanoffGames.UI.Popups
 {
@@ -67,10 +67,14 @@ namespace StepanoffGames.UI.Popups
 
 			_popupBehaviours.Add(behaviour);
 
-			string prefabName = GetPrefabPath(behaviour.PopupName);
-			ResourceRequest request = Resources.LoadAsync(prefabName);
+			//string prefabName = GetPrefabPath(behaviour.PopupName);
+			//ResourceRequest request = Resources.LoadAsync(prefabName);
 
-			await UniTask.WaitUntil(() => request.isDone);
+			//await UniTask.WaitUntil(() => request.isDone);
+
+			string prefabName = GetPrefabPath(behaviour.PopupName);
+			var handle = Addressables.LoadAssetAsync<GameObject>(prefabName);
+			await UniTask.WaitUntil(() => handle.IsDone);
 
 			if (behaviour.State == PopupState.Cancelled)
 			{
@@ -79,7 +83,7 @@ namespace StepanoffGames.UI.Popups
 				return;
 			}
 
-			GameObject prefab = (GameObject)request.asset;
+			GameObject prefab = handle.Result;
 			GameObject instance = Instantiate(prefab, parent, false);
 			instance.name = behaviour.PopupName;
 			instance.transform.position = worldPos;
@@ -93,7 +97,7 @@ namespace StepanoffGames.UI.Popups
 
 		private string GetPrefabPath(string name)
 		{
-			return $"Popups/{name}";
+			return $"Popups/{name}.prefab";
 		}
 
 		private void OnClosePopup(ClosePopupSignal signal)

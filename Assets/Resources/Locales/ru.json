@@ -9,6 +9,9 @@
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
 
+    { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} карт в колоде:" },
+    { "key": "DeckDescriptionPopup:CardsOffer", "value": "Выбор: {0} карты" },
+
 
     { "key": "Card:RerollDice", "value": "Перебросить кубик" },
     { "key": "Card:Plus1ToDice", "value": "+1 к значению кубика" },
@@ -17,6 +20,7 @@
     { "key": "Card:Minus2FromDice", "value": "-2 от значения кубика" },
 
     { "key": "Card:RedrawToken", "value": "Пересдать токен" },
+    { "key": "Card:ReplaceTokenWithEnemy", "value": "Заменить токен на врага" },
 
     { "key": "Card:Plus1ToHealth", "value": "+1 к здоровью" },
     { "key": "Card:Plus2ToHealth", "value": "+2 к здоровью" },
@@ -32,14 +36,11 @@
     { "key": "Perk:FirstMultiplierX3:Title", "value": "Разгон" },
     { "key": "Perk:FirstMultiplierX3:Description", "value": "Первый доп. ход в серии даёт x3 вместо x2" },
 
-    { "key": "Perk:OneCardEvery3Move:Title", "value": "Накопитель" },
-    { "key": "Perk:OneCardEvery3Move:Description", "value": "Каждый 3-й доп. ход в серии даёт +1 карту после завершения хода" },
+    { "key": "Perk:XpBonusForEachMultiplier:Title", "value": "Приятный бонус" },
+    { "key": "Perk:XpBonusForEachMultiplier:Description", "value": "+1 XP при каждом увеличении множителя" },
 
-    { "key": "Perk:XpBonusForMultiplierX4:Title", "value": "Горячая серия" },
-    { "key": "Perk:XpBonusForMultiplierX4:Description", "value": "Если в ходу было 4+ множителя → +1 XP за каждое действие" },
-
-    { "key": "Perk:InstantCardEvery5Move:Title", "value": "Цепной азарт" },
-    { "key": "Perk:InstantCardEvery5Move:Description", "value": "Если серия достигла 5+ множителя → немедленно +1 карта" },
+    { "key": "Perk:OneCardForMultiplierX5:Title", "value": "Накопитель" },
+    { "key": "Perk:OneCardForMultiplierX5:Description", "value": "Множитель x5 даёт +1 карту" },
 
     { "key": "Perk:CardsPerOfferPlus1:Title", "value": "Широкий выбор I" },
     { "key": "Perk:CardsPerOfferPlus1:Description", "value": "В каждом предложении карт +1 карта" },
@@ -50,14 +51,11 @@
     { "key": "Perk:CardsPerOfferPlus3:Title", "value": "Широкий выбор III" },
     { "key": "Perk:CardsPerOfferPlus3:Description", "value": "В каждом предложении карт +3 карты" },
 
-    { "key": "Perk:HitPointsPlus1:Title", "value": "Крепче кожи I" },
-    { "key": "Perk:HitPointsPlus1:Description", "value": "+1 к максимуму здоровья" },
+    { "key": "Perk:IncreaseFirstDefenseBy1:Title", "value": "Железная стойкость" },
+    { "key": "Perk:IncreaseFirstDefenseBy1:Description", "value": "Первый полученный урон в каждом бою уменьшается на 1" },
 
-    { "key": "Perk:HitPointsPlus2:Title", "value": "Крепче кожи II" },
-    { "key": "Perk:HitPointsPlus2:Description", "value": "+2 к максимуму здоровья" },
-
-    { "key": "Perk:HitPointsPlus3:Title", "value": "Крепче кожи III" },
-    { "key": "Perk:HitPointsPlus3:Description", "value": "+3 к максимуму здоровья" },
+    { "key": "Perk:Restore1HealthAfterVictory:Title", "value": "Закалённый" },
+    { "key": "Perk:Restore1HealthAfterVictory:Description", "value": "Каждая победа над врагом восстанавливает +1 здоровье" },
 
     { "key": "Perk:OpponentsSkipMove:Title", "value": "Замешательство" },
     { "key": "Perk:OpponentsSkipMove:Description", "value": "Все соперники пропускают следующий ход" },

@@ -11,7 +11,10 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 	public class DeckPanel : MonoBehaviour
 	{
 		[SerializeField] private Button _confirmButton;
-		[SerializeField] private TMP_Text _cardsCountText;
+		//[SerializeField] private TMP_Text _cardsCountText;
+		[SerializeField] private DeckButton _deckButton;
+
+		public DeckButton DeckButton => _deckButton;
 
 		private List<DeckPanelCard> _cards;
 		private DeckPanelCard _selectedCard;
@@ -28,7 +31,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			_selectedCard = null;
 			_confirmSelected = false;
 
-			_cardsCountText.text = $"Cards: {totalCardsCount}";
+			//_cardsCountText.text = $"Cards: {totalCardsCount}";
 
 			await ShowCards(cardModels);
 			_confirmButton.gameObject.SetActive(true);
@@ -45,12 +48,12 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 				await _selectedCard.ShowSelected();
 				_selectedCard.HideSelected().Forget();
 
-				_cardsCountText.text = "";
+				//_cardsCountText.text = "";
 
 				return _selectedCard.Model;
 			}
 
-			_cardsCountText.text = "";
+			//_cardsCountText.text = "";
 
 			return null;
 		}

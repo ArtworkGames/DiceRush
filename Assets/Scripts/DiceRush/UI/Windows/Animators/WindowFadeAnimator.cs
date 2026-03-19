@@ -7,8 +7,8 @@ namespace StepanoffGames.DiceRush.UI.Windows.Animators
 {
 	public class WindowFadeAnimator : BaseWindowAnimator
 	{
-		[SerializeField] private float _showDuration = 0.3f;
-		[SerializeField] private float _hideDuration = 0.2f;
+		protected float showDuration = 0.2f;
+		protected float hideDuration = 0.2f;
 
 		private CanvasGroup canvasGroup;
 
@@ -52,7 +52,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.Animators
 			{
 				canvasGroup.alpha = 0.0f;
 
-				alphaTween = canvasGroup.DOFade(1.0f, _showDuration)
+				alphaTween = canvasGroup.DOFade(1.0f, showDuration)
 					.SetUpdate(true)
 					.SetEase(Ease.OutCubic)
 					.OnComplete(() =>
@@ -75,7 +75,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.Animators
 			}
 			else
 			{
-				alphaTween = canvasGroup.DOFade(0.0f, _hideDuration)
+				alphaTween = canvasGroup.DOFade(0.0f, hideDuration)
 					.SetUpdate(true)
 					.SetEase(Ease.OutCubic)
 					.OnComplete(() =>

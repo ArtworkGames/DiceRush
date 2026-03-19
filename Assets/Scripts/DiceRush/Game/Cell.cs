@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using StepanoffGames.DiceRush.Data.Models;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -13,20 +12,12 @@ namespace StepanoffGames.DiceRush.Game
 		Start,
 		Finish,
 		Regular,
-		SkipMove,
-		ExtraMove,
-		MoveToForward,
-		MoveToBackward,
 
 		Reward,
 		Enemy,
 		MoveForward,
 		MoveBackward,
-		Portal1,
-		Portal2,
-		Portal3,
-		Portal4,
-		Portal5
+		Portal,
 	}
 
 	[ExecuteInEditMode]
@@ -49,6 +40,9 @@ namespace StepanoffGames.DiceRush.Game
 
 		public bool IsLocked => _isLocked;
 		private bool _isLocked;
+
+		public bool IsUsed => _isUsed;
+		private bool _isUsed;
 
 		private bool isDrawerInitializing;
 		private CellType oldType;
@@ -73,6 +67,12 @@ namespace StepanoffGames.DiceRush.Game
 				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 0f, 1f), 3));
 				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 0f, -1f), 4));
 			}
+
+			float pDist = 1.3f;
+			_playerPositions[0].localPosition = new Vector3(-pDist, 0f, pDist);
+			_playerPositions[1].localPosition = new Vector3(pDist, 0f, -pDist);
+			_playerPositions[2].localPosition = new Vector3(pDist, 0f, pDist);
+			_playerPositions[3].localPosition = new Vector3(-pDist, 0f, -pDist);
 		}
 
 		private async void InitCellDrawer()
@@ -111,6 +111,12 @@ namespace StepanoffGames.DiceRush.Game
 		public void SetLocked(bool locked)
 		{
 			_isLocked = locked;
+		}
+
+		public void SetUsed(bool used)
+		{
+			_isUsed = used;
+			if (_drawer != null) _drawer.Show(this);
 		}
 
 		public void SetType(CellType type)

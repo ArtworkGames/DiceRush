@@ -18,14 +18,20 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		[SerializeField] private Image _xpBarFill;
 		[SerializeField] private TMP_Text _xpValue;
 		[SerializeField] private TMP_Text _levelValue;
+		[Space]
+		[SerializeField] private Transform _xpMultiplierPanel;
+		[Space]
 		[SerializeField] private TMP_Text _moveXpValue;
+		[SerializeField] private TMP_Text _xpMultiplierValue;
+		[SerializeField] private TMP_Text _totalXpValue;
+		[SerializeField] private GameObject[] _fireImages;
 
 		private XpManager _xpManager;
 		private PlayerModel _player;
 
 		private int destMoveXp;
 		private int currMoveXp;
-		private int multiplier;
+		private int xpMultiplier;
 		private int destTotalXp;
 		private int currTotalXp;
 		private int minTotalXp;
@@ -34,6 +40,8 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		private Tween moveXpValueTween;
 		private Tween totalXpValueTween;
+
+		private Vector3 xpMultiplierPosition;
 
 		private void Start()
 		{
@@ -47,9 +55,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			SignalBus.Subscribe<TotalXpChangedSignal>(OnTotalXpChanged);
 
 			currMoveXp = 0;
-			multiplier = 1;
+			xpMultiplier = 1;
 			currTotalXp = 0;
 			level = 1;
+
+			xpMultiplierPosition = _xpMultiplierPanel.localPosition;
 
 			UpdateLevel();
 			UpdateValues();
@@ -67,6 +77,42 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			SignalBus.Unsubscribe<TotalXpChangedSignal>(OnTotalXpChanged);
 		}
 
+		private void Update()
+		{
+			Vector3 posOffset = Vector3.zero;
+			float rotationOffset = 0f;
+			float scaleOffset = 0f;
+
+			if (xpMultiplier > 1)
+			{
+				float k = xpMultiplier / 10f;
+				float posAmplitude = k * 10f;
+				float rotAmplitude = k * 3f;
+				float scaleAmplitude = k * 0.1f;
+
+				float frequency = 10f;
+				float t = Time.time * frequency;
+
+				float posX = Mathf.PerlinNoise(t, 11.1f) * 2 - 1;
+				float posY = Mathf.PerlinNoise(t, 22.2f) * 2 - 1;
+
+				float rot = Mathf.PerlinNoise(t, 33.3f) * 2 - 1;
+				float scale = Mathf.PerlinNoise(t, 44.4f) * 2 - 1;
+
+				posOffset = new Vector3(
+					posX * posAmplitude,
+					posY * posAmplitude,
+					0f
+				);
+				rotationOffset = rot * rotAmplitude;
+				scaleOffset = scale * scaleAmplitude;
+			}
+
+			_xpMultiplierPanel.localPosition = xpMultiplierPosition + posOffset;
+			_xpMultiplierPanel.localRotation = Quaternion.Euler(0f, 0f, rotationOffset);
+			_xpMultiplierPanel.localScale = Vector3.one * (1f + scaleOffset);
+		}
+
 		private void OnMoveXpChanged(MoveXpChangedSignal signal)
 		{
 			if (signal.Player != _player) return;
@@ -79,8 +125,8 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		{
 			if (signal.Player != _player) return;
 
-			multiplier = _player.XpMultiplier;
-			if (multiplier == 0)
+			xpMultiplier = _player.XpMultiplier;
+			if (xpMultiplier == 0)
 			{
 				destMoveXp = 0;
 				currMoveXp = 0;
@@ -177,7 +223,15 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			_xpBarFill.fillAmount = (float)(currTotalXp - minTotalXp) / (float)(maxTotalXp - minTotalXp);
 			_xpValue.text = $"{minTotalXp} -> {currTotalXp} -> {maxTotalXp}";
 			_levelValue.text = $"Level {level}";
-			_moveXpValue.text = $"{currMoveXp} x {multiplier} = {(currMoveXp * multiplier)}";
+
+			_moveXpValue.text = $"{currMoveXp}";
+			_xpMultiplierValue.text = $"<size=120>x</size>{xpMultiplier}";
+			_totalXpValue.text = $"={(currMoveXp * xpMultiplier)}";
+
+			for (int i = 0; i < _fireImages.Length; i++)
+			{
+				_fireImages[i].SetActive(i == xpMultiplier || (xpMultiplier > 10 && i == 10));
+			}
 		}
 
 		private void UpdateLevel()

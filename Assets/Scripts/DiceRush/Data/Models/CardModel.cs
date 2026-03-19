@@ -21,6 +21,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 		Minus2FromDice,
 
 		RedrawToken,
+		ReplaceTokenWithEnemy,
 
 		Plus1ToHealth,
 		Plus2ToHealth,
@@ -44,6 +45,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 			new CardModel(CardKind.Dice, CardType.Minus2FromDice, 2),
 
 			new CardModel(CardKind.Bag, CardType.RedrawToken, 2),
+			new CardModel(CardKind.Bag, CardType.ReplaceTokenWithEnemy, 2),
 
 			new CardModel(CardKind.Battle, CardType.Plus1ToHealth, 2),
 			new CardModel(CardKind.Battle, CardType.Plus2ToHealth, 2),

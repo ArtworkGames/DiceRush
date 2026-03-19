@@ -10,6 +10,11 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 
 		[SerializeField] private Animator _animator;
 
+		private void Start()
+		{
+			_animator.speed = 2f;
+		}
+
 		public void ShowEnemyAttack()
 		{
 			_animator.SetBool("EnemyAttack", true);

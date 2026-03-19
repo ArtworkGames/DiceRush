@@ -2,7 +2,9 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Dice;
+using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.UI.Windows;
 using System;
@@ -43,18 +45,18 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 		[Space]
 		[SerializeField] private PlayerStats _playerStats;
 		[SerializeField] private EnemyStats _enemyStats;
-
 		[Space]
 		[SerializeField] private CharacterAnimation _playerAnimation;
 		[SerializeField] private Transform _playerImageContainer;
-		
 		[Space]
 		[SerializeField] private CharacterAnimation _enemyAnimation;
 		[SerializeField] private Transform _enemyImageContainer;
-
 		[Space]
 		[SerializeField] private StatsAnimation _statsAnimation;
+		[Space]
+		[SerializeField] private TMP_Text _timeLabel;
 
+		private float startTime;
 		private bool isVictory;
 
 		private bool isEnemyAttacked;
@@ -95,6 +97,8 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 			_enemyStats.AttackValue.text = Params.Enemy.BaseAttack > 0 ? $"+{Params.Enemy.BaseAttack}" : "";
 
 			UpdateEnemyDiceValue(0);
+
+			startTime = Time.time;
 		}
 
 		override protected void AfterOpen()
@@ -109,6 +113,13 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 		override protected void AfterClose()
 		{
 			Params.OnVictory?.Invoke();
+		}
+
+		private void Update()
+		{
+			float time = Time.time - startTime;
+			string timeStr = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
+			_timeLabel.text = timeStr;
 		}
 
 		private async UniTask LoadImage(Transform parent, string imageName, string imagePath)
@@ -133,7 +144,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 			_playerStats.HealthValue.text = Params.Player.Model.Health.ToString();
 
 			int defense = Params.Player.Model.BaseDefense;
-			int defenseDelta = Params.Player.Model.Defense - Params.Player.Model.BaseDefense;
+			int defenseDelta = Params.Player.Model.Defense + Params.Player.Model.ExtraDefense - Params.Player.Model.BaseDefense;
 			string defenseDeltaStr = "";
 			if (defenseDelta != 0)
 			{
@@ -144,7 +155,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 			_playerStats.DefenseValue.text = defense.ToString() + defenseDeltaStr;
 
 			int attack = Params.Player.Model.BaseAttack;
-			int attackDelta = Params.Player.Model.Attack - Params.Player.Model.BaseAttack;
+			int attackDelta = Params.Player.Model.Attack + Params.Player.Model.ExtraAttack - Params.Player.Model.BaseAttack;
 			string attackDeltaStr = "";
 			if (attackDelta != 0)
 			{
@@ -169,14 +180,21 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 		{
 			DeckController deckController = ServiceLocator.Get<DeckController>();
 			DiceController diceController = ServiceLocator.Get<DiceController>();
+			PerksManager perksManager = ServiceLocator.Get<PerksManager>();
+			XpManager xpManager = ServiceLocator.Get<XpManager>();
 
-			//await deckController.PrepareForBattle(Params.Player);
-			//UpdatePlayerBattleValues();
-
-			//await UniTask.WaitForSeconds(0.5f);
+			Params.Player.Model.BattleRound = 0;
 
 			do
 			{
+				Params.Player.Model.BattleRound++;
+				Params.Player.Model.ExtraDefense = 0;
+
+				//SignalBus.Publish(new BattleRoundStartedSignal(Params.Player, Params.Enemy));
+
+				await perksManager.UseForBattleRoundStarted(Params.Player.Model);
+
+				UpdatePlayerBattleValues();
 				UpdateEnemyDiceValue(0);
 				await deckController.PrepareForBattle(Params.Player);
 				UpdatePlayerBattleValues();
@@ -194,9 +212,11 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				await UniTask.WaitUntil(() => isStatsEnemyAttacked);
 
 				int enemyAttack = Params.Enemy.BaseAttack + diceValue;
-				int playerDamage = Mathf.Max(0, enemyAttack - Params.Player.Model.Defense);
-				Params.Player.Model.Health = Math.Max(0, Params.Player.Model.Health - playerDamage);
+				int playerDamage = Mathf.Max(0, enemyAttack - (Params.Player.Model.Defense + Params.Player.Model.ExtraDefense));
+				Params.Player.Model.Health = Mathf.Max(0, Params.Player.Model.Health - playerDamage);
 				UpdatePlayerHealthValue();
+
+				xpManager.AddMoveXp(Params.Player.Model, enemyAttack);
 
 				if (Params.Player.Model.Health == 0)
 				{
@@ -210,7 +230,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				_playerAnimation.ShowDamage();
 				await UniTask.WaitUntil(() => isPlayerDamaged);
 
-				await UniTask.WaitForSeconds(0.5f);
+				await UniTask.WaitForSeconds(0.2f);
 
 				isPlayerAttacked = false;
 				_playerAnimation.ShowAttack();
@@ -220,14 +240,23 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				_statsAnimation.ShowPlayerAttack();
 				await UniTask.WaitUntil(() => isStatsPlayerAttacked);
 
-				Params.Enemy.Health = Math.Max(0, Params.Enemy.Health - Params.Player.Model.Attack);
+				int playerAttack = Params.Player.Model.Attack;
+				Params.Enemy.Health = Mathf.Max(0, Params.Enemy.Health - playerAttack);
 				UpdateEnemyHealthValue();
+
+				xpManager.AddMoveXp(Params.Player.Model, playerAttack);
 
 				if (Params.Enemy.Health == 0)
 				{
 					isEnemyDied = false;
 					_enemyAnimation.ShowDeath();
 					await UniTask.WaitUntil(() => isEnemyDied);
+
+					//SignalBus.Publish(new PlayerWonBattleSignal(Params.Player, Params.Enemy));
+
+					await perksManager.UseForPlayerWonBattle(Params.Player.Model);
+
+					UpdatePlayerBattleValues();
 					break;
 				}
 
@@ -235,7 +264,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				_enemyAnimation.ShowDamage();
 				await UniTask.WaitUntil(() => isEnemyDamaged);
 
-				await UniTask.WaitForSeconds(0.5f);
+				await UniTask.WaitForSeconds(0.2f);
 			}
 			while (true);
 

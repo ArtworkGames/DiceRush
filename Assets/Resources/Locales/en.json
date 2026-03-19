@@ -9,6 +9,9 @@
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
 
+    { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} cards in the deck:" },
+    { "key": "DeckDescriptionPopup:CardsOffer", "value": "Offer: {0} cards" },
+
 
     { "key": "Card:RerollDice", "value": "Reroll The Dice" },
     { "key": "Card:Plus1ToDice", "value": "+1 To Dice Value" },
@@ -17,6 +20,7 @@
     { "key": "Card:Minus2FromDice", "value": "-2 From Dice Value" },
 
     { "key": "Card:RedrawToken", "value": "Redraw The Token" },
+    { "key": "Card:ReplaceTokenWithEnemy", "value": "Replace Token With Enemy" },
 
     { "key": "Card:Plus1ToHealth", "value": "+1 To Health" },
     { "key": "Card:Plus2ToHealth", "value": "+2 To Health" },
@@ -32,14 +36,11 @@
     { "key": "Perk:FirstMultiplierX3:Title", "value": "Head Start" },
     { "key": "Perk:FirstMultiplierX3:Description", "value": "The first extra move in a chain gives x3 instead of x2" },
 
-    { "key": "Perk:OneCardEvery3Move:Title", "value": "Accumulator" },
-    { "key": "Perk:OneCardEvery3Move:Description", "value": "Every 3rd extra move in a chain grants +1 card after the turn ends" },
+    { "key": "Perk:XpBonusForEachMultiplier:Title", "value": "Nice Bonus" },
+    { "key": "Perk:XpBonusForEachMultiplier:Description", "value": "+1 XP whenever the multiplier increases" },
 
-    { "key": "Perk:XpBonusForMultiplierX4:Title", "value": "Hot Streak" },
-    { "key": "Perk:XpBonusForMultiplierX4:Description", "value": "If the turn reached 4+ multipliers → gain +1 XP per action" },
-
-    { "key": "Perk:InstantCardEvery5Move:Title", "value": "Chain Rush" },
-    { "key": "Perk:InstantCardEvery5Move:Description", "value": "If the chain reaches 5+ multipliers → immediately gain +1 card" },
+    { "key": "Perk:OneCardForMultiplierX5:Title", "value": "Accumulator" },
+    { "key": "Perk:OneCardForMultiplierX5:Description", "value": "Multiplier x5 gives +1 card" },
 
     { "key": "Perk:CardsPerOfferPlus1:Title", "value": "Broader Choice I" },
     { "key": "Perk:CardsPerOfferPlus1:Description", "value": "Each card offer contains +1 card" },
@@ -50,14 +51,11 @@
     { "key": "Perk:CardsPerOfferPlus3:Title", "value": "Broader Choice III" },
     { "key": "Perk:CardsPerOfferPlus3:Description", "value": "Each card offer contains +3 cards" },
 
-    { "key": "Perk:HitPointsPlus1:Title", "value": "Thick Skin I" },
-    { "key": "Perk:HitPointsPlus1:Description", "value": "+1 to maximum Health" },
+    { "key": "Perk:IncreaseFirstDefenseBy1:Title", "value": "Iron Fortitude" },
+    { "key": "Perk:IncreaseFirstDefenseBy1:Description", "value": "The first damage taken in each battle is reduced by 1" },
 
-    { "key": "Perk:HitPointsPlus2:Title", "value": "Thick Skin II" },
-    { "key": "Perk:HitPointsPlus2:Description", "value": "+2 to maximum Health" },
-
-    { "key": "Perk:HitPointsPlus3:Title", "value": "Thick Skin III" },
-    { "key": "Perk:HitPointsPlus3:Description", "value": "+3 to maximum Health" },
+    { "key": "Perk:Restore1HealthAfterVictory:Title", "value": "Tempered" },
+    { "key": "Perk:Restore1HealthAfterVictory:Description", "value": "Each victory over an enemy restores +1 health" },
 
     { "key": "Perk:OpponentsSkipMove:Title", "value": "Disarray" },
     { "key": "Perk:OpponentsSkipMove:Description", "value": "All opponents skip their next turn" },

@@ -7,11 +7,11 @@ namespace StepanoffGames.DiceRush.UI.Windows.Animators
 {
 	public class CenterContentAnimator : BaseWindowAnimator
 	{
-		protected CanvasGroup canvasGroup;
-
-		protected float showDuration = 0.15f;
-		protected float hideDuration = 0.15f;
+		protected float showDuration = 0.2f;
+		protected float hideDuration = 0.2f;
 		protected float minScale = 0.9f;
+
+		protected CanvasGroup canvasGroup;
 
 		private bool shown;
 		private Tween scaleTween;

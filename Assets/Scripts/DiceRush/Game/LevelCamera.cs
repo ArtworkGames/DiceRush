@@ -1,15 +1,20 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using StepanoffGames.DiceRush.Game.Path;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace StepanoffGames.DiceRush.Game
 {
 	public class LevelCamera : MonoBehaviour
 	{
 		[SerializeField] private Camera _camera;
+		[Space]
+		//[SerializeField] private float _dragSpeed = 20f;
+		[SerializeField] private bool _invert = false;
 
 		public Camera Camera => _camera;
 
@@ -29,16 +34,92 @@ namespace StepanoffGames.DiceRush.Game
 		//private float focusOnBackOfPlayerDistance = -40f;
 		//private float focusOnBackOfPlayerTime = 1f;
 
-		private PathController _path;
+		private PathController _pathController;
+
+		private bool isDragging;
+		private Vector2 lastMousePosition;
+		//private Vector3 lastWorldPointOnPlane;
+		private Plane dragPlane;
+		//private Vector3 destPosition;
 
 		private void Start()
 		{
-			_path = ServiceLocator.Get<PathController>();
+			_pathController = ServiceLocator.Get<PathController>();
+
+			dragPlane = new Plane(Vector3.up, Vector3.zero);
 		}
 
 		private void OnDestroy()
 		{
-			_path = null;
+			_pathController = null;
+		}
+
+		private void Update()
+		{
+			if (Mouse.current == null) return;
+
+			Vector2 mousePosition = Mouse.current.position.ReadValue();
+
+			if ((mousePosition - lastMousePosition).sqrMagnitude < 0.01f)
+				return;
+
+			if (Mouse.current.leftButton.wasPressedThisFrame)
+			{
+				if (IsPointerOverUI())
+				{
+					isDragging = false;
+					return;
+				}
+
+				isDragging = true;
+				lastMousePosition = mousePosition;
+			}
+
+			if (Mouse.current.leftButton.wasReleasedThisFrame)
+			{
+				isDragging = false;
+			}
+
+			if (!isDragging || !Mouse.current.leftButton.isPressed)
+				return;
+
+			if (!TryGetPointOnDragPlane(lastMousePosition, out Vector3 lastWorldPoint))
+				return;
+
+			if (!TryGetPointOnDragPlane(mousePosition, out Vector3 currentWorldPoint))
+				return;
+
+			Vector3 delta = lastWorldPoint - currentWorldPoint;
+			delta.y = 0f;
+
+			if (_invert)
+				delta = -delta;
+
+			transform.position += delta;
+
+			lastMousePosition = mousePosition;
+		}
+
+		private bool TryGetPointOnDragPlane(Vector2 screenPosition, out Vector3 worldPoint)
+		{
+			Ray ray = _camera.ScreenPointToRay(screenPosition);
+
+			if (dragPlane.Raycast(ray, out float enter))
+			{
+				worldPoint = ray.GetPoint(enter);
+				return true;
+			}
+
+			worldPoint = default;
+			return false;
+		}
+
+		private bool IsPointerOverUI()
+		{
+			if (EventSystem.current == null)
+				return false;
+
+			return EventSystem.current.IsPointerOverGameObject();
 		}
 
 		public async UniTask FocusOnPlayer(PlayerAvatar player)
@@ -61,11 +142,11 @@ namespace StepanoffGames.DiceRush.Game
 		{
 			Vector3 pos = player.CurrentPoint.transform.position;
 			int count = 1;
-			for (int i = 0; i < _path.Markers.Count; i++)
+			for (int i = 0; i < _pathController.Markers.Count; i++)
 			{
-				if (_path.Markers[i] != null && _path.Markers[i].Cell != null)
+				if (_pathController.Markers[i] != null && _pathController.Markers[i].Cell != null)
 				{
-					pos += _path.Markers[i].Cell.transform.position;
+					pos += _pathController.Markers[i].Cell.transform.position;
 					count++;
 				}
 			}

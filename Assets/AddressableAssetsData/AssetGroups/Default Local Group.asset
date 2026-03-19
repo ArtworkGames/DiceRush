@@ -21,14 +21,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 823924ffa9a6da341904a278bd3d9efb
-    m_Address: Game/Deck
+  - m_GUID: 36549959152de034690b16b3407dd496
+    m_Address: Popups
     m_ReadOnly: 0
     m_SerializedLabels:
     - default
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: a058db47fef9b114bb2ef531a4177c82
-    m_Address: Game/CellDrawer.prefab
+  - m_GUID: 6607d30bd40e02f419f2904f886a3519
+    m_Address: Game
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - default
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ecd466c89e76fa4e9d75dfdd5e4e5ec
+    m_Address: UI
     m_ReadOnly: 0
     m_SerializedLabels:
     - default

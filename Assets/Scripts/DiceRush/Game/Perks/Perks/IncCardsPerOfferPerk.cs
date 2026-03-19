@@ -1,7 +1,8 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Players;
-using UnityEngine;
+using StepanoffGames.Services;
 
 namespace StepanoffGames.DiceRush.Game.Perks.Perks
 {
@@ -19,16 +20,17 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 			}
 		}
 
-		override public async UniTask Use(PlayerController player)
+		override public async UniTask<bool> Use(PlayerController player)
 		{
-			player.Model.CardsPerOffer = player.Model.BaseCardsPerOffer + _delta;
-			await UniTask.Yield();
+			return await Apply(player);
 		}
 
-		override public async UniTask Apply(PlayerController player)
+		override public async UniTask<bool> Apply(PlayerController player)
 		{
-			player.Model.CardsPerOffer = player.Model.BaseCardsPerOffer + _delta;
+			DeckController deckController = ServiceLocator.Get<DeckController>();
+			deckController.SetCardsPerOffer(player, player.Model.BaseCardsPerOffer + _delta);
 			await UniTask.Yield();
+			return true;
 		}
 	}
 }

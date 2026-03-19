@@ -9,7 +9,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 		Dice,
 		Bag,
 		Deck,
-		Fight,
+		Battle,
 		Opponents,
 		Cards,
 	}
@@ -19,17 +19,15 @@ namespace StepanoffGames.DiceRush.Data.Models
 		Undefined,
 
 		FirstMultiplierX3,
-		OneCardEvery3Move,
-		XpBonusForMultiplierX4,
-		InstantCardEvery5Move,
+		XpBonusForEachMultiplier,
+		OneCardForMultiplierX5,
 
 		CardsPerOfferPlus1,
 		CardsPerOfferPlus2,
 		CardsPerOfferPlus3,
 
-		HitPointsPlus1,
-		HitPointsPlus2,
-		HitPointsPlus3,
+		IncreaseFirstDefenseBy1,
+		Restore1HealthAfterVictory,
 
 		OpponentsSkipMove,
 		SwitchPlacesWithFirstOpponent,
@@ -38,28 +36,34 @@ namespace StepanoffGames.DiceRush.Data.Models
 		Take3Cards,
 	}
 
+	public enum PerkUsage
+	{
+		Undefined,
+		OneTime,
+		OneTimeSave,
+		Multiple,
+	}
+
 	public class PerkModel
 	{
 		public static PerkModel[] AllPerks = new PerkModel[]
 		{
-			new PerkModel(PerkKind.Xp, PerkType.FirstMultiplierX3, false, 2),
-			new PerkModel(PerkKind.Xp, PerkType.OneCardEvery3Move, false, 4),
-			new PerkModel(PerkKind.Xp, PerkType.XpBonusForMultiplierX4, false, 6),
-			new PerkModel(PerkKind.Xp, PerkType.InstantCardEvery5Move, false, 8),
+			new PerkModel(PerkKind.Xp, PerkType.FirstMultiplierX3, PerkUsage.Multiple),
+			new PerkModel(PerkKind.Xp, PerkType.XpBonusForEachMultiplier, PerkUsage.Multiple, PerkType.FirstMultiplierX3),
+			new PerkModel(PerkKind.Xp, PerkType.OneCardForMultiplierX5, PerkUsage.Multiple, PerkType.XpBonusForEachMultiplier),
 
-			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus1, false, 0),
-			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus2, false, 0, PerkType.CardsPerOfferPlus1),
-			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus3, false, 0, PerkType.CardsPerOfferPlus2),
+			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus1, PerkUsage.OneTimeSave),
+			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus2, PerkUsage.OneTimeSave, PerkType.CardsPerOfferPlus1),
+			new PerkModel(PerkKind.Deck, PerkType.CardsPerOfferPlus3, PerkUsage.OneTimeSave, PerkType.CardsPerOfferPlus2),
 
-			//new PerkModel(PerkKind.Fight, PerkType.HitPointsPlus1),
-			//new PerkModel(PerkKind.Fight, PerkType.HitPointsPlus2),
-			//new PerkModel(PerkKind.Fight, PerkType.HitPointsPlus3),
+			new PerkModel(PerkKind.Battle, PerkType.IncreaseFirstDefenseBy1, PerkUsage.Multiple, 0),
+			new PerkModel(PerkKind.Battle, PerkType.Restore1HealthAfterVictory, PerkUsage.Multiple, PerkType.IncreaseFirstDefenseBy1),
 
-			new PerkModel(PerkKind.Opponents, PerkType.OpponentsSkipMove, true),
-			new PerkModel(PerkKind.Opponents, PerkType.SwitchPlacesWithFirstOpponent, true),
-			new PerkModel(PerkKind.Opponents, PerkType.OpponentsStartWithBackwardMove, true),
+			//new PerkModel(PerkKind.Opponents, PerkType.OpponentsSkipMove, PerkUsage.OneTime),
+			//new PerkModel(PerkKind.Opponents, PerkType.SwitchPlacesWithFirstOpponent, PerkUsage.OneTime),
+			//new PerkModel(PerkKind.Opponents, PerkType.OpponentsStartWithBackwardMove, PerkUsage.OneTime),
 
-			new PerkModel(PerkKind.Cards, PerkType.Take3Cards, true),
+			new PerkModel(PerkKind.Cards, PerkType.Take3Cards, PerkUsage.OneTime),
 		};
 
 		public static PerkModel[] GetPerks(PerkKind kind)
@@ -74,22 +78,20 @@ namespace StepanoffGames.DiceRush.Data.Models
 
 		public PerkKind Kind;
 		public PerkType Type;
-		public bool IsSingleUse;
-		public int StartFromLevel;
+		public PerkUsage Usage;
 		public PerkType RequiredType;
 
-		public PerkModel(PerkKind kind, PerkType type, bool isSingleUse = false, int startFromLevel = 0, PerkType requiredType = PerkType.Undefined)
+		public PerkModel(PerkKind kind, PerkType type, PerkUsage usage, PerkType requiredType = PerkType.Undefined)
 		{
 			Kind = kind;
 			Type = type;
-			IsSingleUse = isSingleUse;
-			StartFromLevel = startFromLevel;
+			Usage = usage;
 			RequiredType = requiredType;
 		}
 
 		public PerkModel Clone()
 		{
-			PerkModel card = new PerkModel(Kind, Type, IsSingleUse, StartFromLevel, RequiredType);
+			PerkModel card = new PerkModel(Kind, Type, Usage, RequiredType);
 			return card;
 		}
 	}

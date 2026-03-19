@@ -14,14 +14,16 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 			_model = model;
 		}
 
-		virtual public async UniTask Use(PlayerController player)
+		virtual public async UniTask<bool> Use(PlayerController player)
 		{
 			await UniTask.Yield();
+			return false;
 		}
 
-		virtual public async UniTask Apply(PlayerController player)
+		virtual public async UniTask<bool> Apply(PlayerController player)
 		{
 			await UniTask.Yield();
+			return false;
 		}
 	}
 }

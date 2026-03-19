@@ -12,16 +12,18 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		[SerializeField] private BagAnimation _animation;
 		[SerializeField] private BagPanel _panel;
 
-		private LevelManager _level;
+		public CellType CurrentCellType => _currentCellType;
+		private CellType _currentCellType;
 
-		private CellType _cellType;
-		private bool _animationFinished;
+		private LevelManager _levelManager;
+
+		private bool animationFinished;
 
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
 
-			_level = ServiceLocator.Get<LevelManager>();
+			_levelManager = ServiceLocator.Get<LevelManager>();
 		}
 
 		private void Start()
@@ -34,22 +36,22 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		{
 			ServiceLocator.Unregister<BagController>();
 
-			_level = null;
+			_levelManager = null;
 		}
 
 		public async UniTask<CellType> Draw(PlayerController player)
 		{
 			List<CellType> cellTypes = new List<CellType>();
-			_cellType = GetCellType(player, ref cellTypes);
+			_currentCellType = GetCellType(player, ref cellTypes);
 
 			_panel.ShowTokens(cellTypes);
 
-			_animationFinished = false;
+			animationFinished = false;
 			_animation.Draw();
 
-			await UniTask.WaitUntil(() => _animationFinished);
+			await UniTask.WaitUntil(() => animationFinished);
 
-			return _cellType;
+			return _currentCellType;
 		}
 
 		public void Confirm()
@@ -61,8 +63,8 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		public CellType GetCellType(PlayerController player)
 		{
 			List<CellType> cellTypes = new List<CellType>();
-			_cellType = GetCellType(player, ref cellTypes);
-			return _cellType;
+			CellType cellType = GetCellType(player, ref cellTypes);
+			return cellType;
 		}
 
 		private CellType GetCellType(PlayerController player, ref List<CellType> cellTypes)
@@ -72,11 +74,11 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			string str = $"{playerCellIndex} [";
 
 			List<int> otherPlayerCellIndexes = new List<int>();
-			for (int i = 0; i < _level.Players.Count; i++)
+			for (int i = 0; i < _levelManager.Players.Count; i++)
 			{
-				if (player != _level.Players[i])
+				if (player != _levelManager.Players[i])
 				{
-					int cellIndex = ((Cell)_level.Players[i].Avatar.CurrentPoint).Index;
+					int cellIndex = ((Cell)_levelManager.Players[i].Avatar.CurrentPoint).Index;
 					otherPlayerCellIndexes.Add(cellIndex);
 
 					str += $"{cellIndex}, ";
@@ -107,7 +109,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				);
 			}
 
-			bool hasNearPortalCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.Portal1);
+			bool hasNearPortalCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.Portal);
 			bool hasNearMoveForwardCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveForward);
 			bool hasNearMoveBackwardCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveBackward);
 
@@ -120,6 +122,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			cellTypes.Add(CellType.Enemy);
 			cellTypes.Add(CellType.Enemy);
 			cellTypes.Add(CellType.Enemy);
+			//cellTypes.Add(CellType.Enemy); // ???
 
 			cellTypes.Add(CellType.MoveForward);
 			cellTypes.Add(CellType.MoveForward);
@@ -154,24 +157,24 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				}
 			}
 
-			cellTypes.Add(CellType.Portal1);
+			cellTypes.Add(CellType.Portal);
 			if (!hasNearPortalCell)
 			{
-				cellTypes.Add(CellType.Portal1);
-				cellTypes.Add(CellType.Portal1);
+				cellTypes.Add(CellType.Portal);
+				cellTypes.Add(CellType.Portal);
 			}
 			if (isPlayerInFrontOfAll)
 			{
 				for (int i = 0; i < frontCount; i++)
 				{
-					cellTypes.Add(CellType.Portal1);
+					cellTypes.Add(CellType.Portal);
 				}
 			}
 			if (isPlayerInBackOfAll)
 			{
 				for (int i = 0; i < backCount; i++)
 				{
-					cellTypes.Add(CellType.Portal1);
+					cellTypes.Add(CellType.Portal);
 				}
 			}
 
@@ -188,12 +191,12 @@ namespace StepanoffGames.DiceRush.Game.Bag
 
 		private void OnAnimationShowToken()
 		{
-			ShowToken(_cellType);
+			ShowToken(_currentCellType);
 		}
 
 		private void OnAnimationFinished()
 		{
-			_animationFinished = true;
+			animationFinished = true;
 		}
 	}
 }

@@ -6,50 +6,47 @@ namespace StepanoffGames.DiceRush.UI.Components.Perks
 {
 	public class PerksPanel : MonoBehaviour
 	{
-		[SerializeField] private GameObject _sourcePerk;
+		[SerializeField] private GameObject _sourcePerkItem;
 
-		private List<PerksPanelItem> _perks;
+		private Dictionary<PerkType, PerkIconItem> _perks;
 
 		private void Awake()
 		{
-			_sourcePerk.SetActive(false);
-			_perks = new List<PerksPanelItem>();
+			_perks = new Dictionary<PerkType, PerkIconItem>();
+			_sourcePerkItem.SetActive(false);
 		}
 
 		public void ShowPerks(PlayerModel player)
 		{
-			List<PerkType> perkTypes = new List<PerkType>();
 			for (int i = 0; i < player.PerksSet.Perks.Count; i++)
 			{
-				perkTypes.Add(player.PerksSet.Perks[i].Type);
-			}
-
-			HidePerks();
-
-			for (int i = 0; i < perkTypes.Count; i++)
-			{
-				AddPerk(i, perkTypes[i]);
+				if (player.PerksSet.Perks[i].Usage == PerkUsage.Multiple && !_perks.ContainsKey(player.PerksSet.Perks[i].Type))
+				{
+					AddPerk(player.PerksSet.Perks[i].Type);
+				}
 			}
 		}
 
-		private void AddPerk(int index, PerkType perkType)
+		public PerkIconItem AddPerk(PerkType perkType)
 		{
-			GameObject perkObject = Instantiate(_sourcePerk, _sourcePerk.transform.parent, false);
-			perkObject.name = "Perk" + index;
+			GameObject perkObject = Instantiate(_sourcePerkItem, _sourcePerkItem.transform.parent, false);
+			perkObject.name = $"PerkItem ({perkType})";
 			perkObject.SetActive(true);
 
-			PerksPanelItem perk = perkObject.GetComponent<PerksPanelItem>();
-			perk.UpdateView(perkType);
-			_perks.Add(perk);
+			PerkIconItem perk = perkObject.GetComponent<PerkIconItem>();
+			perk.Show(perkType);
+			_perks.Add(perkType, perk);
+
+			return perk;
 		}
 
-		public void HidePerks()
+		public PerkIconItem GetPerkItem(PerkType perkType)
 		{
-			for (int i = 0; i < _perks.Count; i++)
+			if (_perks.ContainsKey(perkType))
 			{
-				Destroy(_perks[i].gameObject);
+				return _perks[perkType];
 			}
-			_perks.Clear();
+			return null;
 		}
 	}
 }

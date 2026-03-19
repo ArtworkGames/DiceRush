@@ -2,14 +2,10 @@
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Perks;
-using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
-using StepanoffGames.DiceRush.UI.Windows.ConfirmWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
-using StepanoffGames.UI.Windows.Signals;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Xp
@@ -70,11 +66,13 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		private void OnPlayerMoveStarted(PlayerMoveStartedSignal signal)
 		{
+			IncMovesCount(signal.Player.Model);
 			IncMultiplier(signal.Player.Model);
 		}
 
 		private void OnPlayerPortalPassed(PlayerPortalPassedSignal signal)
 		{
+			IncMovesCount(signal.Player.Model);
 			IncMultiplier(signal.Player.Model);
 		}
 
@@ -89,14 +87,20 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			{
 				PlayerModel player = _dataManager.Players[i];
 
-				player.XpMultiplier = 0;
+				player.MovesCount = 0;
 				player.MoveXp = 0;
+				player.XpMultiplier = 0;
 
 				player.IsXpAdditionCompleted = false;
 
 				SignalBus.Publish(new XpMultiplierChangedSignal(_dataManager.Players[i]));
 				SignalBus.Publish(new MoveXpChangedSignal(_dataManager.Players[i]));
 			}
+		}
+
+		public void IncMovesCount(PlayerModel playerModel)
+		{
+			playerModel.MovesCount += 1;
 		}
 
 		public void IncMultiplier(PlayerModel playerModel)
@@ -138,7 +142,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 					int newLevels = player.Level - oldLevel;
 					for (int j = 0; j < newLevels; j++)
 					{
-						AddPerk(player).Forget();
+						LevelUp(player).Forget();
 					}
 
 					player.IsXpAdditionCompleted = true;
@@ -150,54 +154,14 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		public async UniTask LevelUp(PlayerModel player)
 		{
-			List<PerkModel> perks = GetPerksOffer(player);
-			if (perks.Count == 0) return;
-
-			bool levelUpWindowClosed = false;
-			PerkModel selectedPerk = null;
-
-			SignalBus.Publish(new OpenWindowSignal(LevelUpWindow.PrefabName, new LevelUpWindowParams()
+			if (player.Type == PlayerType.HI)
 			{
-				Perks = perks,
-				OnSelect = (PerkModel perk) =>
-				{
-					selectedPerk = perk;
-					levelUpWindowClosed = true;
-				}
-			}));
-
-			await UniTask.WaitUntil(() => levelUpWindowClosed);
-
-			if (!selectedPerk.IsSingleUse)
-			{
-				player.PerksSet.AddPerk(selectedPerk);
-				_perksManager.ShowPerks(player);
+				await _perksManager.SelectPerk(player);
 			}
-
-			PlayerController playerController = _levelManager.GetPlayer(player);
-			await _perksManager.UsePerk(playerController, selectedPerk);
-		}
-
-		private async UniTask AddPerk(PlayerModel player)
-		{
-			List<PerkModel> perks = GetPerksOffer(player);
-			if (perks.Count == 0) return;
-
-			PerkModel selectedPerk = perks[Random.Range(0, perks.Count)];
-
-			if (!selectedPerk.IsSingleUse)
-			{
-				player.PerksSet.AddPerk(selectedPerk);
+            else
+            {
+				_perksManager.AddPerk(player).Forget();
 			}
-
-			PlayerController playerController = _levelManager.GetPlayer(player);
-			await _perksManager.ApplyPerk(playerController, selectedPerk);
-		}
-
-		private List<PerkModel> GetPerksOffer(PlayerModel player)
-		{
-			List<PerkModel> perks = _perksManager.GetPerksOffer(player);
-			return perks;
 		}
 
 		public async UniTask CheckXpAdditionCompleted()

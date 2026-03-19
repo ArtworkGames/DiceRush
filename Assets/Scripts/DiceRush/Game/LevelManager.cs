@@ -6,7 +6,9 @@ using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game
@@ -22,14 +24,18 @@ namespace StepanoffGames.DiceRush.Game
 		[SerializeField] private PlayerAvatar[] _avatars;
 		[Space]
 		[SerializeField] private Camera _hudCamera;
+		[SerializeField] private Camera _uiCamera;
 		[Space]
 		[Range(1, 4)]
 		[SerializeField] private int _playersCount;
+		[Space]
+		[SerializeField] private TMP_Text _timeLabel;
 
 		public LevelCamera Camera => _camera;
 		public List<PlayerController> Players => _players;
 
 		public Camera HUDCamera => _hudCamera;
+		public Camera UICamera => _uiCamera;
 
 		private Map _map;
 		private DataManager _dataManager;
@@ -37,6 +43,7 @@ namespace StepanoffGames.DiceRush.Game
 
 		private List<PlayerController> _players;
 
+		private float startTime;
 		private int movesCount;
 
 		private void Awake()
@@ -76,11 +83,15 @@ namespace StepanoffGames.DiceRush.Game
 				}
 			}
 
+			startTime = Time.time;
+
 			GameLoop();
 		}
 
 		private void OnDestroy()
 		{
+			ServiceLocator.Unregister<LevelManager>();
+
 			_map = null;
 			_dataManager = null;
 			_xpManager = null;
@@ -89,8 +100,13 @@ namespace StepanoffGames.DiceRush.Game
 			{
 				_players[i].Destroy();
 			}
+		}
 
-			ServiceLocator.Unregister<LevelManager>();
+		private void Update()
+		{
+			float time = Time.time - startTime;
+			string timeStr = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
+			_timeLabel.text = timeStr;
 		}
 
 		public PlayerController GetPlayer(PlayerModel playerModel)
@@ -154,6 +170,8 @@ namespace StepanoffGames.DiceRush.Game
 			{
 				movesCount++;
 				//_movesCount.text = "Move: " + movesCount;
+
+				_map.ResetUsedCells();
 
 				SignalBus.Publish(new TurnStartedSignal());
 
@@ -226,7 +244,7 @@ namespace StepanoffGames.DiceRush.Game
 						currentCellTypes.AddRange(moveBackwardCellTypes);
 					}
 
-					CellType cellType = currentCellTypes[Random.Range(0, currentCellTypes.Count)];
+					CellType cellType = currentCellTypes[UnityEngine.Random.Range(0, currentCellTypes.Count)];
 					cell.SetType(cellType);
 				}
 			}

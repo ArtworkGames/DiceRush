@@ -692,6 +692,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: WindowFade
       objectReference: {fileID: 0}
+    - target: {fileID: 3640506508564734567, guid: a4126fddc8943ac44a20895b84407e69, type: 3}
+      propertyPath: _hideDuration
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3640506508564734567, guid: a4126fddc8943ac44a20895b84407e69, type: 3}
+      propertyPath: _showDuration
+      value: 0.15
+      objectReference: {fileID: 0}
     - target: {fileID: 4378095563270760339, guid: a4126fddc8943ac44a20895b84407e69, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

@@ -10,10 +10,10 @@ namespace StepanoffGames.DiceRush.Game.Players
 		{
 		}
 
-		override protected async UniTask<int> RollDice(CellType cellType)
+		override protected async UniTask<int> RollDice(bool isMoveForward)
 		{
-			int diceValue = _dice.GetValue(this);
-			diceValue = await _deck.ApplyDiceRoll(this, diceValue);
+			int diceValue = _diceController.GetValue(this);
+			diceValue = await _deckController.ApplyDiceRoll(this, diceValue);
 
 			return diceValue;
 		}
@@ -46,8 +46,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		override protected async UniTask<CellType> DrawToken()
 		{
-			CellType cellType = _bag.GetCellType(this);
-			cellType = await _deck.ApplyTokenDraw(this, cellType);
+			CellType cellType = _bagController.GetCellType(this);
+			cellType = await _deckController.ApplyTokenDraw(this, cellType);
 
 			return cellType;
 		}
@@ -56,7 +56,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 		{
 			await UniTask.Yield();
 
-			_chest.AddCards(this);
+			_chestController.AddCards(this);
 		}
 
 		override protected async UniTask BeforeMoveToNextPortal(Cell portalCell)

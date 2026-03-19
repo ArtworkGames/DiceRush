@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.DiceRush.UI.Windows.BattleWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
@@ -14,6 +15,8 @@ namespace StepanoffGames.DiceRush.Game.Battle
 	{
 		[SerializeField] private Transform _battleWindowParent;
 
+		private XpManager _xpManager;
+
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
@@ -21,11 +24,14 @@ namespace StepanoffGames.DiceRush.Game.Battle
 
 		private void Start()
 		{
+			_xpManager = ServiceLocator.Get<XpManager>();
 		}
 
 		private void OnDestroy()
 		{
 			ServiceLocator.Unregister<BattleController>();
+
+			_xpManager = null;
 		}
 
 		public async UniTask Fight(PlayerController player)
@@ -61,6 +67,11 @@ namespace StepanoffGames.DiceRush.Game.Battle
 
 			player.Model.Defense = player.Model.BaseDefense;
 			player.Model.Attack = player.Model.BaseAttack;
+
+			if (isVictory)
+			{
+				//await _xpManager.LevelUp(player.Model);
+			}
 		}
 
 		private EnemyModel GetEnemyForPlayer(PlayerController player)

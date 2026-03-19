@@ -10,17 +10,23 @@ namespace StepanoffGames.DiceRush.Data.Models
 	{
 		public PlayerType Type;
 
-		public int BaseAttack = 5;
+		public int MaxHealth = 20;
 		public int BaseDefense = 3;
+		public int BaseAttack = 5;
 
 		public int Health = 20;
-		public int Attack = 5;
 		public int Defense = 3;
+		public int Attack = 5;
+
+		public int ExtraDefense;
+		public int ExtraAttack;
+		public int BattleRound;
 
 		public int Place;
 		public int PrevPlace;
 		public int CellIndex;
 
+		public int MovesCount;
 		public int MoveXp;
 		public int XpMultiplier;
 		public int TotalXp;
@@ -48,6 +54,8 @@ namespace StepanoffGames.DiceRush.Data.Models
 			_deck.AddCard(CardModel.GetCard(CardType.Plus1ToDefense).Clone());
 
 			_perksSet = new PerksSetModel();
+
+			//_perksSet.AddPerk(PerkModel.GetPerk(PerkType.IncreaseFirstDefenseBy1).Clone());
 		}
 	}
 }
