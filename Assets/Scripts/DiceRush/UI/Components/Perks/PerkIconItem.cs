@@ -10,25 +10,39 @@ using UnityEngine.EventSystems;
 
 namespace StepanoffGames.DiceRush.UI.Components.Perks
 {
-	public class PerkIconItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+	public class PerkIconItem : TweenButton// MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	{
-		[SerializeField] private Transform _icon;
+		//[SerializeField] private Transform _icon;
 
 		public PerkType Type => _type;
 		private PerkType _type;
 
-		public Transform Icon => _icon;
 		public GameObject IconObject => _iconObject;
 
 		private GameObject _iconObject;
 
 		private Tween widthTween;
-		private Tween scaleTween;
+		//private Tween scaleTween;
 
-		private void OnDestroy()
+		private void Awake()
 		{
+			mode = TweenButtonMode.Focusable;
+		}
+
+		override protected void OnDestroy()
+		{
+			base.OnDestroy();
+
 			widthTween?.Kill();
-			scaleTween?.Kill();
+			//scaleTween?.Kill();
+		}
+
+		public void Init(PerkType type)
+		{
+			_type = type;
+			LoadIcon(true).Forget();
+			//_iconObject.SetActive(false);
+			((RectTransform)transform).SetWidth(140f);
 		}
 
 		public void Show(PerkType type)
@@ -38,7 +52,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Perks
 			float width = 0f;
 			((RectTransform)transform).SetWidth(width);
 
-			LoadIcon().Forget();
+			LoadIcon(false).Forget();
 
 			//_icon.localScale = Vector3.zero;
 
@@ -59,16 +73,16 @@ namespace StepanoffGames.DiceRush.UI.Components.Perks
 			//	});
 		}
 
-		private async UniTask LoadIcon()
+		private async UniTask LoadIcon(bool iconObjectActive)
 		{
 			string perkName = $"{_type}PerkIcon";
 			string perkPath = $"UI/Perks/{perkName}.prefab";
 			var handle = Addressables.LoadAssetAsync<GameObject>(perkPath);
 			await UniTask.WaitUntil(() => handle.IsDone);
 
-			_iconObject = Instantiate(handle.Result, _icon, false);
+			_iconObject = Instantiate(handle.Result, _content, false);
 			_iconObject.name = perkName;
-			_iconObject.SetActive(false);
+			_iconObject.SetActive(iconObjectActive);
 		}
 
 		public void ShowIcon()
@@ -76,25 +90,29 @@ namespace StepanoffGames.DiceRush.UI.Components.Perks
 			_iconObject.SetActive(true);
 		}
 
-		public void OnPointerEnter(PointerEventData eventData)
+		override public void OnPointerEnter(PointerEventData eventData)
 		{
 			PerkDescriptionPopup.Show(this);
 
-			scaleTween?.Kill();
-			scaleTween = _icon.DOScale(1.2f, 0.2f)
-				.SetEase(Ease.OutBack);
+			base.OnPointerEnter(eventData);
+
+			//scaleTween?.Kill();
+			//scaleTween = _icon.DOScale(1.2f, 0.2f)
+			//	.SetEase(Ease.OutBack);
 		}
 
-		public void OnPointerExit(PointerEventData eventData)
+		override public void OnPointerExit(PointerEventData eventData)
 		{
 			SignalBus.Publish(new CloseAllPopupsSignal()
 			{
 				CloseAutoclosingPopups = false
 			});
 
-			scaleTween?.Kill();
-			scaleTween = _icon.DOScale(1f, 0.15f)
-				.SetEase(Ease.OutCubic);
+			base.OnPointerExit(eventData);
+
+			//scaleTween?.Kill();
+			//scaleTween = _icon.DOScale(1f, 0.15f)
+			//	.SetEase(Ease.OutCubic);
 		}
 	}
 }

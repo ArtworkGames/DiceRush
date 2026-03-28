@@ -18,15 +18,15 @@ namespace StepanoffGames.DiceRush.Game
 
 		public Camera Camera => _camera;
 
-		private float focusOnPlayerHeight = 2f;
+		//private float focusOnPlayerHeight = 2f;
 		private float focusOnPlayerDistance = -15f;
 		private float focusOnPlayerTime = 1f;
 
-		private float focusOnCellHeight = 2f;
+		//private float focusOnCellHeight = 2f;
 		private float focusOnCellDistance = -15f;
 		private float focusOnCellTime = 1f;
 
-		private float focusOnFrontOfPlayerHeight = 5f;
+		//private float focusOnFrontOfPlayerHeight = 5f;
 		private float focusOnFrontOfPlayerDistance = -40f;
 		private float focusOnFrontOfPlayerTime = 1f;
 

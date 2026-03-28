@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
@@ -11,7 +10,6 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 	public class DeckPanel : MonoBehaviour
 	{
 		[SerializeField] private Button _confirmButton;
-		//[SerializeField] private TMP_Text _cardsCountText;
 		[SerializeField] private DeckButton _deckButton;
 
 		public DeckButton DeckButton => _deckButton;
@@ -31,8 +29,6 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			_selectedCard = null;
 			_confirmSelected = false;
 
-			//_cardsCountText.text = $"Cards: {totalCardsCount}";
-
 			await ShowCards(cardModels);
 			_confirmButton.gameObject.SetActive(true);
 
@@ -48,12 +44,8 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 				await _selectedCard.ShowSelected();
 				_selectedCard.HideSelected().Forget();
 
-				//_cardsCountText.text = "";
-
 				return _selectedCard.Model;
 			}
-
-			//_cardsCountText.text = "";
 
 			return null;
 		}
@@ -120,19 +112,6 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 				}
 			}
 		}
-
-		//private void ClearCards()
-		//{
-		//	for (int i = 0; i < _cards.Count; i++)
-		//	{
-		//		_cards[i].Model = null;
-		//		_cards[i].OnSelect -= OnCardSelect;
-
-		//		Destroy(_cards[i].gameObject);
-		//	}
-
-		//	_cards.Clear();
-		//}
 
 		private void OnConfirmButtonClick()
 		{

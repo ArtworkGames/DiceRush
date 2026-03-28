@@ -9,7 +9,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 	{
 		protected PathController _path;
 
-		public HIPlayerController(PlayerModel model, PlayerAvatar avatar) : base(model, avatar)
+		public HIPlayerController(PlayerModel model, PlayerAvatar avatar, PlayerController prevPlayer) : base(model, avatar, prevPlayer)
 		{
 			_path = ServiceLocator.Get<PathController>();
 		}
@@ -23,6 +23,9 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		override protected async UniTask<int> RollDice(bool isMoveForward)
 		{
+			//SetState(PlayerState.Waiting);
+			SetState(PlayerState.RollDice);
+
 			if (!isMoveForward)
 			{
 				_path.ShowMarkersInBackOfPlayer(_avatar);
@@ -31,47 +34,52 @@ namespace StepanoffGames.DiceRush.Game.Players
 			{
 				_path.ShowMarkersInFrontOfPlayer(_avatar);
 			}
-			await _levelManager.Camera.FocusOnPathMarkers(_avatar);
+			//await _levelManager.Camera.FocusOnPathMarkers(_avatar);
+			_levelManager.Camera.FocusOnPathMarkers(_avatar).Forget();
 
-			int diceValue = await _diceController.Roll(this);
+			_lastDiceValue = await _diceController.Roll(this);
 
 			if (!isMoveForward)
 			{
-				_path.ShowDiceValueInBackOfPlayer(_avatar, diceValue);
+				_path.ShowDiceValueInBackOfPlayer(_avatar, _lastDiceValue);
 			}
 			else
 			{
-				_path.ShowDiceValueInFrontOfPlayer(_avatar, diceValue);
+				_path.ShowDiceValueInFrontOfPlayer(_avatar, _lastDiceValue);
 			}
 
-			int oldDiceValue = diceValue;
-			diceValue = await _deckController.ConfirmDiceRoll(this, diceValue);
+			SetState(PlayerState.ConfirmDice);
 
-			if (diceValue != oldDiceValue)
+			int oldDiceValue = _lastDiceValue;
+			_lastDiceValue = await _deckController.ConfirmDiceRoll(this, _lastDiceValue);
+
+			if (_lastDiceValue != oldDiceValue)
 			{
 				//_dice.ShowValue(diceValue);
 
 				if (!isMoveForward)
 				{
-					_path.ShowDiceValueInBackOfPlayer(_avatar, diceValue);
+					_path.ShowDiceValueInBackOfPlayer(_avatar, _lastDiceValue);
 				}
 				else
 				{
-					_path.ShowDiceValueInFrontOfPlayer(_avatar, diceValue);
+					_path.ShowDiceValueInFrontOfPlayer(_avatar, _lastDiceValue);
 				}
 			}
 			_diceController.Confirm();
 
-			return diceValue;
+			return _lastDiceValue;
 		}
 
 		override protected async UniTask<int> SelectNextDirection(int diceValue, int cellsPassed)
 		{
+			SetState(PlayerState.SelectDirection);
+
 			//await Game.Instance.Camera.FocusOnWayMarkers(_view);
 			_levelManager.Camera.FocusOnPathMarkers(_avatar).Forget();
 
 			int directionIndex = await _forkController.SelectNextDirection(_avatar.CurrentPoint, _avatar);
-
+			
 			_path.ShowDiceValueInFrontOfPlayer(_avatar, diceValue - cellsPassed, directionIndex);
 
 			return directionIndex;
@@ -79,11 +87,13 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		override protected async UniTask<int> SelectPrevDirection(int diceValue, int cellsPassed)
 		{
+			SetState(PlayerState.SelectDirection);
+
 			//await Game.Instance.Camera.FocusOnWayMarkers(_view);
 			_levelManager.Camera.FocusOnPathMarkers(_avatar).Forget();
 
 			int directionIndex = await _forkController.SelectPrevDirection(_avatar.CurrentPoint, _avatar);
-
+			
 			_path.ShowDiceValueInBackOfPlayer(_avatar, diceValue - cellsPassed, directionIndex);
 
 			return directionIndex;
@@ -92,7 +102,6 @@ namespace StepanoffGames.DiceRush.Game.Players
 		override protected async UniTask EndMove()
 		{
 			await UniTask.Yield();
-
 			_path.HideMarkers();
 		}
 
@@ -103,35 +112,44 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		override protected async UniTask<CellType> DrawToken()
 		{
-			await _levelManager.Camera.FocusOnPlayer(_avatar);
+			//SetState(PlayerState.Waiting);
+			SetState(PlayerState.DrawToken);
 
-			CellType cellType = await _bagController.Draw(this);
+			//await _levelManager.Camera.FocusOnPlayer(_avatar);
+			_levelManager.Camera.FocusOnPlayer(_avatar).Forget();
 
-			CellType oldCellType = cellType;
-			cellType = await _deckController.ConfirmTokenDraw(this, cellType);
+			_lastCellType = await _bagController.Draw(this);
 
-			if (cellType != oldCellType)
+			SetState(PlayerState.ConfirmToken);
+			
+			CellType oldCellType = _lastCellType;
+			_lastCellType = await _deckController.ConfirmTokenDraw(this, _lastCellType);
+
+			if (_lastCellType != oldCellType)
 			{
-				_bagController.ShowToken(cellType);
+				_bagController.ShowToken(_lastCellType);
 			}
 
 			_bagController.Confirm();
 
-			return cellType;
+			return _lastCellType;
 		}
 
 		override protected async UniTask OpenChest()
 		{
+			SetState(PlayerState.OpenChest);
 			await _chestController.Open(this);
 		}
 
 		override protected async UniTask Battle()
 		{
+			SetState(PlayerState.Battle);
 			await _battleController.Fight(this);
 		}
 
 		override protected async UniTask BeforeMoveToNextPortal(Cell portalCell)
 		{
+			SetState(PlayerState.MoveToPortal);
 			await _levelManager.Camera.FocusOnCell(portalCell);
 
 			//await UniTask.WaitForSeconds(0.5f);

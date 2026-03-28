@@ -6,9 +6,39 @@ namespace StepanoffGames.DiceRush.Data.Models
 		AI
 	}
 
+	public enum PlayerState
+	{
+		Undefined,
+		Waiting,
+		RollDice,
+		ConfirmDice,
+		MoveForward,
+		MoveBackward,
+		SelectDirection,
+		DrawToken,
+		ConfirmToken,
+		OpenChest,
+		Battle,
+		MoveToPortal,
+		MoveToPosition,
+		CountXp,
+		EndTurn,
+	}
+
+	public enum PlayerColor
+	{
+		Red,
+		Blue,
+		Green,
+		Yellow,
+	}
+
 	public class PlayerModel
 	{
+		public string Name;
+
 		public PlayerType Type;
+		public PlayerState State;
 
 		public int MaxHealth = 20;
 		public int BaseDefense = 3;
@@ -41,10 +71,11 @@ namespace StepanoffGames.DiceRush.Data.Models
 		public PerksSetModel PerksSet => _perksSet;
 		private PerksSetModel _perksSet;
 
-		public bool IsXpAdditionCompleted;
+		public bool IsTotalXpCounted;
 
-		public PlayerModel(PlayerType type)
+		public PlayerModel(string name, PlayerType type)
 		{
+			Name = name;
 			Type = type;
 
 			_deck = new DeckModel();

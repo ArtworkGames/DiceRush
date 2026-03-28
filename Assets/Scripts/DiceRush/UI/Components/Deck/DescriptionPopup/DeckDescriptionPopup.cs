@@ -1,7 +1,6 @@
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.UI.Components;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup

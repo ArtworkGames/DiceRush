@@ -15,11 +15,12 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 		override public async UniTask<int> UseForDice(PlayerController player, int diceValue)
 		{
 			DiceController dice = ServiceLocator.Get<DiceController>();
-
 			dice.Confirm();
 			await UniTask.NextFrame();
 
+			player.SetState(PlayerState.RollDice);
 			diceValue = await dice.Roll(player);
+			player.SetState(PlayerState.ConfirmDice);
 
 			return diceValue;
 		}

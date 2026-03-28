@@ -184,10 +184,10 @@ namespace StepanoffGames.DiceRush.Game.Perks
 			}
 		}
 
-		public void ShowPerks(PlayerModel player)
-		{
-			_panel.ShowPerks(player);
-		}
+		//public void ShowPerks(PlayerModel player)
+		//{
+		//	_panel.ShowPerks(player);
+		//}
 
 		private void OnXpMultiplierChanged(XpMultiplierChangedSignal signal)
 		{

@@ -15,11 +15,12 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 		override public async UniTask<CellType> UseForToken(PlayerController player, CellType cellType)
 		{
 			BagController bag = ServiceLocator.Get<BagController>();
-
 			bag.Confirm();
 			await UniTask.NextFrame();
 
+			player.SetState(PlayerState.DrawToken);
 			cellType = await bag.Draw(player);
+			player.SetState(PlayerState.ConfirmToken);
 
 			return cellType;
 		}

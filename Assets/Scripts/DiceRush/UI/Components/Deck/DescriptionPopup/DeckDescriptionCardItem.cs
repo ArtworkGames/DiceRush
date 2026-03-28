@@ -34,13 +34,9 @@ namespace StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup
 
 			GameObject cardObject = Instantiate(handle.Result, _card, false);
 			cardObject.name = cardName;
-			//cardObject.transform.localScale = Vector3.one * 0.75f;
-			//cardObject.transform.localPosition = new Vector3(0f, -350f, 0f);
 
 			DeckPanelCard card = cardObject.GetComponent<DeckPanelCard>();
 			card.Model = cardModel;
-			//card.OnSelect += OnCardSelect;
-			//_cards.Add(card);
 
 			Button button = cardObject.GetComponent<Button>();
 			Destroy(button);

@@ -81,7 +81,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 			_statsAnimation.OnEnemyAttack += OnStatsEnemyAttack;
 			_statsAnimation.OnPlayerAttack += OnStatsPlayerAttack;
 
-			string playerImageName = $"RedPlayer";
+			string playerImageName = $"{Params.Player.Avatar.Color}Player";
 			string playerImagePath = $"Windows/BattleWindow/Players/{playerImageName}.prefab";
 			LoadImage(_playerImageContainer, playerImageName, playerImagePath).Forget();
 

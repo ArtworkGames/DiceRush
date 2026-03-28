@@ -17,6 +17,8 @@ namespace StepanoffGames.DiceRush.Game.Deck
 	{
 		[SerializeField] private DeckPanel _panel;
 
+		public DeckPanel Panel => _panel;
+
 		private BagController _bagController;
 
 		private void Awake()
@@ -60,7 +62,6 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 		public async UniTask<int> ConfirmDiceRoll(PlayerController player, int diceValue)
 		{
-			_panel.DeckButton.SetPlayer(player.Model);
 			return await ConfirmDiceRollInternal(player, true, diceValue);
 		}
 
@@ -112,18 +113,11 @@ namespace StepanoffGames.DiceRush.Game.Deck
 				}
 			}
 
-			// ???
-			if (!isHuman)
-			{
-				await UniTask.WaitForSeconds(1f);
-			}
-
 			return diceValue;
 		}
 
 		public async UniTask<CellType> ConfirmTokenDraw(PlayerController player, CellType tileType)
 		{
-			_panel.DeckButton.SetPlayer(player.Model);
 			return await ConfirmTokenDrawInternal(player, true, tileType);
 		}
 
@@ -185,12 +179,6 @@ namespace StepanoffGames.DiceRush.Game.Deck
 				{
 					await UniTask.WaitForSeconds(0.5f);
 				}
-			}
-
-			// ???
-			if (!isHuman)
-			{
-				await UniTask.WaitForSeconds(1f);
 			}
 
 			return tileType;

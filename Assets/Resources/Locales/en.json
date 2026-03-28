@@ -9,6 +9,17 @@
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
 
+    { "key": "PlayerDescriptionPopup:PlaceLabel", "value": "Place:" },
+    { "key": "PlayerDescriptionPopup:PlaceValue", "value": "Place {0}. Position {1}." },
+    { "key": "PlayerDescriptionPopup:XpLabel", "value": "Level:" },
+    { "key": "PlayerDescriptionPopup:XpValue", "value": "Level {0}. Xp {1}." },
+    { "key": "PlayerDescriptionPopup:MoveLabel", "value": "Current Move:" },
+    { "key": "PlayerDescriptionPopup:MoveValue", "value": "Xp {0} x {1} = {2}." },
+    { "key": "PlayerDescriptionPopup:PerksLabel", "value": "Perks:" },
+    { "key": "PlayerDescriptionPopup:DeckLabel", "value": "Deck:" },
+    { "key": "PlayerDescriptionPopup:DeckValue", "value": "Cards: {0} ({1}/{2}/{3}). Offer: {4}" },
+    { "key": "PlayerDescriptionPopup:BattleLabel", "value": "Battle:" },
+
     { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} cards in the deck:" },
     { "key": "DeckDescriptionPopup:CardsOffer", "value": "Offer: {0} cards" },
 

@@ -14,6 +14,8 @@ namespace StepanoffGames.DiceRush.UI.Components
 	{
 		[SerializeField] protected Transform _content;
 
+		public Transform Content => _content;
+
 		protected TweenButtonMode mode = TweenButtonMode.Pressable;
 
 		protected float focusTime = 0.2f;

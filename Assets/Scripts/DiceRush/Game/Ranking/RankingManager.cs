@@ -53,11 +53,6 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 			{
 				PlayerController player = _levelManager.Players[i];
 				players.Add(player);
-
-				if (player.Avatar.CurrentPoint is Cell)
-				{
-					player.Model.CellIndex = ((Cell)player.Avatar.CurrentPoint).Index;
-				}
 			}
 
 			players.Sort((a, b) => b.Model.CellIndex.CompareTo(a.Model.CellIndex));

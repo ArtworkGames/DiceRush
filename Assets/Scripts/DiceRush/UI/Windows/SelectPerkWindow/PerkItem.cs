@@ -67,6 +67,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow
 			//_canvasGroup.blocksRaycasts = false;
 
 			await LoadIcon();
+			if (isDestroyed) return;
 
 			LocalizationManager localizationManager = ServiceLocator.Get<LocalizationManager>();
 			_title.text = localizationManager.GetString($"Perk:{model.Type}:Title");
@@ -93,6 +94,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow
 			string perkPath = $"UI/Perks/{perkName}.prefab";
 			var handle = Addressables.LoadAssetAsync<GameObject>(perkPath);
 			await UniTask.WaitUntil(() => handle.IsDone);
+			if (isDestroyed) return;
 
 			iconObject = Instantiate(handle.Result, _icon, false);
 			iconObject.name = perkName;

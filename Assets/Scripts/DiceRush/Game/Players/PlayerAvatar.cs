@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using StepanoffGames.DiceRush.Data.Models;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Players
@@ -7,10 +8,12 @@ namespace StepanoffGames.DiceRush.Game.Players
 	public class PlayerAvatar : MonoBehaviour
 	{
 		[SerializeField] private int _id;
+		[SerializeField] private PlayerColor _color;
 
 		public int Id => _id;
-		public MapPoint CurrentPoint => _currentPoint;
+		public PlayerColor Color => _color;
 
+		public MapPoint CurrentPoint => _currentPoint;
 		private MapPoint _currentPoint;
 
 		private float speed = 12f;

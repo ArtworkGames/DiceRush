@@ -3,7 +3,7 @@
     <type fullname="StepanoffGames.DiceRush.Game.CellDrawer" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Components.Deck.DeckPanelCard" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Components.Perks.FlyingPerkTarget" preserve="all" />
-    <type fullname="StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup.DeckDescriptionPopup" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup.DeckDescriptionCardItem" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup.FlyingIconPopup" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Popups.PerkDescriptionPopup.PerkDescriptionPopup" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.Animators.CenterContentAnimator" preserve="all" />

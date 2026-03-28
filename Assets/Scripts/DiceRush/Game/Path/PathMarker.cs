@@ -59,7 +59,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 
 		private void Update()
 		{
-			Vector3 pos = new Vector3(0f, 2.5f + 0.5f * Mathf.Sin(Time.time * 4f), 0f);
+			Vector3 pos = new Vector3(0f, 1.5f + 0.5f * Mathf.Sin(Time.time * 4f), 0f);
 			_markerMeshRenderer.transform.localPosition = pos;
 			_markerMeshRenderer.transform.Rotate(new Vector3(0f, Time.deltaTime * Mathf.Rad2Deg * 2f, 0f));
 		}

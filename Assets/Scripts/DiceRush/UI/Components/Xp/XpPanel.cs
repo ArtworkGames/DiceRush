@@ -1,19 +1,23 @@
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
-using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Players.Signals;
+using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace StepanoffGames.DiceRush.Game.Xp
+namespace StepanoffGames.DiceRush.UI.Components.Xp
 {
 	public class XpPanel : MonoBehaviour
 	{
-		[SerializeField] private int _playerIndex;
+		[SerializeField] private HideablePanel _totalXpPanel;
+		[SerializeField] private HideablePanel _moveXpPanel;
 		[Space]
 		[SerializeField] private Image _xpBarFill;
 		[SerializeField] private TMP_Text _xpValue;
@@ -27,6 +31,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		[SerializeField] private GameObject[] _fireImages;
 
 		private XpManager _xpManager;
+		
 		private PlayerModel _player;
 
 		private int destMoveXp;
@@ -45,11 +50,10 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		private void Start()
 		{
-			DataManager dataManager = ServiceLocator.Get<DataManager>();
-			_player = dataManager.Players[_playerIndex];
-
 			_xpManager = ServiceLocator.Get<XpManager>();
 
+			SignalBus.Subscribe<PlayerTurnStartedSignal>(OnPlayerTurnStarted);
+			SignalBus.Subscribe<PlayerTurnEndedSignal>(OnPlayerTurnEnded);
 			SignalBus.Subscribe<MoveXpChangedSignal>(OnMoveXpChanged);
 			SignalBus.Subscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
 			SignalBus.Subscribe<TotalXpChangedSignal>(OnTotalXpChanged);
@@ -71,7 +75,10 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			totalXpValueTween?.Kill();
 
 			_xpManager = null;
+			_player = null;
 
+			SignalBus.Unsubscribe<PlayerTurnStartedSignal>(OnPlayerTurnStarted);
+			SignalBus.Unsubscribe<PlayerTurnEndedSignal>(OnPlayerTurnEnded);
 			SignalBus.Unsubscribe<MoveXpChangedSignal>(OnMoveXpChanged);
 			SignalBus.Unsubscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
 			SignalBus.Unsubscribe<TotalXpChangedSignal>(OnTotalXpChanged);
@@ -111,6 +118,75 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			_xpMultiplierPanel.localPosition = xpMultiplierPosition + posOffset;
 			_xpMultiplierPanel.localRotation = Quaternion.Euler(0f, 0f, rotationOffset);
 			_xpMultiplierPanel.localScale = Vector3.one * (1f + scaleOffset);
+		}
+
+		private async UniTask Show()
+		{
+			List<UniTask> tasks = new();
+			tasks.Add(_totalXpPanel.Show());
+			tasks.Add(_moveXpPanel.Show());
+			await UniTask.WhenAll(tasks);
+		}
+
+		private async UniTask Hide()
+		{
+			List<UniTask> tasks = new();
+			tasks.Add(_totalXpPanel.Hide());
+			tasks.Add(_moveXpPanel.Hide());
+			await UniTask.WhenAll(tasks);
+		}
+
+		public async void SetPlayer(PlayerModel player)
+		{
+			if (_player == player) return;
+
+			if (_totalXpPanel.IsShown)
+			{
+				await Hide();
+			}
+
+			_player = player;
+
+			moveXpValueTween?.Kill();
+			totalXpValueTween?.Kill();
+
+			destMoveXp = _player.MoveXp;
+			xpMultiplier = _player.XpMultiplier;
+			destTotalXp = _player.TotalXp;
+			level = _player.Level;
+
+			currMoveXp = destMoveXp;
+			currTotalXp = destTotalXp;
+			minTotalXp = 0;
+			maxTotalXp = 0;
+
+			UpdateLevel();
+			UpdateValues();
+
+			await Show();
+		}
+
+		public async void ClearPlayer()
+		{
+			_player = null;
+			if (_totalXpPanel.IsShown)
+			{
+				await Hide();
+			}
+		}
+
+		private void OnPlayerTurnStarted(PlayerTurnStartedSignal signal)
+		{
+			if (signal.Player.Model.Type != PlayerType.HI) return;
+			SetPlayer(signal.Player.Model);
+		}
+
+		private void OnPlayerTurnEnded(PlayerTurnEndedSignal signal)
+		{
+			if (signal.Player.Model == _player)
+			{
+				ClearPlayer();
+			}
 		}
 
 		private void OnMoveXpChanged(MoveXpChangedSignal signal)
@@ -178,7 +254,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			{
 				AnimateTotalXpValue(destTotalXp, () =>
 				{
-					_player.IsXpAdditionCompleted = true;
+					_player.IsTotalXpCounted = true;
 				});
 			}
 			else

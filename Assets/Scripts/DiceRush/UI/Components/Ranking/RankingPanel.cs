@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Game;
 using StepanoffGames.DiceRush.Game.Players;
@@ -13,16 +14,25 @@ namespace StepanoffGames.DiceRush.UI.Components.Ranking
 	{
 		[SerializeField] private PlayerItem[] _playerItems;
 
-		private void Start()
+		private async void Start()
 		{
 			SignalBus.Subscribe<PlayerPlaceChangedSignal>(OnPlayerPlaceChanged);
 			SignalBus.Subscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 			SignalBus.Subscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
 
-			DataManager dataManager = ServiceLocator.Get<DataManager>();
+			//DataManager dataManager = ServiceLocator.Get<DataManager>();
+			//for (int i = 0; i < _playerItems.Length; i++)
+			//{
+			//	_playerItems[i].Model = dataManager.Players[i];
+			//}
+
+			await UniTask.NextFrame();
+			await UniTask.NextFrame();
+
+			LevelManager levelManager = ServiceLocator.Get<LevelManager>();
 			for (int i = 0; i < _playerItems.Length; i++)
 			{
-				_playerItems[i].Model = dataManager.Players[i];
+				_playerItems[i].SetPlayer(levelManager.Players[i]);
 			}
 		}
 
@@ -37,7 +47,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Ranking
 		{
 			for (int i = 0; i < _playerItems.Length; i++)
 			{
-				if (_playerItems[i].Model == signal.Player.Model)
+				if (_playerItems[i].Player.Model == signal.Player.Model)
 				{
 					bool up = signal.PrevPlace > signal.Place;
 					_playerItems[i].MoveToPlace(signal.Place, up);
@@ -61,7 +71,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Ranking
 		{
 			for (int i = 0; i < _playerItems.Length; i++)
 			{
-				if (_playerItems[i].Model == player.Model)
+				if (_playerItems[i].Player.Model == player.Model)
 				{
 					int cellIndex = ((Cell)player.Avatar.CurrentPoint).Index;
 					_playerItems[i].UpdateCell(cellIndex);

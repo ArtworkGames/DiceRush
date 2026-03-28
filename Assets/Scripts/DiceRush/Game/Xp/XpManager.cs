@@ -1,9 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Perks;
+using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
+using StepanoffGames.DiceRush.UI.Components.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using UnityEngine;
@@ -12,8 +15,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 {
 	public class XpManager : MonoBehaviour, IService
 	{
+		[SerializeField] private XpPanel _panel;
+
 		private DataManager _dataManager;
 		private LevelManager _levelManager;
+		private DeckController _deckController;
 		private PerksManager _perksManager;
 
 		private float baseXp = 20f;
@@ -28,10 +34,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		{
 			_dataManager = ServiceLocator.Get<DataManager>();
 			_levelManager = ServiceLocator.Get<LevelManager>();
+			_deckController = ServiceLocator.Get<DeckController>();
 			_perksManager = ServiceLocator.Get<PerksManager>();
 
-			SignalBus.Subscribe<TurnStartedSignal>(OnMoveStarted);
-			SignalBus.Subscribe<TurnEndedSignal>(OnMoveEnded);
+			SignalBus.Subscribe<TurnStartedSignal>(OnTurnStarted);
+			SignalBus.Subscribe<TurnEndedSignal>(OnTurnEnded);
 
 			SignalBus.Subscribe<PlayerMoveStartedSignal>(OnPlayerMoveStarted);
 			SignalBus.Subscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
@@ -44,24 +51,25 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 			_dataManager = null;
 			_levelManager = null;
+			_deckController = null;
 			_perksManager = null;
 
-			SignalBus.Unsubscribe<TurnStartedSignal>(OnMoveStarted);
-			SignalBus.Unsubscribe<TurnEndedSignal>(OnMoveEnded);
+			SignalBus.Unsubscribe<TurnStartedSignal>(OnTurnStarted);
+			SignalBus.Unsubscribe<TurnEndedSignal>(OnTurnEnded);
 
 			SignalBus.Unsubscribe<PlayerMoveStartedSignal>(OnPlayerMoveStarted);
 			SignalBus.Unsubscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 			SignalBus.Unsubscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
 		}
 
-		private void OnMoveStarted(TurnStartedSignal signal)
+		private void OnTurnStarted(TurnStartedSignal signal)
 		{
 			StartTurn();
 		}
 
-		private void OnMoveEnded(TurnEndedSignal signal)
+		private void OnTurnEnded(TurnEndedSignal signal)
 		{
-			EndTurn();
+			//EndTurn();
 		}
 
 		private void OnPlayerMoveStarted(PlayerMoveStartedSignal signal)
@@ -91,7 +99,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 				player.MoveXp = 0;
 				player.XpMultiplier = 0;
 
-				player.IsXpAdditionCompleted = false;
+				player.IsTotalXpCounted = false;
 
 				SignalBus.Publish(new XpMultiplierChangedSignal(_dataManager.Players[i]));
 				SignalBus.Publish(new MoveXpChangedSignal(_dataManager.Players[i]));
@@ -119,43 +127,96 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			SignalBus.Publish(new MoveXpChangedSignal(playerModel));
 		}
 
-		private void EndTurn()
+		//private void EndTurn()
+		//{
+		//	for (int i = 0; i < _dataManager.Players.Count; i++)
+		//	{
+		//		PlayerModel player = _dataManager.Players[i];
+
+		//		int xp = player.MoveXp * player.XpMultiplier;
+		//		if (xp == 0f)
+		//		{
+		//			player.IsTotalXpCounted = true;
+		//			continue;
+		//		}
+
+		//		player.TotalXp += xp;
+
+		//		int oldLevel = player.Level;
+		//		UpdateLevel(player);
+
+		//		if (player.Type == PlayerType.AI)
+		//		{
+		//			int newLevels = player.Level - oldLevel;
+		//			for (int j = 0; j < newLevels; j++)
+		//			{
+		//				LevelUp(player).Forget();
+		//			}
+
+		//			player.IsTotalXpCounted = true;
+		//		}
+
+		//		SignalBus.Publish(new TotalXpChangedSignal(_dataManager.Players[i]));
+		//	}
+		//}
+
+		public async UniTask CountTotalXp(PlayerModel player)
 		{
-			for (int i = 0; i < _dataManager.Players.Count; i++)
+			int xp = player.MoveXp * player.XpMultiplier;
+			if (xp == 0f)
 			{
-				PlayerModel player = _dataManager.Players[i];
-
-				int xp = player.MoveXp * player.XpMultiplier;
-				if (xp == 0f)
-				{
-					player.IsXpAdditionCompleted = true;
-					continue;
-				}
-
-				player.TotalXp += xp;
-
-				int oldLevel = player.Level;
-				UpdateLevel(player);
-
-				if (player.Type == PlayerType.AI)
-				{
-					int newLevels = player.Level - oldLevel;
-					for (int j = 0; j < newLevels; j++)
-					{
-						LevelUp(player).Forget();
-					}
-
-					player.IsXpAdditionCompleted = true;
-				}
-
-				SignalBus.Publish(new TotalXpChangedSignal(_dataManager.Players[i]));
+				player.IsTotalXpCounted = true;
+				return;
 			}
+
+			//if (player.Type == PlayerType.HI)
+			//{
+			//	PlayerController playerController = _levelManager.GetPlayer(player);
+			//	_levelManager.Camera.FocusOnPlayer(playerController.Avatar).Forget();
+			//	await UniTask.WaitForSeconds(1f);
+
+			//	_panel.SetPlayer(player);
+
+			//	//_perksManager.Panel.SetPlayer(player);
+			//	//PlayerController playerController = _levelManager.GetPlayer(player);
+			//	//_deckController.Panel.DeckButton.SetPlayer(playerController);
+			//}
+
+			player.TotalXp += xp;
+
+			int oldLevel = player.Level;
+			UpdateLevel(player);
+
+			if (player.Type == PlayerType.AI)
+			{
+				int newLevels = player.Level - oldLevel;
+				for (int j = 0; j < newLevels; j++)
+				{
+					LevelUp(player).Forget();
+				}
+				player.IsTotalXpCounted = true;
+			}
+
+			SignalBus.Publish(new TotalXpChangedSignal(player));
+
+			await UniTask.WaitUntil(() => player.IsTotalXpCounted);
+
+			//if (player.Type == PlayerType.HI)
+			//{
+			////	_deckController.Panel.DeckButton.ClearPlayer();
+
+			//	await UniTask.WaitForSeconds(0.5f);
+			//}
 		}
 
 		public async UniTask LevelUp(PlayerModel player)
 		{
 			if (player.Type == PlayerType.HI)
 			{
+				//_perksManager.Panel.SetPlayer(player);
+				//PlayerController playerController = _levelManager.GetPlayer(player);
+				//_deckController.Panel.DeckButton.SetPlayer(playerController);
+
 				await _perksManager.SelectPerk(player);
 			}
             else
@@ -164,27 +225,27 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			}
 		}
 
-		public async UniTask CheckXpAdditionCompleted()
-		{
-			bool isXpAdditionCompleted = true;
-			do
-			{
-				isXpAdditionCompleted = true;
-				for (int i = 0; i < _dataManager.Players.Count; i++)
-				{
-					PlayerModel player = _dataManager.Players[i];
+		//public async UniTask CheckXpAdditionCompleted()
+		//{
+		//	bool isXpAdditionCompleted = true;
+		//	do
+		//	{
+		//		isXpAdditionCompleted = true;
+		//		for (int i = 0; i < _dataManager.Players.Count; i++)
+		//		{
+		//			PlayerModel player = _dataManager.Players[i];
 
-					if (!player.IsXpAdditionCompleted)
-					{
-						isXpAdditionCompleted = false;
-						break;
-					}
-				}
+		//			if (!player.IsTotalXpCounted)
+		//			{
+		//				isXpAdditionCompleted = false;
+		//				break;
+		//			}
+		//		}
 
-				await UniTask.WaitForSeconds(0.1f);
-			}
-			while (!isXpAdditionCompleted);
-		}
+		//		await UniTask.WaitForSeconds(0.1f);
+		//	}
+		//	while (!isXpAdditionCompleted);
+		//}
 
 		public int GetXpForLevel(int level)
 		{

@@ -70,12 +70,15 @@ namespace StepanoffGames.DiceRush.Game
 			}
 
 			_players = new List<PlayerController>();
+			PlayerController prevHiPlayer = null;
 			for (int i = 0; i < _playersCount; i++)
 			{
 				switch (_dataManager.Players[i].Type)
 				{
 					case PlayerType.HI:
-						_players.Add(new HIPlayerController(_dataManager.Players[i], _avatars[i]));
+						PlayerController hiPlayer = new HIPlayerController(_dataManager.Players[i], _avatars[i], prevHiPlayer);
+						_players.Add(hiPlayer);
+						prevHiPlayer = hiPlayer;
 						break;
 					case PlayerType.AI:
 						_players.Add(new AIPlayerController(_dataManager.Players[i], _avatars[i]));
@@ -124,59 +127,27 @@ namespace StepanoffGames.DiceRush.Game
 		private async void GameLoop()
 		{
 			await UniTask.NextFrame();
+			await UniTask.NextFrame();
 
 			for (int i = 0; i < _playersCount; i++)
 			{
 				_avatars[i].SetToCellPlayerPosition(_map.StartCell);
 			}
 
-
-			// VAR 1
-
-			//movesCount = 0;
-			//do
-			//{
-			//	movesCount++;
-			//	//_movesCount.text = "Move: " + movesCount;
-
-			//	for (int i = 0; i < _playerCount; i++)
-			//	{
-			//		//_playerColor.color = _players[i].Color;
-
-			//		await _playerControllers[i].MoveForward();
-
-			//		await UniTask.WaitForSeconds(0.1f);
-			//	}
-
-			//	if (IsFinished()) break;
-			//}
-			//while (true);
-
-
-			// VAR 2
-
-			//FillMap();
-
-			//for (int i = 0; i < _playersCount; i++)
-			//{
-			//	PlayerLoop(_players[i]);
-			//}
-
-
-			// VAR 3
+			await UniTask.NextFrame();
+			await UniTask.NextFrame();
 
 			movesCount = 0;
 			do
 			{
 				movesCount++;
-				//_movesCount.text = "Move: " + movesCount;
 
 				_map.ResetUsedCells();
 
 				SignalBus.Publish(new TurnStartedSignal());
 
 				List<UniTask> tasks = new();
-				for (int i = 0; i < _playersCount; i++)
+				for (int i = 0; i < _players.Count; i++)
 				{
 					tasks.Add(_players[i].Turn());
 				}
@@ -184,22 +155,7 @@ namespace StepanoffGames.DiceRush.Game
 
 				SignalBus.Publish(new TurnEndedSignal());
 
-				//await UniTask.WaitForSeconds(0.1f);
-
-				await _xpManager.CheckXpAdditionCompleted();
-
 				if (IsFinished()) break;
-			}
-			while (true);
-		}
-
-		private async void PlayerLoop(PlayerController playerController)
-		{
-			do
-			{
-				await playerController.Turn();
-
-				//if (playerController) break;
 			}
 			while (true);
 		}

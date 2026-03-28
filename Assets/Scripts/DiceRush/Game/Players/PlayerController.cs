@@ -7,8 +7,10 @@ using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Dice;
 using StepanoffGames.DiceRush.Game.Fork;
 using StepanoffGames.DiceRush.Game.Players.Signals;
+using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
+using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Players
 {
@@ -20,6 +22,15 @@ namespace StepanoffGames.DiceRush.Game.Players
 		public PlayerAvatar Avatar => _avatar;
 		protected PlayerAvatar _avatar;
 
+		public PlayerController PrevPlayer => _prevPlayer;
+		protected PlayerController _prevPlayer;
+
+		public int LastDiceValue => _lastDiceValue;
+		protected int _lastDiceValue;
+
+		public CellType LastCellType => _lastCellType;
+		protected CellType _lastCellType;
+
 		protected LevelManager _levelManager;
 		protected Map _map;
 		protected DiceController _diceController;
@@ -28,13 +39,15 @@ namespace StepanoffGames.DiceRush.Game.Players
 		protected ForkController _forkController;
 		protected ChestController _chestController;
 		protected BattleController _battleController;
+		protected XpManager _xpManager;
 
 		protected bool _isSkipNextMove;
 
-		public PlayerController(PlayerModel model, PlayerAvatar avatar)
+		public PlayerController(PlayerModel model, PlayerAvatar avatar, PlayerController prevPlayer)
 		{
 			_model = model;
 			_avatar = avatar;
+			_prevPlayer = prevPlayer;
 
 			_levelManager = ServiceLocator.Get<LevelManager>();
 			_map = ServiceLocator.Get<Map>();
@@ -44,6 +57,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_forkController = ServiceLocator.Get<ForkController>();
 			_chestController = ServiceLocator.Get<ChestController>();
 			_battleController = ServiceLocator.Get<BattleController>();
+			_xpManager = ServiceLocator.Get<XpManager>();
 		}
 
 		virtual public void Destroy()
@@ -58,11 +72,47 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_deckController = null;
 			_chestController = null;
 			_battleController = null;
+			_xpManager = null;
+		}
+
+		public void SetState(PlayerState state)
+		{
+			if (_model.Type == PlayerType.HI)
+			{
+				Debug.Log($"[PlayerController] SetState: {state} - {Time.time}");
+			}
+
+			_model.State = state;
+			SignalBus.Publish(new PlayerStateChangedSignal(this));
 		}
 
 		public async UniTask Turn()
 		{
+			if (_prevPlayer != null)
+			{
+				SetState(PlayerState.Waiting);
+				await UniTask.WaitUntil(() => _prevPlayer.Model.State == PlayerState.EndTurn);
+			}
+
+			SignalBus.Publish(new PlayerTurnStartedSignal(this));
+
 			await MoveForward(true);
+
+			if (_model.Type == PlayerType.HI)
+				await UniTask.WaitForSeconds(0.5f);
+
+			SetState(PlayerState.CountXp);
+			await _xpManager.CountTotalXp(_model);
+
+			if (_model.Type == PlayerType.HI)
+				await UniTask.WaitForSeconds(0.5f);
+
+			SignalBus.Publish(new PlayerTurnEndedSignal(this));
+
+			if (_model.Type == PlayerType.HI)
+				await UniTask.WaitForSeconds(0.5f);
+
+			SetState(PlayerState.EndTurn);
 		}
 
 		public async UniTask MoveForward(bool isFirst = false)
@@ -80,21 +130,22 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 			SignalBus.Publish(new PlayerMoveStartedSignal(this));
 
-			//CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
-			//bool isMoveForward = isFirst || cellType != CellType.MoveBackward;
-			int diceValue = await RollDice(true);
+			_lastDiceValue = await RollDice(true);
 
-			for (int i = 0; i < diceValue; i++)
+			for (int i = 0; i < _lastDiceValue; i++)
 			{
 				do
 				{
 					if (_avatar.CurrentPoint.NextPoints.Count == 1)
 					{
+						SetState(PlayerState.MoveForward);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.NextPoints[0]);
 					}
 					else if (_avatar.CurrentPoint.NextPoints.Count > 1)
 					{
-						int nextIndex = await SelectNextDirection(diceValue, i);
+						int nextIndex = await SelectNextDirection(_lastDiceValue, i);
+
+						SetState(PlayerState.MoveForward);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.NextPoints[nextIndex]);
 					}
 					else
@@ -103,6 +154,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 					}
 				}
 				while (!(_avatar.CurrentPoint is Cell));
+
+				_model.CellIndex = ((Cell)_avatar.CurrentPoint).Index;
 
 				SignalBus.Publish(new PlayerCellPassedSignal(this));
 
@@ -113,7 +166,6 @@ namespace StepanoffGames.DiceRush.Game.Players
 			}
 
 			await EndMove();
-
 			await CheckCurrentCell();
 		}
 
@@ -132,20 +184,22 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 			SignalBus.Publish(new PlayerMoveStartedSignal(this));
 
-			//CellType cellType = ((Cell)_avatar.CurrentPoint).Type;
-			int diceValue = await RollDice(false);
+			_lastDiceValue = await RollDice(false);
 
-			for (int i = 0; i < diceValue; i++)
+			for (int i = 0; i < _lastDiceValue; i++)
 			{
 				do
 				{
 					if (_avatar.CurrentPoint.PrevPoints.Count == 1)
 					{
+						SetState(PlayerState.MoveBackward);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.PrevPoints[0]);
 					}
 					else if (_avatar.CurrentPoint.PrevPoints.Count > 1)
 					{
-						int prevIndex = await SelectPrevDirection(diceValue, i);
+						int prevIndex = await SelectPrevDirection(_lastDiceValue, i);
+
+						SetState(PlayerState.MoveBackward);
 						await _avatar.MoveToPoint(_avatar.CurrentPoint.PrevPoints[prevIndex]);
 					}
 					else
@@ -154,6 +208,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 					}
 				}
 				while (!(_avatar.CurrentPoint is Cell));
+
+				_model.CellIndex = ((Cell)_avatar.CurrentPoint).Index;
 
 				SignalBus.Publish(new PlayerCellPassedSignal(this));
 
@@ -164,7 +220,6 @@ namespace StepanoffGames.DiceRush.Game.Players
 			}
 
 			await EndMove();
-
 			await CheckCurrentCell();
 		}
 
@@ -175,37 +230,9 @@ namespace StepanoffGames.DiceRush.Game.Players
 			Cell currentCell = (Cell)_avatar.CurrentPoint;
 			bool isJustDefinedCell = false;
 
-			//if (currentCell.Type == CellType.Empty)
-			//{
-			//	if (currentCell.IsLocked)
-			//	{
-			//		await BeforeWaitForCellToUnlock();
-
-			//		await UniTask.WaitWhile(() => currentCell.IsLocked);
-			//	}
-			//	else
-			//	{
-			//		isJustDefinedCell = true;
-			//		currentCell.SetLocked(true);
-
-			//		CellType tileType = await DrawToken();
-			//		currentCell.SetType(tileType);
-
-			//		currentCell.SetLocked(false);
-			//	}
-			//}
-
-			//if (currentCell.IsUsed)
-			//{
-			//	await _avatar.MoveToCurrentCellPlayerPosition();
-			//	await UniTask.WaitForSeconds(1f);
-			//	return;
-			//}
-
 			if (currentCell.IsUsed || currentCell.IsLocked)
 			{
-				await _avatar.MoveToCurrentCellPlayerPosition();
-				await UniTask.WaitForSeconds(1f);
+				await MoveToPlayerPosition();
 				return;
 			}
 
@@ -214,8 +241,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 				isJustDefinedCell = true;
 				currentCell.SetLocked(true);
 
-				CellType tileType = await DrawToken();
-				currentCell.SetType(tileType);
+				_lastCellType = await DrawToken();
+				currentCell.SetType(_lastCellType);
 
 				currentCell.SetLocked(false);
 			}
@@ -227,8 +254,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 				case CellType.Start:
 				case CellType.Finish:
 				case CellType.Regular:
-					await _avatar.MoveToCurrentCellPlayerPosition();
-					await UniTask.WaitForSeconds(1f);
+					await MoveToPlayerPosition();
 					break;
 
 				case CellType.Reward:
@@ -236,14 +262,12 @@ namespace StepanoffGames.DiceRush.Game.Players
 					{
 						await OpenChest();
 					}
-					await _avatar.MoveToCurrentCellPlayerPosition();
-					await UniTask.WaitForSeconds(1f);
+					await MoveToPlayerPosition();
 					break;
 
 				case CellType.Enemy:
 					await Battle();
-					await _avatar.MoveToCurrentCellPlayerPosition();
-					await UniTask.WaitForSeconds(1f);
+					await MoveToPlayerPosition();
 					break;
 
 				case CellType.MoveForward:
@@ -255,37 +279,23 @@ namespace StepanoffGames.DiceRush.Game.Players
 					break;
 
 				case CellType.Portal:
-					//Cell otherCell = _map.GetOtherCellSameTypeClosestToFinish((Cell)_avatar.CurrentPoint);
-
-					//Cell otherPortal = null;
-					//int cellIndex = 0;
-					//for (int i = 0; i < _map.Cells.Length; i++)
-					//{
-					//	if (_map.Cells[i].Type == CellType.Portal && !_map.Cells[i].IsUsed && _map.Cells[i] != _avatar.CurrentPoint && _map.Cells[i].Index > cellIndex)
-					//	{
-					//		cellIndex = _map.Cells[i].Index;
-					//		otherPortal = _map.Cells[i];
-					//	}
-					//}
-
 					Cell otherPortal = _map.GetOtherPortal(currentCell);
 
 					if (otherPortal != null)
 					{
 						otherPortal.SetLocked(true);
-
 						await BeforeMoveToNextPortal(otherPortal);
 
 						otherPortal.SetUsed(true);
 						otherPortal.SetLocked(false);
 
 						_avatar.SetToCellCenterPosition(otherPortal);
+						_model.CellIndex = otherPortal.Index;
 
 						SignalBus.Publish(new PlayerPortalPassedSignal(this));
 					}
 
-					_avatar.MoveToCurrentCellPlayerPosition().Forget();
-					await UniTask.WaitForSeconds(1f);
+					await MoveToPlayerPosition();
 					break;
 			}
 		}
@@ -337,6 +347,12 @@ namespace StepanoffGames.DiceRush.Game.Players
 		virtual protected async UniTask BeforeMoveToNextPortal(Cell portalCell)
 		{
 			await UniTask.Yield();
+		}
+
+		virtual protected async UniTask MoveToPlayerPosition()
+		{
+			SetState(PlayerState.MoveToPosition);
+			await _avatar.MoveToCurrentCellPlayerPosition();
 		}
 	}
 }

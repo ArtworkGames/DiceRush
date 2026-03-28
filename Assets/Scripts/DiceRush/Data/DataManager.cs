@@ -21,10 +21,10 @@ namespace StepanoffGames.DiceRush.Data
 		{
 			_players = new List<PlayerModel>();
 
-			AddPlayer(new PlayerModel(PlayerType.HI));
-			AddPlayer(new PlayerModel(PlayerType.AI));
-			AddPlayer(new PlayerModel(PlayerType.AI));
-			AddPlayer(new PlayerModel(PlayerType.AI));
+			AddPlayer(new PlayerModel("Player 1", PlayerType.HI));
+			AddPlayer(new PlayerModel("Player 2", PlayerType.HI));
+			AddPlayer(new PlayerModel("Player 3", PlayerType.AI));
+			AddPlayer(new PlayerModel("Player 4", PlayerType.AI));
 
 			await UniTask.Yield();
 		}

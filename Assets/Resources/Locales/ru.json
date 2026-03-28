@@ -9,6 +9,17 @@
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
 
+    { "key": "PlayerDescriptionPopup:PlaceLabel", "value": "Место:" },
+    { "key": "PlayerDescriptionPopup:PlaceValue", "value": "Место {0}. Позиция {1}." },
+    { "key": "PlayerDescriptionPopup:XpLabel", "value": "Уровень:" },
+    { "key": "PlayerDescriptionPopup:XpValue", "value": "Уровень {0}. Опыт {1}." },
+    { "key": "PlayerDescriptionPopup:MoveLabel", "value": "Текущий ход:" },
+    { "key": "PlayerDescriptionPopup:MoveValue", "value": "Опыт {0} x {1} = {2}." },
+    { "key": "PlayerDescriptionPopup:PerksLabel", "value": "Перки:" },
+    { "key": "PlayerDescriptionPopup:DeckLabel", "value": "Колода:" },
+    { "key": "PlayerDescriptionPopup:DeckValue", "value": "Карт: {0} ({1}/{2}/{3}). Выбор: {4}" },
+    { "key": "PlayerDescriptionPopup:BattleLabel", "value": "Битва:" },
+
     { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} карт в колоде:" },
     { "key": "DeckDescriptionPopup:CardsOffer", "value": "Выбор: {0} карты" },
 
