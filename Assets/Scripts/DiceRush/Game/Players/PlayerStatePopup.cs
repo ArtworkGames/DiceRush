@@ -21,6 +21,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 		[SerializeField] private GameObject _battleIcon;
 		[SerializeField] private GameObject _moveToPortalIcon;
 		[SerializeField] private GameObject _endTurnIcon;
+		[SerializeField] private GameObject _finishIcon;
 		[Space]
 		[SerializeField] private GameObject[] _confirmDiceValues;
 		[SerializeField] private GameObject[] _confirmTokenValues;
@@ -60,6 +61,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_battleIcon.SetActive(playerState == PlayerState.Battle);
 			_moveToPortalIcon.SetActive(playerState == PlayerState.MoveToPortal);
 			_endTurnIcon.SetActive(playerState == PlayerState.EndTurn);
+			_finishIcon.SetActive(playerState == PlayerState.Finish);
 
 			for (int i = 0; i < _confirmDiceValues.Length; i++)
 			{

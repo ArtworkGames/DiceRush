@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.UI;
 
 namespace StepanoffGames.DiceRush.UI.Components.Deck
@@ -11,12 +10,18 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 	{
 		[SerializeField] private Button _confirmButton;
 		[SerializeField] private DeckButton _deckButton;
+		[SerializeField] private GameObject _sourceCardButton;
 
 		public DeckButton DeckButton => _deckButton;
 
-		private List<DeckPanelCard> _cards;
-		private DeckPanelCard _selectedCard;
+		private List<CardButton> _cards;
+		private CardButton _selectedCard;
 		private bool _confirmSelected;
+
+		private void Awake()
+		{
+			_sourceCardButton.SetActive(false);
+		}
 
 		private void Start()
 		{
@@ -29,7 +34,10 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			_selectedCard = null;
 			_confirmSelected = false;
 
-			await ShowCards(cardModels);
+			ShowCards(cardModels);
+			await UniTask.WaitUntil(() => IsAllCardsShown());
+
+			EnableCards();
 			_confirmButton.gameObject.SetActive(true);
 
 			await UniTask.WaitUntil(() => _selectedCard != null || _confirmSelected);
@@ -50,54 +58,55 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			return null;
 		}
 
-		private async UniTask ShowCards(List<CardModel> cardModels)
-		{
-			_cards = new List<DeckPanelCard>();
-			for (int i = 0; i < cardModels.Count; i++)
-			{
-				await AddCard(cardModels[i]);
-			}
-
-			ArrangeCards();
-
-			for (int i = 0; i < _cards.Count; i++)
-			{
-				if (i > 0) await UniTask.WaitForSeconds(0.1f);
-				_cards[i].Show();
-			}
-		}
-
-		private async UniTask AddCard(CardModel cardModel)
-		{
-			string cardName = $"{cardModel.Type}Card";
-			string cardPath = $"Game/Deck/{cardName}.prefab";
-			var handle = Addressables.LoadAssetAsync<GameObject>(cardPath);
-			await UniTask.WaitUntil(() => handle.IsDone);
-
-			GameObject cardObject = Instantiate(handle.Result, transform, false);
-			cardObject.name = cardName;
-			cardObject.transform.localScale = Vector3.one * 0.75f;
-			cardObject.transform.localPosition = new Vector3(0f, -350f, 0f);
-
-			DeckPanelCard card = cardObject.GetComponent<DeckPanelCard>();
-			card.Model = cardModel;
-			card.OnSelect += OnCardSelect;
-			_cards.Add(card);
-		}
-
-		private void ArrangeCards()
+		private void ShowCards(List<CardModel> cardModels)
 		{
 			float cardsSpace = 440f;
-			float x = -(_cards.Count - 1) * cardsSpace / 2f;
+			float x = -(cardModels.Count - 1) * cardsSpace / 2f;
 
-			for (int i = 0; i < _cards.Count; i++)
+			_cards = new List<CardButton>();
+			for (int i = 0; i < cardModels.Count; i++)
 			{
-				_cards[i].transform.localPosition = new Vector3(x, _cards[i].transform.localPosition.y, 0f);
+				AddCard(cardModels[i], (cardModels.Count - i - 1) * 0.05f, i * 0.05f, new Vector3(x, -740f, 0f));
 				x += cardsSpace;
 			}
 		}
 
-		private void OnCardSelect(DeckPanelCard card)
+		private void AddCard(CardModel cardModel, float showDelay, float hideDelay, Vector3 destPos)
+		{
+			GameObject cardObject = Instantiate(_sourceCardButton, _sourceCardButton.transform.parent, false);
+			cardObject.name = $"{cardModel.Type}Card";
+			//cardObject.transform.localPosition = _deckButton.transform.localPosition;
+			cardObject.transform.localPosition = new Vector3(destPos.x, -1600f, 0f);
+			cardObject.SetActive(true);
+
+			CardButton card = cardObject.GetComponent<CardButton>();
+			card.OnSelect += OnCardSelect;
+			_cards.Add(card);
+
+			card.Show(cardModel, showDelay, hideDelay, destPos);
+		}
+
+		private bool IsAllCardsShown()
+		{
+			for (int i = 0; i < _cards.Count; i++)
+			{
+				if (!_cards[i].IsShown)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private void EnableCards()
+		{
+			for (int i = 0; i < _cards.Count; i++)
+			{
+				_cards[i].EnableButton();
+			}
+		}
+
+		private void OnCardSelect(CardButton card)
 		{
 			_selectedCard = card;
 		}

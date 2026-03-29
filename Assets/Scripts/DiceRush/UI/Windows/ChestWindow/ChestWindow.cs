@@ -24,12 +24,12 @@ namespace StepanoffGames.DiceRush.UI.Windows.ConfirmWindow
 		[SerializeField] private Button _okButton;
 		[SerializeField] private Transform _cardsParent;
 
-		private List<DeckPanelCard> _cards;
-		private DeckPanelCard _selectedCard;
+		private List<CardView> _cards;
+		private CardView _selectedCard;
 
 		override protected void BeforeOpen()
 		{
-			_cards = new List<DeckPanelCard>();
+			_cards = new List<CardView>();
 			for (int i = 0; i < Params.Cards.Length; i++)
 			{
 				AddCard(Params.Cards[i]).Forget();
@@ -56,23 +56,19 @@ namespace StepanoffGames.DiceRush.UI.Windows.ConfirmWindow
 		private async UniTask AddCard(CardModel cardModel)
 		{
 			string cardName = $"{cardModel.Type}Card";
-			string cardPath = $"Game/Deck/{cardName}.prefab";
+			string cardPath = $"UI/Deck/{cardName}.prefab";
 			var handle = Addressables.LoadAssetAsync<GameObject>(cardPath);
 			await UniTask.WaitUntil(() => handle.IsDone);
 
 			GameObject cardObject = Instantiate(handle.Result, _cardsParent, false);
 			cardObject.name = cardName;
 
-			//CanvasGroup cardCanvasGroup = cardObject.AddComponent<CanvasGroup>();
-			//cardCanvasGroup.alpha = 0.5f;
-
-			DeckPanelCard card = cardObject.GetComponent<DeckPanelCard>();
-			card.Model = cardModel;
-			//card.OnSelect += OnCardSelect;
-			_cards.Add(card);
+			CardView cardView = cardObject.GetComponent<CardView>();
+			cardView.SetModel(cardModel);
+			_cards.Add(cardView);
 		}
 
-		private void OnCardSelect(DeckPanelCard card)
+		private void OnCardSelect(CardView card)
 		{
 			_selectedCard = card;
 			for (int i = 0; i < _cards.Count; i++)

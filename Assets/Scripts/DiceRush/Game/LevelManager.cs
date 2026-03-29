@@ -129,9 +129,12 @@ namespace StepanoffGames.DiceRush.Game
 			await UniTask.NextFrame();
 			await UniTask.NextFrame();
 
+			//Cell startCell = _map.StartCell;
+			Cell startCell = _map.GetCell(70);
 			for (int i = 0; i < _playersCount; i++)
 			{
-				_avatars[i].SetToCellPlayerPosition(_map.StartCell);
+				_avatars[i].SetToCellPlayerPosition(startCell);
+				_players[i].Model.IsFinished = false;
 			}
 
 			await UniTask.NextFrame();
@@ -147,7 +150,7 @@ namespace StepanoffGames.DiceRush.Game
 				SignalBus.Publish(new TurnStartedSignal());
 
 				List<UniTask> tasks = new();
-				for (int i = 0; i < _players.Count; i++)
+				for (int i = 0; i < _playersCount; i++)
 				{
 					tasks.Add(_players[i].Turn());
 				}
@@ -212,7 +215,7 @@ namespace StepanoffGames.DiceRush.Game
 
 			for (int i = 0; i < _playersCount; i++)
 			{
-				if (_avatars[i].CurrentPoint is Cell && ((Cell)_avatars[i].CurrentPoint).Type == CellType.Finish)
+				if (_players[i].Model.IsFinished)
 				{
 					playersOnFinish++;
 				}

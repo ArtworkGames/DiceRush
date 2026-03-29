@@ -28,18 +28,15 @@ namespace StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup
 		private async UniTask LoadCard(CardModel cardModel)
 		{
 			string cardName = $"{cardModel.Type}Card";
-			string cardPath = $"Game/Deck/{cardName}.prefab";
+			string cardPath = $"UI/Deck/{cardName}.prefab";
 			var handle = Addressables.LoadAssetAsync<GameObject>(cardPath);
 			await UniTask.WaitUntil(() => handle.IsDone);
 
 			GameObject cardObject = Instantiate(handle.Result, _card, false);
 			cardObject.name = cardName;
 
-			DeckPanelCard card = cardObject.GetComponent<DeckPanelCard>();
-			card.Model = cardModel;
-
-			Button button = cardObject.GetComponent<Button>();
-			Destroy(button);
+			CardView cardView = cardObject.GetComponent<CardView>();
+			cardView.SetModel(cardModel);
 		}
 	}
 }

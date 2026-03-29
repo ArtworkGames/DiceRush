@@ -69,6 +69,18 @@ namespace StepanoffGames.DiceRush.Game
 			}
 		}
 
+		public Cell GetCell(int index)
+		{
+			for (int i = 0; i < _cells.Length; i++)
+			{
+				if (_cells[i].Index == index)
+				{
+					return _cells[i];
+				}
+			}
+			return null;
+		}
+
 		public void ResetUsedCells()
 		{
 			for (int i = 0; i < _cells.Length; i++)

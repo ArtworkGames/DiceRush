@@ -1,3 +1,4 @@
+using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 				AddCellAndNext(player.CurrentPoint.NextPoints[i], 1, 6, false, ref cells);
 			}
 
-			ShowMarkers(cells, _playerMaterials[player.Id - 1]);
+			ShowMarkers(cells, player.Color);
 		}
 
 		public void ShowMarkersInBackOfPlayer(PlayerAvatar player)
@@ -44,7 +45,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 				AddCellAndPrev(player.CurrentPoint.PrevPoints[i], 1, 6, false, ref cells);
 			}
 
-			ShowMarkers(cells, _playerMaterials[player.Id - 1]);
+			ShowMarkers(cells, player.Color);
 		}
 
 		public void ShowDiceValueInFrontOfPlayer(PlayerAvatar player, int diceValue, int direction = -1)
@@ -58,7 +59,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 				}
 			}
 
-			UpdateMarkers(cells, _playerMaterials[player.Id - 1]);
+			UpdateMarkers(cells, player.Color);
 		}
 
 		public void ShowDiceValueInBackOfPlayer(PlayerAvatar player, int diceValue, int direction = -1)
@@ -72,7 +73,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 				}
 			}
 
-			UpdateMarkers(cells, _playerMaterials[player.Id - 1]);
+			UpdateMarkers(cells, player.Color);
 		}
 
 		private void AddCellAndNext(MapPoint point, int count, int maxCount, bool onlyLast, ref List<Cell> cells)
@@ -133,16 +134,16 @@ namespace StepanoffGames.DiceRush.Game.Path
 			}
 		}
 
-		private void ShowMarkers(List<Cell> cells, Material material)
+		private void ShowMarkers(List<Cell> cells, PlayerColor color)
 		{
 			for (int i = 0; i < cells.Count; i++)
 			{
-				PathMarker marker = CreateMarker(_markers.Count + 1, cells[i], material);
+				PathMarker marker = CreateMarker(_markers.Count + 1, cells[i], color);
 				_markers.Add(marker);
 			}
 		}
 
-		private void UpdateMarkers(List<Cell> cells, Material material)
+		private void UpdateMarkers(List<Cell> cells, PlayerColor color)
 		{
 			List<PathMarker> markers = new List<PathMarker>(_markers);
 			List<Cell> newCells = new List<Cell>(cells);
@@ -160,17 +161,17 @@ namespace StepanoffGames.DiceRush.Game.Path
 				}
 			}
 
-			ShowMarkers(newCells, material);
+			ShowMarkers(newCells, color);
 		}
 
-		private PathMarker CreateMarker(int id, Cell cell, Material material)
+		private PathMarker CreateMarker(int id, Cell cell, PlayerColor color)
 		{
 			GameObject markerObject = Instantiate(_sourceMarker, _sourceMarker.transform.parent, false);
 			markerObject.name = $"Marker{id}";
 			markerObject.SetActive(true);
 
 			PathMarker marker = markerObject.GetComponent<PathMarker>();
-			marker.Init(cell, material);
+			marker.Init(cell, color);
 			return marker;
 		}
 

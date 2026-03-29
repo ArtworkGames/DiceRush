@@ -88,10 +88,18 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		public async UniTask Turn()
 		{
-			if (_prevPlayer != null)
+			if (_model.IsFinished)
+			{
+				return;
+			}
+
+			if (_prevPlayer != null && _prevPlayer.Model.State != PlayerState.Finish)
 			{
 				SetState(PlayerState.Waiting);
-				await UniTask.WaitUntil(() => _prevPlayer.Model.State == PlayerState.EndTurn);
+				await UniTask.WaitUntil(() => _prevPlayer.Model.State == PlayerState.EndTurn || _prevPlayer.Model.State == PlayerState.Finish);
+
+				if (_model.Type == PlayerType.HI)
+					await UniTask.WaitForSeconds(0.5f);
 			}
 
 			SignalBus.Publish(new PlayerTurnStartedSignal(this));
@@ -107,12 +115,14 @@ namespace StepanoffGames.DiceRush.Game.Players
 			if (_model.Type == PlayerType.HI)
 				await UniTask.WaitForSeconds(0.5f);
 
+			if (_model.IsFinished) SetState(PlayerState.Finish);
+			else SetState(PlayerState.EndTurn);
 			SignalBus.Publish(new PlayerTurnEndedSignal(this));
 
 			if (_model.Type == PlayerType.HI)
 				await UniTask.WaitForSeconds(0.5f);
 
-			SetState(PlayerState.EndTurn);
+			//SetState(PlayerState.EndTurn);
 		}
 
 		public async UniTask MoveForward(bool isFirst = false)
@@ -247,14 +257,21 @@ namespace StepanoffGames.DiceRush.Game.Players
 				currentCell.SetLocked(false);
 			}
 
-			currentCell.SetUsed(true);
+			if (currentCell.Type != CellType.Finish)
+			{
+				currentCell.SetUsed(true);
+			}
 
 			switch (currentCell.Type)
 			{
 				case CellType.Start:
-				case CellType.Finish:
 				case CellType.Regular:
 					await MoveToPlayerPosition();
+					break;
+
+				case CellType.Finish:
+					await MoveToPlayerPosition();
+					await Finish();
 					break;
 
 				case CellType.Reward:
@@ -353,6 +370,12 @@ namespace StepanoffGames.DiceRush.Game.Players
 		{
 			SetState(PlayerState.MoveToPosition);
 			await _avatar.MoveToCurrentCellPlayerPosition();
+		}
+
+		virtual protected async UniTask Finish()
+		{
+			_model.IsFinished = true;
+			await UniTask.Yield();
 		}
 	}
 }

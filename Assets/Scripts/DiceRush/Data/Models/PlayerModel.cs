@@ -6,6 +6,14 @@ namespace StepanoffGames.DiceRush.Data.Models
 		AI
 	}
 
+	public enum PlayerColor
+	{
+		Red,
+		Blue,
+		Green,
+		Yellow,
+	}
+
 	public enum PlayerState
 	{
 		Undefined,
@@ -23,14 +31,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 		MoveToPosition,
 		CountXp,
 		EndTurn,
-	}
-
-	public enum PlayerColor
-	{
-		Red,
-		Blue,
-		Green,
-		Yellow,
+		Finish,
 	}
 
 	public class PlayerModel
@@ -72,6 +73,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 		private PerksSetModel _perksSet;
 
 		public bool IsTotalXpCounted;
+		public bool IsFinished;
 
 		public PlayerModel(string name, PlayerType type)
 		{
