@@ -3,7 +3,7 @@ using StepanoffGames.UI.Components;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup
+namespace StepanoffGames.DiceRush.UI.Components.Deck.DescriptionPopup
 {
 	public class DeckDescriptionPopup : MonoBehaviour
 	{

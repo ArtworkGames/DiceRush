@@ -3,7 +3,7 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Deck.Signals;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
-using StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup;
+using StepanoffGames.DiceRush.UI.Components.Deck.DescriptionPopup;
 using StepanoffGames.Signals;
 using TMPro;
 using UnityEngine;

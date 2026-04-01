@@ -79,8 +79,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 		override protected async UniTask OpenChest()
 		{
 			SetState(PlayerState.OpenChest);
-			await UniTask.Yield();
 
+			await UniTask.WaitForSeconds(0.5f);
 			_chestController.AddCards(this);
 		}
 

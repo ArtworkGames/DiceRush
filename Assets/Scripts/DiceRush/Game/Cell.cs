@@ -31,7 +31,9 @@ namespace StepanoffGames.DiceRush.Game
 		[SerializeField] private MapPoint _moveToPoint;
 
 		public CellType Type => _type;
-		
+
+		public CellDrawer Drawer => _drawer;
+
 		public List<Transform> PlayerPositions => _playerPositions;		
 		public MapPoint MoveToPoint => _moveToPoint;
 

@@ -26,10 +26,12 @@ namespace StepanoffGames.DiceRush.Game
 		[SerializeField] private Camera _hudCamera;
 		[SerializeField] private Camera _uiCamera;
 		[Space]
-		[Range(1, 4)]
-		[SerializeField] private int _playersCount;
-		[Space]
+		//[Range(1, 4)]
+		//[SerializeField] private int _playersCount;
+		//[Space]
 		[SerializeField] private TMP_Text _timeLabel;
+
+		//public int PlayersCount => _playersCount;
 
 		public LevelCamera Camera => _camera;
 		public List<PlayerController> Players => _players;
@@ -66,12 +68,12 @@ namespace StepanoffGames.DiceRush.Game
 
 			for (int i = 0; i < _avatars.Length; i++)
 			{
-				_avatars[i].gameObject.SetActive(i < _playersCount);
+				_avatars[i].gameObject.SetActive(i < _dataManager.Players.Count);
 			}
 
 			_players = new List<PlayerController>();
 			PlayerController prevHiPlayer = null;
-			for (int i = 0; i < _playersCount; i++)
+			for (int i = 0; i < _dataManager.Players.Count; i++)
 			{
 				switch (_dataManager.Players[i].Type)
 				{
@@ -129,13 +131,17 @@ namespace StepanoffGames.DiceRush.Game
 			await UniTask.NextFrame();
 			await UniTask.NextFrame();
 
-			//Cell startCell = _map.StartCell;
-			Cell startCell = _map.GetCell(70);
-			for (int i = 0; i < _playersCount; i++)
+			Cell startCell = _map.StartCell;
+			//Cell startCell = _map.GetCell(70);
+			for (int i = 0; i < _players.Count; i++)
 			{
 				_avatars[i].SetToCellPlayerPosition(startCell);
 				_players[i].Model.IsFinished = false;
 			}
+			//_avatars[0].SetToCellPlayerPosition(_map.GetCell(79));
+			//_avatars[1].SetToCellPlayerPosition(_map.GetCell(60));
+			//_avatars[2].SetToCellPlayerPosition(_map.GetCell(0));
+			//_avatars[3].SetToCellPlayerPosition(_map.GetCell(0));
 
 			await UniTask.NextFrame();
 			await UniTask.NextFrame();
@@ -150,7 +156,7 @@ namespace StepanoffGames.DiceRush.Game
 				SignalBus.Publish(new TurnStartedSignal());
 
 				List<UniTask> tasks = new();
-				for (int i = 0; i < _playersCount; i++)
+				for (int i = 0; i < _players.Count; i++)
 				{
 					tasks.Add(_players[i].Turn());
 				}
@@ -213,7 +219,7 @@ namespace StepanoffGames.DiceRush.Game
 		{
 			int playersOnFinish = 0;
 
-			for (int i = 0; i < _playersCount; i++)
+			for (int i = 0; i < _players.Count; i++)
 			{
 				if (_players[i].Model.IsFinished)
 				{
@@ -222,7 +228,7 @@ namespace StepanoffGames.DiceRush.Game
 			}
 
 			//if ((_playerCount - playersOnFinish) <= 1)
-			if ((_playersCount - playersOnFinish) == 0)
+			if ((_players.Count - playersOnFinish) == 0)
 				return true;
 
 			return false;

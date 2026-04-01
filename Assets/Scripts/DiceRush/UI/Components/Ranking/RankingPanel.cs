@@ -30,9 +30,13 @@ namespace StepanoffGames.DiceRush.UI.Components.Ranking
 			await UniTask.NextFrame();
 
 			LevelManager levelManager = ServiceLocator.Get<LevelManager>();
-			for (int i = 0; i < _playerItems.Length; i++)
+			for (int i = 0; i < levelManager.Players.Count; i++)
 			{
 				_playerItems[i].SetPlayer(levelManager.Players[i]);
+			}
+			for (int i = levelManager.Players.Count; i < _playerItems.Length; i++)
+			{
+				_playerItems[i].gameObject.SetActive(false);
 			}
 		}
 

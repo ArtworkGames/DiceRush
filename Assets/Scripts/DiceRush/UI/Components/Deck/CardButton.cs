@@ -50,61 +50,64 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			_model = cardModel;
 
 			this.hideDelay = hideDelay;
-			hidePos = transform.localPosition;
 
 			LoadCard().Forget();
 
-			transform.localScale = Vector3.one * 0.75f;
+			//hidePos = transform.localPosition;
 
-			moveTween?.Kill();
-			moveTween = transform.DOLocalMove(destPos, 0.3f)
-				.SetDelay(showDelay)
-				.SetEase(Ease.OutBack)
-				.OnComplete(() =>
-				{
-					_isShown = true;
-				});
+			//transform.localScale = Vector3.one * 0.75f;
 
-			//float duration = 0.4f;// 0.33f;
-
-			//_canvasGroup.interactable = false;
-			//_canvasGroup.blocksRaycasts = false;
-
-			//_back.SetActive(false);
-			//_front.SetActive(false);
-
-			//transform.localScale = Vector3.one * 0.5f;
-
-			//moveTween = transform.DOLocalMove(destPos, duration)
+			//moveTween?.Kill();
+			//moveTween = transform.DOLocalMove(destPos, 0.3f)
 			//	.SetDelay(showDelay)
-			//	.SetEase(Ease.InOutQuad)
+			//	.SetEase(Ease.OutBack)
 			//	.OnComplete(() =>
 			//	{
 			//		_isShown = true;
 			//	});
 
-			//scaleTween = transform.DOScale(0.75f, duration)
-			//	.SetDelay(showDelay)
-			//	.SetEase(Ease.OutBack);
+			hidePos = new Vector3(destPos.x, -1600f, 0f);
 
-			//flipTween = _back.transform.DOScaleX(0f, duration / 3f)
-			//	.SetDelay(showDelay + duration / 3f)
-			//	.SetEase(Ease.InCubic)
-			//	.OnStart(() =>
-			//	{
-			//		_back.SetActive(true);
-			//	})
-			//	.OnComplete(() =>
-			//	{
-			//		_back.SetActive(false);
-			//		_back.transform.localScale = Vector3.one;
+			float duration = 0.4f;// 0.33f;
 
-			//		_front.transform.localScale = new Vector3(0f, 1f, 1f);
-			//		_front.SetActive(true);
+			_canvasGroup.interactable = false;
+			_canvasGroup.blocksRaycasts = false;
 
-			//		flipTween = _front.transform.DOScaleX(1f, duration / 3f)
-			//			.SetEase(Ease.OutCubic);
-			//	});
+			_back.SetActive(false);
+			_front.SetActive(false);
+
+			transform.localScale = Vector3.one * 0.5f;
+
+			moveTween = transform.DOLocalMove(destPos, duration)
+				.SetDelay(showDelay)
+				.SetEase(Ease.InOutQuad)
+				.OnComplete(() =>
+				{
+					_isShown = true;
+				});
+
+			scaleTween = transform.DOScale(0.75f, duration)
+				.SetDelay(showDelay)
+				.SetEase(Ease.OutBack);
+
+			flipTween = _back.transform.DOScaleX(0f, duration / 3f)
+				.SetDelay(showDelay + duration / 3f)
+				.SetEase(Ease.InCubic)
+				.OnStart(() =>
+				{
+					_back.SetActive(true);
+				})
+				.OnComplete(() =>
+				{
+					_back.SetActive(false);
+					_back.transform.localScale = Vector3.one;
+
+					_front.transform.localScale = new Vector3(0f, 1f, 1f);
+					_front.SetActive(true);
+
+					flipTween = _front.transform.DOScaleX(1f, duration / 3f)
+						.SetEase(Ease.OutCubic);
+				});
 		}
 
 		private async UniTask LoadCard()

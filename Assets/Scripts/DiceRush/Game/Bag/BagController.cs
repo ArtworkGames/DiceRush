@@ -42,14 +42,15 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		public async UniTask<CellType> Draw(PlayerController player)
 		{
 			List<CellType> cellTypes = new List<CellType>();
-			_currentCellType = GetCellType(player, ref cellTypes);
+			_currentCellType = GetCellType(player, ref cellTypes, out BagDescription bagDescription);
 
-			_panel.ShowTokens(cellTypes);
+			_panel.BagButton.DescriptionPopup.SetDescription(bagDescription);
 
 			animationFinished = false;
 			_animation.Draw();
 
 			await UniTask.WaitUntil(() => animationFinished);
+			_panel.BagButton.Show();
 
 			return _currentCellType;
 		}
@@ -57,17 +58,18 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		public void Confirm()
 		{
 			_animation.Confirm();
-			_panel.HideTokens();
+			_panel.BagButton.Hide();
+			//_panel.HideTokens();
 		}
 
 		public CellType GetCellType(PlayerController player)
 		{
 			List<CellType> cellTypes = new List<CellType>();
-			CellType cellType = GetCellType(player, ref cellTypes);
+			CellType cellType = GetCellType(player, ref cellTypes, out BagDescription bagDescription);
 			return cellType;
 		}
 
-		private CellType GetCellType(PlayerController player, ref List<CellType> cellTypes)
+		private CellType GetCellType(PlayerController player, ref List<CellType> cellTypes, out BagDescription bagDescription)
 		{
 			int playerCellIndex = ((Cell)player.Avatar.CurrentPoint).Index;
 
@@ -114,23 +116,31 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			bool hasNearMoveBackwardCell = ((Cell)player.Avatar.CurrentPoint).HasNearCellWithSameType(CellType.MoveBackward);
 
 			cellTypes = new List<CellType>();
+			bagDescription = new BagDescription();
 
 			cellTypes.Add(CellType.Reward);
 			cellTypes.Add(CellType.Reward);
 			cellTypes.Add(CellType.Reward);
+			bagDescription.Tokens[CellType.Reward].RegularCount = 3;
 
 			cellTypes.Add(CellType.Enemy);
 			cellTypes.Add(CellType.Enemy);
 			cellTypes.Add(CellType.Enemy);
 			//cellTypes.Add(CellType.Enemy); // ???
+			bagDescription.Tokens[CellType.Enemy].RegularCount = 3;
 
 			cellTypes.Add(CellType.MoveForward);
 			cellTypes.Add(CellType.MoveForward);
-
+			bagDescription.Tokens[CellType.MoveForward].RegularCount = 2;
 			if (!hasNearMoveForwardCell)
 			{
 				cellTypes.Add(CellType.MoveForward);
 				cellTypes.Add(CellType.MoveForward);
+				bagDescription.Tokens[CellType.MoveForward].RegularCount += 2;
+			}
+            else
+            {
+				bagDescription.Tokens[CellType.MoveForward].RemovedCount = 2;
 			}
 			if (isPlayerInBackOfAll)
 			{
@@ -138,6 +148,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				{
 					cellTypes.Add(CellType.MoveForward);
 				}
+				bagDescription.Tokens[CellType.MoveForward].AddedCount = backCount;
 			}
 
 			if (!hasNearMoveBackwardCell)
@@ -147,21 +158,36 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				cellTypes.Add(CellType.MoveBackward);
 				cellTypes.Add(CellType.MoveBackward);
 				//cellTypes.Add(CellType.MoveBackward);
-
+				bagDescription.Tokens[CellType.MoveBackward].RegularCount = 4;
 				if (isPlayerInFrontOfAll)
 				{
 					for (int i = 0; i < frontCount; i++)
 					{
 						cellTypes.Add(CellType.MoveBackward);
 					}
+					bagDescription.Tokens[CellType.MoveBackward].AddedCount = frontCount;
+				}
+			}
+			else
+			{
+				bagDescription.Tokens[CellType.MoveBackward].RemovedCount = 4;
+				if (isPlayerInFrontOfAll)
+				{
+					bagDescription.Tokens[CellType.MoveBackward].RemovedCount += frontCount;
 				}
 			}
 
 			cellTypes.Add(CellType.Portal);
+			bagDescription.Tokens[CellType.Portal].RegularCount = 1;
 			if (!hasNearPortalCell)
 			{
 				cellTypes.Add(CellType.Portal);
 				cellTypes.Add(CellType.Portal);
+				bagDescription.Tokens[CellType.Portal].RegularCount += 2;
+			}
+			else
+			{
+				bagDescription.Tokens[CellType.Portal].RemovedCount = 2;
 			}
 			if (isPlayerInFrontOfAll)
 			{
@@ -169,6 +195,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				{
 					cellTypes.Add(CellType.Portal);
 				}
+				bagDescription.Tokens[CellType.Portal].AddedCount = frontCount;
 			}
 			if (isPlayerInBackOfAll)
 			{
@@ -176,6 +203,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 				{
 					cellTypes.Add(CellType.Portal);
 				}
+				bagDescription.Tokens[CellType.Portal].AddedCount = backCount;
 			}
 
 			int index = Random.Range(0, cellTypes.Count);

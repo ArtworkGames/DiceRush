@@ -9,6 +9,12 @@
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
 
+    { "key": "BagDescriptionPopup:RewardLabel", "value": "Сундуки:" },
+    { "key": "BagDescriptionPopup:EnemyLabel", "value": "Враги:" },
+    { "key": "BagDescriptionPopup:MoveForwardLabel", "value": "Доп.ходы:" },
+    { "key": "BagDescriptionPopup:MoveBackwardLabel", "value": "Ловушки:" },
+    { "key": "BagDescriptionPopup:PortalLabel", "value": "Порталы:" },
+
     { "key": "PlayerDescriptionPopup:PlaceLabel", "value": "Место:" },
     { "key": "PlayerDescriptionPopup:PlaceValue", "value": "Место {0}. Позиция {1}." },
     { "key": "PlayerDescriptionPopup:XpLabel", "value": "Уровень:" },

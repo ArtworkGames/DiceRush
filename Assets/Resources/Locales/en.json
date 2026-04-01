@@ -9,6 +9,12 @@
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
 
+    { "key": "BagDescriptionPopup:RewardLabel", "value": "Chests:" },
+    { "key": "BagDescriptionPopup:EnemyLabel", "value": "Enemies:" },
+    { "key": "BagDescriptionPopup:MoveForwardLabel", "value": "Extra moves:" },
+    { "key": "BagDescriptionPopup:MoveBackwardLabel", "value": "Traps:" },
+    { "key": "BagDescriptionPopup:PortalLabel", "value": "Portals:" },
+
     { "key": "PlayerDescriptionPopup:PlaceLabel", "value": "Place:" },
     { "key": "PlayerDescriptionPopup:PlaceValue", "value": "Place {0}. Position {1}." },
     { "key": "PlayerDescriptionPopup:XpLabel", "value": "Level:" },

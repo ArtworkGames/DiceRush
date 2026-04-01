@@ -55,36 +55,15 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 				players.Add(player);
 			}
 
-			players.Sort((a, b) => b.Model.CellIndex.CompareTo(a.Model.CellIndex));
+			//players.Sort((a, b) => b.Model.CellIndex.CompareTo(a.Model.CellIndex));
+			players.Sort((a, b) =>
+				b.Model.CellIndex != a.Model.CellIndex ?
+				b.Model.CellIndex.CompareTo(a.Model.CellIndex) :
+				a.Model.CellIndexTime.CompareTo(b.Model.CellIndexTime));
 
 			for (int i = 0; i < players.Count; i++)
 			{
 				players[i].Model.PrevPlace = players[i].Model.Place;
-			}
-
-			/*int place = 1;
-			players[0].Model.Place = place;
-			int cellIndex = players[0].Model.CellIndex;
-
-			for (int i = 1; i < players.Count; i++)
-			{
-				if (players[i].Model.CellIndex < cellIndex)
-				{
-					place++;
-					players[i].Model.Place = place;
-					cellIndex = players[i].Model.CellIndex;
-				}
-				else
-				{
-					players[i].Model.Place = place;
-				}
-
-				if (players[i].Model.PrevPlace == 0)
-					players[i].Model.PrevPlace = players[i].Model.Place;
-			}*/
-			
-			for (int i = 0; i < players.Count; i++)
-			{
 				players[i].Model.Place = i + 1;
 			}
 

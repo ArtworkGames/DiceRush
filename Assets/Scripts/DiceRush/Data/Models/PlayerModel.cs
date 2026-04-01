@@ -56,6 +56,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 		public int Place;
 		public int PrevPlace;
 		public int CellIndex;
+		public float CellIndexTime;
 
 		public int MovesCount;
 		public int MoveXp;

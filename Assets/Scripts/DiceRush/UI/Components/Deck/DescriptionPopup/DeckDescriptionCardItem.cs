@@ -1,11 +1,9 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
-using StepanoffGames.DiceRush.UI.Components.Deck;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.UI;
 
-namespace StepanoffGames.DiceRush.UI.Popups.Deck.DescriptionPopup
+namespace StepanoffGames.DiceRush.UI.Components.Deck.DescriptionPopup
 {
 	public class DeckDescriptionCardItem : MonoBehaviour
 	{

@@ -2,13 +2,12 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace StepanoffGames.DiceRush.UI.Components.Deck
 {
 	public class DeckPanel : MonoBehaviour
 	{
-		[SerializeField] private Button _confirmButton;
+		[SerializeField] private ConfirmButton _confirmButton;
 		[SerializeField] private DeckButton _deckButton;
 		[SerializeField] private GameObject _sourceCardButton;
 
@@ -25,8 +24,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 
 		private void Start()
 		{
-			_confirmButton.gameObject.SetActive(false);
-			_confirmButton.onClick.AddListener(OnConfirmButtonClick);
+			_confirmButton.OnConfirm += OnConfirm;
 		}
 
 		public async UniTask<CardModel> SelectCard(List<CardModel> cardModels, int totalCardsCount)
@@ -38,11 +36,11 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			await UniTask.WaitUntil(() => IsAllCardsShown());
 
 			EnableCards();
-			_confirmButton.gameObject.SetActive(true);
+			await _confirmButton.Show();
 
 			await UniTask.WaitUntil(() => _selectedCard != null || _confirmSelected);
 
-			_confirmButton.gameObject.SetActive(false);
+			_confirmButton.Hide().Forget();
 			HideUnselectedCards();
 
 			_cards.Clear();
@@ -75,8 +73,8 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 		{
 			GameObject cardObject = Instantiate(_sourceCardButton, _sourceCardButton.transform.parent, false);
 			cardObject.name = $"{cardModel.Type}Card";
-			//cardObject.transform.localPosition = _deckButton.transform.localPosition;
-			cardObject.transform.localPosition = new Vector3(destPos.x, -1600f, 0f);
+			cardObject.transform.localPosition = _deckButton.transform.localPosition;
+			//cardObject.transform.localPosition = new Vector3(destPos.x, -1600f, 0f);
 			cardObject.SetActive(true);
 
 			CardButton card = cardObject.GetComponent<CardButton>();
@@ -122,7 +120,7 @@ namespace StepanoffGames.DiceRush.UI.Components.Deck
 			}
 		}
 
-		private void OnConfirmButtonClick()
+		private void OnConfirm()
 		{
 			_confirmSelected = true;
 		}

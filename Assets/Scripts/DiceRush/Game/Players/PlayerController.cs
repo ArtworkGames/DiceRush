@@ -119,7 +119,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			else SetState(PlayerState.EndTurn);
 			SignalBus.Publish(new PlayerTurnEndedSignal(this));
 
-			if (_model.Type == PlayerType.HI)
+			//if (_model.Type == PlayerType.HI)
 				await UniTask.WaitForSeconds(0.5f);
 
 			//SetState(PlayerState.EndTurn);
@@ -166,6 +166,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 				while (!(_avatar.CurrentPoint is Cell));
 
 				_model.CellIndex = ((Cell)_avatar.CurrentPoint).Index;
+				_model.CellIndexTime = Time.time;
 
 				SignalBus.Publish(new PlayerCellPassedSignal(this));
 
@@ -220,6 +221,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 				while (!(_avatar.CurrentPoint is Cell));
 
 				_model.CellIndex = ((Cell)_avatar.CurrentPoint).Index;
+				_model.CellIndexTime = Time.time;
 
 				SignalBus.Publish(new PlayerCellPassedSignal(this));
 

@@ -11,7 +11,11 @@ namespace StepanoffGames.DiceRush.Game
 		[SerializeField] private GameObject _moveForward;
 		[SerializeField] private GameObject _portal;
 		[Space]
+		[SerializeField] private Transform _chestRewardPosition;
+		[Space]
 		[SerializeField] private TMP_Text _indexText;
+
+		public Transform ChestRewardPosition => _chestRewardPosition;
 
 		public void Show(Cell cell)
 		{
@@ -33,10 +37,17 @@ namespace StepanoffGames.DiceRush.Game
 
 		private void UpdateUsed(bool isUsed, GameObject sprite)
 		{
-			SpriteRenderer spriteRenderer = sprite.GetComponent<SpriteRenderer>();
-			Color c = spriteRenderer.color;
+			//SpriteRenderer spriteRenderer = sprite.GetComponent<SpriteRenderer>();
+			//Color c = spriteRenderer.color;
+			//c.a = isUsed ? 0.5f : 1f;
+			//spriteRenderer.color = c;
+
+			MeshRenderer meshRenderer = sprite.GetComponent<MeshRenderer>();
+			Material material = meshRenderer.material;
+			Color c = material.color;
 			c.a = isUsed ? 0.5f : 1f;
-			spriteRenderer.color = c;
+			material.color = c;
+			meshRenderer.material = material;
 		}
 	}
 }

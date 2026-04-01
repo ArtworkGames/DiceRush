@@ -1,69 +1,114 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Deck;
+using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.Game.Players;
+using StepanoffGames.DiceRush.UI.Components.Perks;
+using StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup;
 using StepanoffGames.DiceRush.UI.Windows.ConfirmWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows.Signals;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace StepanoffGames.DiceRush.Game.Chest
 {
 	public class ChestController : MonoBehaviour, IService
 	{
+		private LevelManager _levelManager;
+		private DeckController _deckController;
+		private PerksManager _perksManager;
+
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
 		}
 
+		private void Start()
+		{
+			_levelManager = ServiceLocator.Get<LevelManager>();
+			_deckController = ServiceLocator.Get<DeckController>();
+			_perksManager = ServiceLocator.Get<PerksManager>();
+		}
+
 		private void OnDestroy()
 		{
 			ServiceLocator.Unregister<ChestController>();
+
+			_levelManager = null;
+			_deckController = null;
+			_perksManager = null;
 		}
 
 		public async UniTask Open(PlayerController player)
 		{
 			CardModel[] cards = GetCards(player);
 
-			bool chestWindowClosed = false;
-			SignalBus.Publish(new OpenWindowSignal(ChestWindow.PrefabName, new ChestWindowParams()
+			//bool chestWindowClosed = false;
+			//SignalBus.Publish(new OpenWindowSignal(ChestWindow.PrefabName, new ChestWindowParams()
+			//{
+			//	Cards = cards,
+			//	OnSelect = (CardModel card) =>
+			//	{
+			//		//player.Model.Deck.AddCard(card);
+
+			//		_deckController.AddCards(player, cards);
+
+			//		//for (int i = 0; i < cards.Length; i++)
+			//		//{
+			//		//	player.Model.Deck.AddCard(cards[i]);
+			//		//}
+
+			//		chestWindowClosed = true;
+			//	}
+			//}));
+
+			//await UniTask.WaitUntil(() => chestWindowClosed);
+
+
+			Vector3 worldPos = ((Cell)player.Avatar.CurrentPoint).Drawer.ChestRewardPosition.position;
+			Vector2 scrPos = _levelManager.Camera.Camera.WorldToScreenPoint(worldPos);
+			worldPos = _levelManager.UICamera.ScreenToWorldPoint(scrPos);
+
+			GameObject iconObject = await LoadPerkIcon();
+			iconObject.transform.position = worldPos;
+			iconObject.transform.localPosition = new Vector3(iconObject.transform.localPosition.x, iconObject.transform.localPosition.y, 0f);
+
+			FlyingPerkTarget flyingPerkTarget = _perksManager.GetFlyingPerkTarget(PerkType.Take3Cards);
+
+			bool isCompleted = false;
+			FlyingIconPopup.Show(iconObject, flyingPerkTarget.transform, null, () =>
 			{
-				Cards = cards,
-				OnSelect = (CardModel card) =>
-				{
-					//player.Model.Deck.AddCard(card);
+				_deckController.AddCards(player, cards);
 
-					DeckController deckController = ServiceLocator.Get<DeckController>();
-					deckController.AddCards(player, cards);
+				Destroy(iconObject);
+				isCompleted = true;
+			});
 
-					//for (int i = 0; i < cards.Length; i++)
-					//{
-					//	player.Model.Deck.AddCard(cards[i]);
-					//}
+			await UniTask.WaitUntil(() => isCompleted);
+		}
 
-					chestWindowClosed = true;
-				}
-			}));
+		private async UniTask<GameObject> LoadPerkIcon()
+		{
+			string perkName = $"Take3CardsPerkIcon";
+			string perkPath = $"UI/Perks/{perkName}.prefab";
+			var handle = Addressables.LoadAssetAsync<GameObject>(perkPath);
+			await UniTask.WaitUntil(() => handle.IsDone);
 
-			await UniTask.WaitUntil(() => chestWindowClosed);
+			GameObject iconObject = Instantiate(handle.Result, _perksManager.Panel.transform, false);
+			iconObject.SetActive(false);
+			iconObject.name = perkName;
+			iconObject.transform.localScale = Vector3.one * 2.3f;
+
+			return iconObject;
 		}
 
 		public void AddCards(PlayerController player)
 		{
 			CardModel[] cards = GetCards(player);
-
-			//CardModel card = cards[Random.Range(0, cards.Length)];
-			//player.Model.Deck.AddCard(card);
-
-			DeckController deckController = ServiceLocator.Get<DeckController>();
-			deckController.AddCards(player, cards);
-
-			//for (int i = 0; i < cards.Length; i++)
-			//{
-			//	player.Model.Deck.AddCard(cards[i]);
-			//}
+			_deckController.AddCards(player, cards);
 		}
 
 		private CardModel[] GetCards(PlayerController player)
