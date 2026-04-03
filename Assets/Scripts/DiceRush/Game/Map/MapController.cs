@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using StepanoffGames.Services;
 using System;
 using System.Collections.Generic;
@@ -5,11 +6,13 @@ using System.Drawing;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace StepanoffGames.DiceRush.Game
+namespace StepanoffGames.DiceRush.Game.Map
 {
-	public class Map : MonoBehaviour, IService
+	public class MapController : MonoBehaviour, IService
 	{
 		public Action OnInited;
+
+		[SerializeField] private MapGenerator _generator;
 
 		private Cell[] _cells;
 		private Cell _startCell;
@@ -22,8 +25,10 @@ namespace StepanoffGames.DiceRush.Game
 			ServiceLocator.Register(this);
 		}
 
-		private void Start()
+		public async UniTask CreateMap()
 		{
+			await _generator.Generate(80);
+
 			_cells = GetComponentsInChildren<Cell>();
 
 			for (int i = 0; i < _cells.Length; i++)
@@ -45,7 +50,7 @@ namespace StepanoffGames.DiceRush.Game
 
 		private void OnDestroy()
 		{
-			ServiceLocator.Unregister<Map>();
+			ServiceLocator.Unregister<MapController>();
 		}
 
 		private void SetCellIndex(MapPoint point, int index)

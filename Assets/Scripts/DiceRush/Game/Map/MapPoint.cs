@@ -4,7 +4,7 @@ using System.Drawing;
 using UnityEditor;
 using UnityEngine;
 
-namespace StepanoffGames.DiceRush.Game
+namespace StepanoffGames.DiceRush.Game.Map
 {
 	public class MapPoint : MonoBehaviour
 	{

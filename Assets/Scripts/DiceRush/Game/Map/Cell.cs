@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace StepanoffGames.DiceRush.Game
+namespace StepanoffGames.DiceRush.Game.Map
 {
 	public enum CellType
 	{

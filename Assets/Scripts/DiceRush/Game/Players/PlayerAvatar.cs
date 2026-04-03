@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Map;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Players

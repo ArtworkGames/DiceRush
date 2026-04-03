@@ -1,3 +1,4 @@
+using StepanoffGames.DiceRush.Game.Map;
 using System.Collections.Generic;
 
 namespace StepanoffGames.DiceRush.Game.Bag

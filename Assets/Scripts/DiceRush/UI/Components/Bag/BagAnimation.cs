@@ -1,4 +1,5 @@
 using StepanoffGames.DiceRush.Game;
+using StepanoffGames.DiceRush.Game.Map;
 using System;
 using UnityEngine;
 

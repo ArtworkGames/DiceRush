@@ -1,4 +1,5 @@
 using StepanoffGames.DiceRush.Game;
+using StepanoffGames.DiceRush.Game.Map;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.UI.Components.Bag

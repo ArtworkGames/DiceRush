@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Deck;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.UI.Components.Perks;

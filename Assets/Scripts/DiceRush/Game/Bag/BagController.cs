@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.UI.Components.Bag;
 using StepanoffGames.Services;

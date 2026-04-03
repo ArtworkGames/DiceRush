@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Game;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Ranking.Signals;
@@ -30,6 +31,9 @@ namespace StepanoffGames.DiceRush.UI.Components.Ranking
 			await UniTask.NextFrame();
 
 			LevelManager levelManager = ServiceLocator.Get<LevelManager>();
+
+			await UniTask.WaitUntil(() => levelManager.Players != null);
+
 			for (int i = 0; i < levelManager.Players.Count; i++)
 			{
 				_playerItems[i].SetPlayer(levelManager.Players[i]);

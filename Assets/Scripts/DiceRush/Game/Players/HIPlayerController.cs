@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Path;
 using StepanoffGames.Services;
 

@@ -6,6 +6,7 @@ using StepanoffGames.DiceRush.Game.Chest;
 using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Dice;
 using StepanoffGames.DiceRush.Game.Fork;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
@@ -32,7 +33,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 		protected CellType _lastCellType;
 
 		protected LevelManager _levelManager;
-		protected Map _map;
+		protected MapController _mapController;
 		protected DiceController _diceController;
 		protected BagController _bagController;
 		protected DeckController _deckController;
@@ -50,7 +51,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_prevPlayer = prevPlayer;
 
 			_levelManager = ServiceLocator.Get<LevelManager>();
-			_map = ServiceLocator.Get<Map>();
+			_mapController = ServiceLocator.Get<MapController>();
 			_diceController = ServiceLocator.Get<DiceController>();
 			_bagController = ServiceLocator.Get<BagController>();
 			_deckController = ServiceLocator.Get<DeckController>();
@@ -66,7 +67,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_avatar = null;
 
 			_levelManager = null;
-			_map = null;
+			_mapController = null;
 			_diceController = null;
 			_bagController = null;
 			_deckController = null;
@@ -298,7 +299,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					break;
 
 				case CellType.Portal:
-					Cell otherPortal = _map.GetOtherPortal(currentCell);
+					Cell otherPortal = _mapController.GetOtherPortal(currentCell);
 
 					if (otherPortal != null)
 					{

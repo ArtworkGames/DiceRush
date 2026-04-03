@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.Cameras.Signals;
 using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
@@ -39,7 +40,7 @@ namespace StepanoffGames.DiceRush.Game
 		public Camera HUDCamera => _hudCamera;
 		public Camera UICamera => _uiCamera;
 
-		private Map _map;
+		private MapController _mapController;
 		private DataManager _dataManager;
 		private XpManager _xpManager;
 
@@ -56,15 +57,17 @@ namespace StepanoffGames.DiceRush.Game
 			SignalBus.Publish(new AddCamerasSignal(_cameras));
 		}
 
-		private void Start()
+		private async void Start()
 		{
-			_map = ServiceLocator.Get<Map>();
+			_mapController = ServiceLocator.Get<MapController>();
 			_dataManager = ServiceLocator.Get<DataManager>();
 			_xpManager = ServiceLocator.Get<XpManager>();
 
-			if ((_map == null) || !_map.gameObject.activeSelf)
-				_map = GetComponentInChildren<Map>();
+			//if ((_map == null) || !_map.gameObject.activeSelf)
+			//	_map = GetComponentInChildren<MapController>();
 			//_map.OnInited += OnMapInited;
+
+			await _mapController.CreateMap();
 
 			for (int i = 0; i < _avatars.Length; i++)
 			{
@@ -97,7 +100,7 @@ namespace StepanoffGames.DiceRush.Game
 		{
 			ServiceLocator.Unregister<LevelManager>();
 
-			_map = null;
+			_mapController = null;
 			_dataManager = null;
 			_xpManager = null;
 
@@ -131,7 +134,7 @@ namespace StepanoffGames.DiceRush.Game
 			await UniTask.NextFrame();
 			await UniTask.NextFrame();
 
-			Cell startCell = _map.StartCell;
+			Cell startCell = _mapController.StartCell;
 			//Cell startCell = _map.GetCell(70);
 			for (int i = 0; i < _players.Count; i++)
 			{
@@ -151,7 +154,7 @@ namespace StepanoffGames.DiceRush.Game
 			{
 				movesCount++;
 
-				_map.ResetUsedCells();
+				_mapController.ResetUsedCells();
 
 				SignalBus.Publish(new TurnStartedSignal());
 
@@ -194,9 +197,9 @@ namespace StepanoffGames.DiceRush.Game
 			moveBackwardCellTypes.Add(CellType.MoveBackward);
 			moveBackwardCellTypes.Add(CellType.MoveBackward);
 
-			for (int i = 0; i < _map.Cells.Length; i++)
+			for (int i = 0; i < _mapController.Cells.Length; i++)
 			{
-				Cell cell = _map.Cells[i];
+				Cell cell = _mapController.Cells[i];
 				if (cell.Type == CellType.Empty)
 				{
 					List<CellType> currentCellTypes = new List<CellType>();

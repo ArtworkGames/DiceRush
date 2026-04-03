@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Path;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
