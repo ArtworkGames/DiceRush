@@ -1,4 +1,3 @@
-using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.UI.Windows;
 

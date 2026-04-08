@@ -5,11 +5,13 @@ using StepanoffGames.DiceRush.Game.Deck.Cards;
 using StepanoffGames.DiceRush.Game.Deck.Signals;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.DiceRush.UI.Components.Deck;
+using StepanoffGames.DiceRush.UI.Deck;
+using StepanoffGames.DiceRush.UI.Messages.Signals;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Deck
@@ -61,17 +63,17 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			SignalBus.Publish(new PlayerCardsChangedSignal(player.Model));
 		}
 
-		public async UniTask<int> ConfirmDiceRoll(PlayerController player, int diceValue)
+		public async UniTask<int> ConfirmDiceRoll(PlayerController player, int diceValue, CancellationToken ct)
 		{
-			return await ConfirmDiceRollInternal(player, true, diceValue);
+			return await ConfirmDiceRollInternal(player, diceValue, ct);
 		}
 
-		public async UniTask<int> ApplyDiceRoll(PlayerController player, int diceValue)
+		public async UniTask<int> ApplyDiceRoll(PlayerController player, int diceValue, CancellationToken ct)
 		{
-			return await ConfirmDiceRollInternal(player, false, diceValue);
+			return await ConfirmDiceRollInternal(player, diceValue, ct);
 		}
 
-		public async UniTask<int> ConfirmDiceRollInternal(PlayerController player, bool isHuman, int diceValue)
+		public async UniTask<int> ConfirmDiceRollInternal(PlayerController player, int diceValue, CancellationToken ct)
 		{
 			List<CardModel> cardModels = player.Model.Deck.GetCards(CardKind.Dice);
 			int totalCardsCount = cardModels.Count;
@@ -79,16 +81,25 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 			if (cardModels == null || cardModels.Count == 0)
 			{
+				if (player.Model.Type == PlayerType.HI)
+				{
+					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForDice"));
+				}
 				return diceValue;
 			}
 
 			CardModel selectedCardModel = null;
 			if (player.Model.Type == PlayerType.HI)
 			{
-				selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount);
+				selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount, ct);
 			}
 			else
 			{
+				List<Card> cards = new List<Card>();
+				for (int i = 0; i < cardModels.Count; i++) {
+					cards.Add(GetCardByModel(cardModels[i]));
+				}
+				selectedCardModel = ((AIPlayerController)player).Brain.SelectCardForDice(diceValue, cards);
 			}
 
 			if (selectedCardModel != null)
@@ -96,9 +107,9 @@ namespace StepanoffGames.DiceRush.Game.Deck
 				RemoveCard(player, selectedCardModel);
 
 				Card card = GetCardByModel(selectedCardModel);
-				if (isHuman)
+				if (player.Model.Type == PlayerType.HI)
 				{
-					diceValue = await card.UseForDice(player, diceValue);
+					diceValue = await card.UseForDice(player, diceValue, ct);
 				}
 				else
 				{
@@ -108,26 +119,26 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			else
 			{
 				// ???
-				if (isHuman)
+				if (player.Model.Type == PlayerType.HI)
 				{
-					await UniTask.WaitForSeconds(0.5f);
+					await UniTask.WaitForSeconds(0.5f, cancellationToken: ct);
 				}
 			}
 
 			return diceValue;
 		}
 
-		public async UniTask<CellType> ConfirmTokenDraw(PlayerController player, CellType tileType)
+		public async UniTask<CellType> ConfirmTokenDraw(PlayerController player, CellType tileType, CancellationToken ct)
 		{
-			return await ConfirmTokenDrawInternal(player, true, tileType);
+			return await ConfirmTokenDrawInternal(player, tileType, ct);
 		}
 
-		public async UniTask<CellType> ApplyTokenDraw(PlayerController player, CellType tileType)
+		public async UniTask<CellType> ApplyTokenDraw(PlayerController player, CellType tileType, CancellationToken ct)
 		{
-			return await ConfirmTokenDrawInternal(player, false, tileType);
+			return await ConfirmTokenDrawInternal(player, tileType, ct);
 		}
 
-		public async UniTask<CellType> ConfirmTokenDrawInternal(PlayerController player, bool isHuman, CellType tileType)
+		public async UniTask<CellType> ConfirmTokenDrawInternal(PlayerController player, CellType tileType, CancellationToken ct)
 		{
 			List<CardModel> rawCardModels = player.Model.Deck.GetCards(CardKind.Bag);
 			int totalCardsCount = rawCardModels.Count;
@@ -147,13 +158,17 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 			if (cardModels == null || cardModels.Count == 0)
 			{
+				if (player.Model.Type == PlayerType.HI)
+				{
+					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBag"));
+				}
 				return tileType;
 			}
 
 			CardModel selectedCardModel = null;
-			if (isHuman)
+			if (player.Model.Type == PlayerType.HI)
 			{
-				selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount);
+				selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount, ct);
 			}
 			else
 			{
@@ -164,9 +179,9 @@ namespace StepanoffGames.DiceRush.Game.Deck
 				RemoveCard(player, selectedCardModel);
 
 				Card card = GetCardByModel(selectedCardModel);
-				if (isHuman)
+				if (player.Model.Type == PlayerType.HI)
 				{
-					tileType = await card.UseForToken(player, tileType);
+					tileType = await card.UseForToken(player, tileType, ct);
 				}
 				else
 				{
@@ -176,16 +191,16 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			else
 			{
 				// ???
-				if (isHuman)
+				if (player.Model.Type == PlayerType.HI)
 				{
-					await UniTask.WaitForSeconds(0.5f);
+					await UniTask.WaitForSeconds(0.5f, cancellationToken: ct);
 				}
 			}
 
 			return tileType;
 		}
 
-		public async UniTask PrepareForBattle(PlayerController player)
+		public async UniTask PrepareForBattle(PlayerController player, CancellationToken ct)
 		{
 			List<CardModel> rawCardModels = player.Model.Deck.GetCards(CardKind.Battle);
 			int totalCardsCount = rawCardModels.Count;
@@ -207,21 +222,25 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 			if (cardModels == null || cardModels.Count == 0)
 			{
+				if (player.Model.Type == PlayerType.HI)
+				{
+					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBattle"));
+				}
 				return;
 			}
 
-			CardModel selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount);
+			CardModel selectedCardModel = await _panel.SelectCard(cardModels, totalCardsCount, ct);
 
 			if (selectedCardModel != null)
 			{
 				RemoveCard(player, selectedCardModel);
 
 				Card card = GetCardByModel(selectedCardModel);
-				await card.UseForBattle(player);
+				await card.UseForBattle(player, ct);
 			}
 			else
 			{
-				await UniTask.WaitForSeconds(0.5f);
+				await UniTask.WaitForSeconds(0.5f, cancellationToken: ct);
 			}
 		}
 

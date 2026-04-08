@@ -3,12 +3,12 @@ using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Perks;
-using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
-using StepanoffGames.DiceRush.UI.Components.Xp;
+using StepanoffGames.DiceRush.UI.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Xp
@@ -18,7 +18,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		[SerializeField] private XpPanel _panel;
 
 		private DataManager _dataManager;
-		private LevelManager _levelManager;
+		private GameManager _gameManager;
 		private DeckController _deckController;
 		private PerksManager _perksManager;
 
@@ -33,7 +33,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		private void Start()
 		{
 			_dataManager = ServiceLocator.Get<DataManager>();
-			_levelManager = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 			_deckController = ServiceLocator.Get<DeckController>();
 			_perksManager = ServiceLocator.Get<PerksManager>();
 
@@ -50,7 +50,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			ServiceLocator.Unregister<XpManager>();
 
 			_dataManager = null;
-			_levelManager = null;
+			_gameManager = null;
 			_deckController = null;
 			_perksManager = null;
 
@@ -160,7 +160,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 		//	}
 		//}
 
-		public async UniTask CountTotalXp(PlayerModel player)
+		public async UniTask CountTotalXp(PlayerModel player, CancellationToken ct)
 		{
 			int xp = player.MoveXp * player.XpMultiplier;
 			if (xp == 0f)
@@ -192,14 +192,14 @@ namespace StepanoffGames.DiceRush.Game.Xp
 				int newLevels = player.Level - oldLevel;
 				for (int j = 0; j < newLevels; j++)
 				{
-					LevelUp(player).Forget();
+					LevelUp(player, ct).Forget();
 				}
 				player.IsTotalXpCounted = true;
 			}
 
 			SignalBus.Publish(new TotalXpChangedSignal(player));
 
-			await UniTask.WaitUntil(() => player.IsTotalXpCounted);
+			await UniTask.WaitUntil(() => player.IsTotalXpCounted, cancellationToken: ct);
 
 			//if (player.Type == PlayerType.HI)
 			//{
@@ -209,7 +209,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			//}
 		}
 
-		public async UniTask LevelUp(PlayerModel player)
+		public async UniTask LevelUp(PlayerModel player, CancellationToken ct)
 		{
 			if (player.Type == PlayerType.HI)
 			{
@@ -217,11 +217,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 				//PlayerController playerController = _levelManager.GetPlayer(player);
 				//_deckController.Panel.DeckButton.SetPlayer(playerController);
 
-				await _perksManager.SelectPerk(player);
+				await _perksManager.SelectPerk(player, ct);
 			}
             else
             {
-				_perksManager.AddPerk(player).Forget();
+				_perksManager.AddPerk(player, ct).Forget();
 			}
 		}
 

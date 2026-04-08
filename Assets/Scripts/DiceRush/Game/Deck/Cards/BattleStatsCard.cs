@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
@@ -33,13 +34,13 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			}
 		}
 
-		override public async UniTask UseForBattle(PlayerController player)
+		override public async UniTask UseForBattle(PlayerController player, CancellationToken ct)
 		{
 			player.Model.Health = Mathf.Min(player.Model.Health + _healthDelta, player.Model.MaxHealth);
 			player.Model.Defense += _defenseDelta;
 			player.Model.Attack += _attackDelta;
 
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 		}
 
 		override public void ApplyForBattle(PlayerController player)

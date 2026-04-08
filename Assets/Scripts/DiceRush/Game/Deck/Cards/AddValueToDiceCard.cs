@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
@@ -19,11 +20,11 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			}
 		}
 
-		override public async UniTask<int> UseForDice(PlayerController player, int diceValue)
+		override public async UniTask<int> UseForDice(PlayerController player, int diceValue, CancellationToken ct)
 		{
 			diceValue = diceValue + _delta;
 
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return diceValue;
 		}
 

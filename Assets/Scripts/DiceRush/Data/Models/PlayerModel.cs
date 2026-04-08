@@ -1,17 +1,26 @@
 namespace StepanoffGames.DiceRush.Data.Models
 {
-	public enum PlayerType
-	{
-		HI,
-		AI
-	}
-
 	public enum PlayerColor
 	{
 		Red,
 		Blue,
 		Green,
 		Yellow,
+	}
+
+	public enum PlayerType
+	{
+		Undefined,
+		HI,
+		AI
+	}
+
+	public enum AIBrainType
+	{
+		NoBrain,
+		Easy,
+		Medium,
+		Hard
 	}
 
 	public enum PlayerState
@@ -37,8 +46,10 @@ namespace StepanoffGames.DiceRush.Data.Models
 	public class PlayerModel
 	{
 		public string Name;
-
+		public PlayerColor Color;
 		public PlayerType Type;
+		public AIBrainType AIBrainType;
+
 		public PlayerState State;
 
 		public int MaxHealth = 20;
@@ -64,8 +75,8 @@ namespace StepanoffGames.DiceRush.Data.Models
 		public int TotalXp;
 		public int Level;
 
-		public int BaseCardsPerOffer = 2;
-		public int CardsPerOffer = 2;
+		public int BaseCardsPerOffer;
+		public int CardsPerOffer;
 
 		public DeckModel Deck => _deck;
 		private DeckModel _deck;
@@ -76,14 +87,23 @@ namespace StepanoffGames.DiceRush.Data.Models
 		public bool IsTotalXpCounted;
 		public bool IsFinished;
 
-		public PlayerModel(string name, PlayerType type)
+		public PlayerModel(string name, PlayerColor color, PlayerType type, AIBrainType aiBrainType = AIBrainType.NoBrain)
 		{
 			Name = name;
+			Color = color;
 			Type = type;
+			AIBrainType = aiBrainType;
+
+			Level = 1;
+			BaseCardsPerOffer = 2;
+			CardsPerOffer = 2;
 
 			_deck = new DeckModel();
 
-			_deck.AddCard(CardModel.GetCard(CardType.RerollDice).Clone());
+			if (Type == PlayerType.HI)
+				_deck.AddCard(CardModel.GetCard(CardType.RerollDice).Clone());
+			else
+				_deck.AddCard(CardModel.GetCard(CardType.Plus1ToDice).Clone());
 			_deck.AddCard(CardModel.GetCard(CardType.RedrawToken).Clone());
 			_deck.AddCard(CardModel.GetCard(CardType.Plus1ToDefense).Clone());
 

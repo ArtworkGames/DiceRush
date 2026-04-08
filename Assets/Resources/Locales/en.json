@@ -5,9 +5,34 @@
     { "key": "LevelUpWindow:Title", "value": "Level Up" },
 
 
+    { "key": "Button:Campaign", "value": "Campaign" },
+    { "key": "Button:LocalMultiplayer", "value": "Local Multiplayer" },
+
+    { "key": "Button:Back", "value": "Back" },
+    { "key": "LocalMultiplayer:DifficultyTutle", "value": "Difficulty:" },
+    { "key": "Button:EasyDifficulty", "value": "Easy" },
+    { "key": "Button:MediumDifficulty", "value": "Medium" },
+    { "key": "Button:HardDifficulty", "value": "Hard" },
+    { "key": "LocalMultiplayer:DefaultPlayerName", "value": "Player {0}" },
+    { "key": "Button:HIPlayer", "value": "Human" },
+    { "key": "Button:AIPlayer", "value": "Computer" },
+    { "key": "Button:NoPlayer", "value": "No" },
+    { "key": "Button:Play", "value": "Play" },
+
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Confirm" },
     { "key": "Button:ConfirmTile", "value": "Confirm" },
+
+    { "key": "Button:Continue", "value": "Continue" },
+    { "key": "Button:ExitGame", "value": "End Run" },
+
+
+    { "key": "Message:StartTurn", "value": "Turn {0}" },
+    { "key": "Message:PlayerStartTurn", "value": "Turn of player {0} ({1})" },
+    { "key": "Message:NoCardsForDice", "value": "No cards for the dice" },
+    { "key": "Message:NoCardsForBag", "value": "No cards for the bag" },
+    { "key": "Message:NoCardsForBattle", "value": "No cards for the battle" },
+
 
     { "key": "BagDescriptionPopup:RewardLabel", "value": "Chests:" },
     { "key": "BagDescriptionPopup:EnemyLabel", "value": "Enemies:" },

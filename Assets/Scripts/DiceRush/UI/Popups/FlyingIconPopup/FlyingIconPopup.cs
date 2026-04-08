@@ -24,10 +24,10 @@ namespace StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup
 	{
 		public static void Show(GameObject sourceIcon, Transform target, Action onStarted, Action onCompleted, bool updateTarget = false)
 		{
-			LevelManager levelManager = ServiceLocator.Get<LevelManager>();
+			GameManager gameManager = ServiceLocator.Get<GameManager>();
 
 			Vector3 worldPos = sourceIcon.transform.position;
-			Vector2 scrPos = levelManager.UICamera.WorldToScreenPoint(worldPos);
+			Vector2 scrPos = gameManager.UICamera.WorldToScreenPoint(worldPos);
 
 			SignalBus.Publish(new OpenPopupSignal(PrefabName, scrPos, new FlyingIconPopupParams()
 			{
@@ -75,7 +75,7 @@ namespace StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup
 			if (isDestroyed) return;
 
 			PopupManager popupManager = ServiceLocator.Get<PopupManager>();
-			LevelManager levelManager = ServiceLocator.Get<LevelManager>();
+			GameManager gameManager = ServiceLocator.Get<GameManager>();
 
 			Vector3 fromPos = _icon.position;
 			Vector3 toPos = Params.Target.position;

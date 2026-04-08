@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
-using StepanoffGames.DiceRush.UI.Components.Deck;
+using StepanoffGames.DiceRush.UI.Deck;
 using StepanoffGames.UI.Windows;
 using System;
 using System.Collections.Generic;

@@ -1,9 +1,10 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.DiceRush.UI.Components.Bag;
+using StepanoffGames.DiceRush.UI.Bag;
 using StepanoffGames.Services;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Bag
@@ -16,7 +17,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		public CellType CurrentCellType => _currentCellType;
 		private CellType _currentCellType;
 
-		private LevelManager _levelManager;
+		private GameManager _gameManager;
 
 		private bool animationFinished;
 
@@ -24,7 +25,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		{
 			ServiceLocator.Register(this);
 
-			_levelManager = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 		}
 
 		private void Start()
@@ -37,10 +38,10 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		{
 			ServiceLocator.Unregister<BagController>();
 
-			_levelManager = null;
+			_gameManager = null;
 		}
 
-		public async UniTask<CellType> Draw(PlayerController player)
+		public async UniTask<CellType> Draw(PlayerController player, CancellationToken ct)
 		{
 			List<CellType> cellTypes = new List<CellType>();
 			_currentCellType = GetCellType(player, ref cellTypes, out BagDescription bagDescription);
@@ -50,7 +51,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			animationFinished = false;
 			_animation.Draw();
 
-			await UniTask.WaitUntil(() => animationFinished);
+			await UniTask.WaitUntil(() => animationFinished, cancellationToken: ct);
 			_panel.BagButton.Show();
 
 			return _currentCellType;
@@ -77,11 +78,11 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			string str = $"{playerCellIndex} [";
 
 			List<int> otherPlayerCellIndexes = new List<int>();
-			for (int i = 0; i < _levelManager.Players.Count; i++)
+			for (int i = 0; i < _gameManager.Players.Count; i++)
 			{
-				if (player != _levelManager.Players[i])
+				if (player != _gameManager.Players[i])
 				{
-					int cellIndex = ((Cell)_levelManager.Players[i].Avatar.CurrentPoint).Index;
+					int cellIndex = ((Cell)_gameManager.Players[i].Avatar.CurrentPoint).Index;
 					otherPlayerCellIndexes.Add(cellIndex);
 
 					str += $"{cellIndex}, ";

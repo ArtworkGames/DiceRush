@@ -5,9 +5,34 @@
     { "key": "LevelUpWindow:Title", "value": "Новый уровень" },
 
 
+    { "key": "Button:Campaign", "value": "Кампания" },
+    { "key": "Button:LocalMultiplayer", "value": "Локальный мультиплеер" },
+
+    { "key": "Button:Back", "value": "Назад" },
+    { "key": "LocalMultiplayer:DifficultyTutle", "value": "Сложность:" },
+    { "key": "Button:EasyDifficulty", "value": "Низкая" },
+    { "key": "Button:MediumDifficulty", "value": "Средняя" },
+    { "key": "Button:HardDifficulty", "value": "Высокая" },
+    { "key": "LocalMultiplayer:DefaultPlayerName", "value": "Игрок {0}" },
+    { "key": "Button:HIPlayer", "value": "Человек" },
+    { "key": "Button:AIPlayer", "value": "Компьютер" },
+    { "key": "Button:NoPlayer", "value": "Нет" },
+    { "key": "Button:Play", "value": "Играть" },
+
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Принять" },
     { "key": "Button:ConfirmTile", "value": "Принять" },
+
+    { "key": "Button:Continue", "value": "Продолжить" },
+    { "key": "Button:ExitGame", "value": "Закончить забег" },
+
+
+    { "key": "Message:StartTurn", "value": "Ход {0}" },
+    { "key": "Message:PlayerStartTurn", "value": "Ход игрока {0} ({1})" },
+    { "key": "Message:NoCardsForDice", "value": "Нет карт для кубика" },
+    { "key": "Message:NoCardsForBag", "value": "Нет карт для мешка" },
+    { "key": "Message:NoCardsForBattle", "value": "Нет карт для битвы" },
+
 
     { "key": "BagDescriptionPopup:RewardLabel", "value": "Сундуки:" },
     { "key": "BagDescriptionPopup:EnemyLabel", "value": "Враги:" },

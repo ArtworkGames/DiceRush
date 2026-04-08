@@ -1,7 +1,8 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.DiceRush.UI.Components.Dice;
+using StepanoffGames.DiceRush.UI.Dice;
 using StepanoffGames.Services;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Dice
@@ -29,14 +30,14 @@ namespace StepanoffGames.DiceRush.Game.Dice
 			ServiceLocator.Unregister<DiceController>();
 		}
 
-		public async UniTask<int> Roll(PlayerController player)
+		public async UniTask<int> Roll(PlayerController player, CancellationToken ct)
 		{
 			_value = GetValue(player);
 
 			_animationFinished = false;
 			_animation.Roll();
 
-			await UniTask.WaitUntil(() => _animationFinished);
+			await UniTask.WaitUntil(() => _animationFinished, cancellationToken: ct);
 
 			return _value;
 		}

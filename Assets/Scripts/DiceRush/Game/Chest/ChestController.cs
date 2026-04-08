@@ -4,13 +4,11 @@ using StepanoffGames.DiceRush.Game.Deck;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.Game.Players;
-using StepanoffGames.DiceRush.UI.Components.Perks;
+using StepanoffGames.DiceRush.UI.Perks;
 using StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup;
-using StepanoffGames.DiceRush.UI.Windows.ConfirmWindow;
 using StepanoffGames.Services;
-using StepanoffGames.Signals;
-using StepanoffGames.UI.Windows.Signals;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -18,7 +16,7 @@ namespace StepanoffGames.DiceRush.Game.Chest
 {
 	public class ChestController : MonoBehaviour, IService
 	{
-		private LevelManager _levelManager;
+		private GameManager _gameManager;
 		private DeckController _deckController;
 		private PerksManager _perksManager;
 
@@ -29,7 +27,7 @@ namespace StepanoffGames.DiceRush.Game.Chest
 
 		private void Start()
 		{
-			_levelManager = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 			_deckController = ServiceLocator.Get<DeckController>();
 			_perksManager = ServiceLocator.Get<PerksManager>();
 		}
@@ -38,12 +36,12 @@ namespace StepanoffGames.DiceRush.Game.Chest
 		{
 			ServiceLocator.Unregister<ChestController>();
 
-			_levelManager = null;
+			_gameManager = null;
 			_deckController = null;
 			_perksManager = null;
 		}
 
-		public async UniTask Open(PlayerController player)
+		public async UniTask Open(PlayerController player, CancellationToken ct)
 		{
 			CardModel[] cards = GetCards(player);
 
@@ -70,10 +68,10 @@ namespace StepanoffGames.DiceRush.Game.Chest
 
 
 			Vector3 worldPos = ((Cell)player.Avatar.CurrentPoint).Drawer.ChestRewardPosition.position;
-			Vector2 scrPos = _levelManager.Camera.Camera.WorldToScreenPoint(worldPos);
-			worldPos = _levelManager.UICamera.ScreenToWorldPoint(scrPos);
+			Vector2 scrPos = _gameManager.Camera.Camera.WorldToScreenPoint(worldPos);
+			worldPos = _gameManager.UICamera.ScreenToWorldPoint(scrPos);
 
-			GameObject iconObject = await LoadPerkIcon();
+			GameObject iconObject = await LoadPerkIcon(ct);
 			iconObject.transform.position = worldPos;
 			iconObject.transform.localPosition = new Vector3(iconObject.transform.localPosition.x, iconObject.transform.localPosition.y, 0f);
 
@@ -88,10 +86,10 @@ namespace StepanoffGames.DiceRush.Game.Chest
 				isCompleted = true;
 			});
 
-			await UniTask.WaitUntil(() => isCompleted);
+			await UniTask.WaitUntil(() => isCompleted, cancellationToken: ct);
 		}
 
-		private async UniTask<GameObject> LoadPerkIcon()
+		private async UniTask<GameObject> LoadPerkIcon(CancellationToken ct)
 		{
 			string perkName = $"Take3CardsPerkIcon";
 			string perkPath = $"UI/Perks/{perkName}.prefab";
@@ -122,9 +120,9 @@ namespace StepanoffGames.DiceRush.Game.Chest
 			List<CardModel> playerBagCards = player.Model.Deck.GetCards(CardKind.Bag);
 			List<CardModel> playerBattleCards = player.Model.Deck.GetCards(CardKind.Battle);
 
-			CardModel diceCard = SelectCard(availableDiceCards, playerDiceCards);
-			CardModel bagCard = SelectCard(availableBagCards, playerBagCards);
-			CardModel battleCard = SelectCard(availableBattleCards, playerBattleCards);
+			CardModel diceCard = SelectCard(player, availableDiceCards, playerDiceCards);
+			CardModel bagCard = SelectCard(player, availableBagCards, playerBagCards);
+			CardModel battleCard = SelectCard(player, availableBattleCards, playerBattleCards);
 
 			CardModel[] cards = new CardModel[] { diceCard.Clone(), bagCard.Clone(), battleCard.Clone() };
 			return cards;
@@ -172,19 +170,20 @@ namespace StepanoffGames.DiceRush.Game.Chest
 					break;
 			}
 
-			CardModel card = SelectCard(availableCards, playerCards);
+			CardModel card = SelectCard(player, availableCards, playerCards);
 			return card.Clone();
 		}
 
-		private CardModel SelectCard(CardModel[] availableCards, List<CardModel> playerCards)
+		private CardModel SelectCard(PlayerController player, CardModel[] availableCards, List<CardModel> playerCards)
 		{
 			List<CardModel> selectedCards = new List<CardModel>();
 
 			for (int i = 0; i < availableCards.Length; i++)
 			{
 				CardModel card = availableCards[i];
-				bool exists = false;
+				if (player.Model.Type == PlayerType.AI && card.Type == CardType.RerollDice) continue;
 
+				bool exists = false;
 				for (int j = 0; j < playerCards.Count; j++)
 				{
 					if (playerCards[j].Type == card.Type)

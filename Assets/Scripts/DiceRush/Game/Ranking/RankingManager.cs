@@ -10,7 +10,7 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 {
 	public class RankingManager : MonoBehaviour, IService
 	{
-		private LevelManager _levelManager;
+		private GameManager _gameManager;
 
 		private void Awake()
 		{
@@ -19,7 +19,7 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 
 		private void Start()
 		{
-			_levelManager = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 
 			SignalBus.Subscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 			SignalBus.Subscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
@@ -29,7 +29,7 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 		{
 			ServiceLocator.Unregister<RankingManager>();
 
-			_levelManager = null;
+			_gameManager = null;
 
 			SignalBus.Unsubscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 			SignalBus.Unsubscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
@@ -49,9 +49,9 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 		{
 			List<PlayerController> players = new List<PlayerController>();
 
-			for (int i = 0; i < _levelManager.Players.Count; i++)
+			for (int i = 0; i < _gameManager.Players.Count; i++)
 			{
-				PlayerController player = _levelManager.Players[i];
+				PlayerController player = _gameManager.Players[i];
 				players.Add(player);
 			}
 

@@ -8,6 +8,7 @@ using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows.Signals;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Battle
@@ -35,7 +36,7 @@ namespace StepanoffGames.DiceRush.Game.Battle
 			_xpManager = null;
 		}
 
-		public async UniTask Fight(PlayerController player)
+		public async UniTask Fight(PlayerController player, CancellationToken ct)
 		{
 			player.Model.Defense = player.Model.BaseDefense;
 			player.Model.Attack = player.Model.BaseAttack;
@@ -64,7 +65,7 @@ namespace StepanoffGames.DiceRush.Game.Battle
 				Parent = _battleWindowParent
 			});
 
-			await UniTask.WaitUntil(() => battleWindowClosed);
+			await UniTask.WaitUntil(() => battleWindowClosed, cancellationToken: ct);
 
 			player.Model.Defense = player.Model.BaseDefense;
 			player.Model.Attack = player.Model.BaseAttack;

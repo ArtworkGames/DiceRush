@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.InputSystem;
 
 namespace StepanoffGames.UI.Windows
 {
@@ -19,6 +20,7 @@ namespace StepanoffGames.UI.Windows
 		private WindowsQueue _queue;
 
 		private bool _openingLock;
+		private bool _escPressed;
 
 		protected void Awake()
 		{
@@ -40,6 +42,55 @@ namespace StepanoffGames.UI.Windows
 			SignalBus.Unsubscribe<CloseAllWindowsSignal>(OnCloseAllWindows);
 
 			ServiceLocator.Unregister<WindowManager>();
+		}
+
+		public bool CanUseHotkeysExternal()
+		{
+			return !HasOpenWindow() && !_escPressed;
+		}
+
+		private void Update()
+		{
+			if (HasOpenWindow())
+			{
+				//if (!_escPressed && Input.GetKeyDown(KeyCode.Escape))
+				if (!_escPressed && Keyboard.current.escapeKey.wasPressedThisFrame)
+				{
+					CloseLastWindow();
+				}
+			}
+		}
+
+		private async void CloseLastWindow()
+		{
+			_escPressed = true;
+			await UniTask.NextFrame();
+			await UniTask.NextFrame();
+
+			BaseWindowBehaviour windowBehaviour = _queue.OpenedWindows[_queue.OpenedWindows.Count - 1];
+			if (windowBehaviour.State == WindowState.Opening)
+			{
+				await UniTask.WaitUntil(() => windowBehaviour == null || windowBehaviour.State == WindowState.Opened);
+			}
+
+			if (windowBehaviour != null)
+			{
+				if (windowBehaviour.State == WindowState.Opened)
+				{
+					string windowName = windowBehaviour.WindowName;
+					SignalBus.Publish(new CloseWindowSignal(windowName));
+
+					await UniTask.WaitUntil(() => windowBehaviour == null || windowBehaviour.State == WindowState.Closed);
+				}
+				else
+				{
+					await UniTask.WaitUntil(() => windowBehaviour == null || windowBehaviour.State == WindowState.Closed);
+				}
+			}
+
+			await UniTask.NextFrame();
+			await UniTask.NextFrame();
+			_escPressed = false;
 		}
 
 		public bool HasOpenWindow()

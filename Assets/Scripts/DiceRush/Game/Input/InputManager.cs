@@ -15,16 +15,16 @@ namespace StepanoffGames.DiceRush.Game
 
 		private IInputReceiver pressedHUDInputReceiver;
 
-		private LevelManager _level;
+		private GameManager _gameManager;
 
 		private void Start()
 		{
-			_level = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 		}
 
 		private void OnDestroy()
 		{
-			_level = null;
+			_gameManager = null;
 		}
 
 		private void Update()
@@ -70,7 +70,7 @@ namespace StepanoffGames.DiceRush.Game
 		private IInputReceiver GetHUDInputReceiver()
 		{
 			Vector2 mousePos = Mouse.current.position.ReadValue();
-			Ray ray = _level.HUDCamera.ScreenPointToRay(mousePos);
+			Ray ray = _gameManager.HUDCamera.ScreenPointToRay(mousePos);
 
 			RaycastHit2D[] hits = Physics2D.RaycastAll(ray.origin, ray.direction);
 

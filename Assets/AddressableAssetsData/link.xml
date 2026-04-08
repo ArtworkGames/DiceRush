@@ -4,9 +4,10 @@
     <type fullname="StepanoffGames.DiceRush.Game.Map.CellDrawer" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.Game.Map.Decor.WorldOrientedDecor" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.Game.Map.MapSection" preserve="all" />
-    <type fullname="StepanoffGames.DiceRush.UI.Components.Deck.CardView" preserve="all" />
-    <type fullname="StepanoffGames.DiceRush.UI.Components.Deck.DescriptionPopup.DeckDescriptionCardItem" preserve="all" />
-    <type fullname="StepanoffGames.DiceRush.UI.Components.Perks.FlyingPerkTarget" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Components.TweenButton" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Deck.CardView" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Deck.DescriptionPopup.DeckDescriptionCardItem" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Perks.FlyingPerkTarget" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup.FlyingIconPopup" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.Animators.CenterContentAnimator" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.Animators.WindowFadeAnimator" preserve="all" />
@@ -14,6 +15,7 @@
     <type fullname="StepanoffGames.DiceRush.UI.Windows.BattleWindow.CharacterAnimation" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.BattleWindow.StatsAnimation" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.ConfirmWindow.ChestWindow" preserve="all" />
+    <type fullname="StepanoffGames.DiceRush.UI.Windows.GamePauseWindow.GamePauseWindow" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow.PerkItem" preserve="all" />
     <type fullname="StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow.SelectPerkWindow" preserve="all" />
     <type fullname="StepanoffGames.UI.Components.TMPTextLocalizer" preserve="all" />
@@ -56,7 +58,6 @@
     <type fullname="UnityEngine.RectTransform" preserve="all" />
     <type fullname="UnityEngine.Shader" preserve="all" />
     <type fullname="UnityEngine.Sprite" preserve="all" />
-    <type fullname="UnityEngine.SpriteRenderer" preserve="all" />
     <type fullname="UnityEngine.Texture2D" preserve="all" />
     <type fullname="UnityEngine.TrailRenderer" preserve="all" />
     <type fullname="UnityEngine.Transform" preserve="all" />

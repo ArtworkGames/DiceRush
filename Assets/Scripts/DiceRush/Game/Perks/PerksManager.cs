@@ -3,13 +3,14 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Perks.Perks;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Xp.Signals;
-using StepanoffGames.DiceRush.UI.Components.Perks;
+using StepanoffGames.DiceRush.UI.Perks;
 using StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup;
 using StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows.Signals;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Perks
@@ -22,7 +23,9 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 		private Dictionary<PerkType, FlyingPerkTarget> _flyingPerkTargets;
 
-		private LevelManager _levelManager;
+		private GameManager _gameManager;
+
+		private CancellationTokenSource cts;
 
 		private void Awake()
 		{
@@ -33,16 +36,20 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 		private void Start()
 		{
-			_levelManager = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 
 			SignalBus.Subscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
 		}
 
 		private void OnDestroy()
 		{
+			cts?.Cancel();
+			cts?.Dispose();
+			cts = null;
+
 			ServiceLocator.Unregister<PerksManager>();
 
-			_levelManager = null;
+			_gameManager = null;
 
 			SignalBus.Unsubscribe<XpMultiplierChangedSignal>(OnXpMultiplierChanged);
 		}
@@ -135,7 +142,7 @@ namespace StepanoffGames.DiceRush.Game.Perks
 		//	}
 		//}
 
-		public async UniTask SelectPerk(PlayerModel player)
+		public async UniTask SelectPerk(PlayerModel player, CancellationToken ct)
 		{
 			List<PerkModel> perks = GetPerksOffer(player);
 			if (perks.Count == 0) return;
@@ -153,7 +160,7 @@ namespace StepanoffGames.DiceRush.Game.Perks
 				}
 			}));
 
-			await UniTask.WaitUntil(() => levelUpWindowClosed);
+			await UniTask.WaitUntil(() => levelUpWindowClosed, cancellationToken: ct);
 
 			if (selectedPerk.Usage != PerkUsage.OneTime)
 			{
@@ -162,16 +169,24 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 			if (selectedPerk.Usage != PerkUsage.Multiple)
 			{
-				await ApplyPerk(player, selectedPerk.Type);
+				await ApplyPerk(player, selectedPerk.Type, ct);
 			}
 		}
 
-		public async UniTask AddPerk(PlayerModel player)
+		public async UniTask AddPerk(PlayerModel player, CancellationToken ct)
 		{
 			List<PerkModel> perks = GetPerksOffer(player);
 			if (perks.Count == 0) return;
 
-			PerkModel selectedPerk = perks[Random.Range(0, perks.Count)];
+			//PerkModel selectedPerk = perks[Random.Range(0, perks.Count)];
+			PerkModel selectedPerk = perks[0];
+			for (int i = 1; i < perks.Count; i++)
+			{
+				if (selectedPerk.Priority > perks[i].Priority)
+				{
+					selectedPerk = perks[i];
+				}
+			}
 
 			if (selectedPerk.Usage != PerkUsage.OneTime)
 			{
@@ -180,7 +195,7 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 			if (selectedPerk.Usage != PerkUsage.Multiple)
 			{
-				await ApplyPerk(player, selectedPerk.Type);
+				await ApplyPerk(player, selectedPerk.Type, ct);
 			}
 		}
 
@@ -191,31 +206,35 @@ namespace StepanoffGames.DiceRush.Game.Perks
 
 		private void OnXpMultiplierChanged(XpMultiplierChangedSignal signal)
 		{
+			cts?.Cancel();
+			cts?.Dispose();
+			cts = new CancellationTokenSource();
+
 			if (signal.Player.Type == PlayerType.HI)
 			{
-				UsePlayerPerk(signal.Player, PerkType.FirstMultiplierX3).Forget();
-				UsePlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier).Forget();
-				UsePlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5).Forget();
+				UsePlayerPerk(signal.Player, PerkType.FirstMultiplierX3, cts.Token).Forget();
+				UsePlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier, cts.Token).Forget();
+				UsePlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5, cts.Token).Forget();
 			}
 			else
 			{
-				ApplyPlayerPerk(signal.Player, PerkType.FirstMultiplierX3).Forget();
-				ApplyPlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier).Forget();
-				ApplyPlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5).Forget();
+				ApplyPlayerPerk(signal.Player, PerkType.FirstMultiplierX3, cts.Token).Forget();
+				ApplyPlayerPerk(signal.Player, PerkType.XpBonusForEachMultiplier, cts.Token).Forget();
+				ApplyPlayerPerk(signal.Player, PerkType.OneCardForMultiplierX5, cts.Token).Forget();
 			}
 		}
 
-		public async UniTask UseForBattleRoundStarted(PlayerModel player)
+		public async UniTask UseForBattleRoundStarted(PlayerModel player, CancellationToken ct)
 		{
-			await UsePlayerPerk(player, PerkType.IncreaseFirstDefenseBy1);
+			await UsePlayerPerk(player, PerkType.IncreaseFirstDefenseBy1, ct);
 		}
 
-		public async UniTask UseForPlayerWonBattle(PlayerModel player)
+		public async UniTask UseForPlayerWonBattle(PlayerModel player, CancellationToken ct)
 		{
-			await UsePlayerPerk(player, PerkType.Restore1HealthAfterVictory);
+			await UsePlayerPerk(player, PerkType.Restore1HealthAfterVictory, ct);
 		}
 
-		private async UniTask UsePlayerPerk(PlayerModel player, PerkType perkType)
+		private async UniTask UsePlayerPerk(PlayerModel player, PerkType perkType, CancellationToken ct)
 		{
 			PerkModel perkModel = player.PerksSet.GetPerk(perkType);
 			if (perkModel != null)
@@ -223,8 +242,8 @@ namespace StepanoffGames.DiceRush.Game.Perks
 				Perk perk = GetPerkByModel(perkModel);
 				if (perk != null)
 				{
-					PlayerController playerController = _levelManager.GetPlayer(player);
-					bool result = await perk.Use(playerController);
+					PlayerController playerController = _gameManager.GetPlayer(player);
+					bool result = await perk.Use(playerController, ct);
 
 					if (result)
 					{
@@ -239,14 +258,14 @@ namespace StepanoffGames.DiceRush.Game.Perks
 								isCompleted = true;
 							});
 
-							await UniTask.WaitUntil(() => isCompleted);
+							await UniTask.WaitUntil(() => isCompleted, cancellationToken: ct);
 						}
 					}
 				}
 			}
 		}
 
-		private async UniTask ApplyPlayerPerk(PlayerModel player, PerkType perkType)
+		private async UniTask ApplyPlayerPerk(PlayerModel player, PerkType perkType, CancellationToken ct)
 		{
 			PerkModel perkModel = player.PerksSet.GetPerk(perkType);
 			if (perkModel != null)
@@ -254,20 +273,20 @@ namespace StepanoffGames.DiceRush.Game.Perks
 				Perk perk = GetPerkByModel(perkModel);
 				if (perk != null)
 				{
-					PlayerController playerController = _levelManager.GetPlayer(player);
-					bool result = await perk.Apply(playerController);
+					PlayerController playerController = _gameManager.GetPlayer(player);
+					bool result = await perk.Apply(playerController, ct);
 				}
 			}
 		}
 
-		private async UniTask ApplyPerk(PlayerModel player, PerkType perkType)
+		private async UniTask ApplyPerk(PlayerModel player, PerkType perkType, CancellationToken ct)
 		{
 			PerkModel perkModel = PerkModel.GetPerk(perkType);
 			Perk perk = GetPerkByModel(perkModel);
 			if (perk != null)
 			{
-				PlayerController playerController = _levelManager.GetPlayer(player);
-				bool result = await perk.Apply(playerController);
+				PlayerController playerController = _gameManager.GetPlayer(player);
+				bool result = await perk.Apply(playerController, ct);
 			}
 		}
 

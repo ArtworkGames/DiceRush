@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Map;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Players
@@ -31,7 +32,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			_currentPoint = cell;
 		}
 
-		public async UniTask MoveToCurrentCellPlayerPosition()
+		public async UniTask MoveToCurrentCellPlayerPosition(CancellationToken ct)
 		{
 			if (!(_currentPoint is Cell)) return;
 
@@ -47,10 +48,10 @@ namespace StepanoffGames.DiceRush.Game.Players
 					isMoveTween = false;
 				});
 
-			await UniTask.WaitWhile(() => isMoveTween);
+			await UniTask.WaitWhile(() => isMoveTween, cancellationToken: ct);
 		}
 
-		public async UniTask MoveToPoint(MapPoint point)
+		public async UniTask MoveToPoint(MapPoint point, CancellationToken ct)
 		{
 			bool isMoveTween = true;
 
@@ -63,7 +64,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 					isMoveTween = false;
 				});
 
-			await UniTask.WaitWhile(() => isMoveTween);
+			await UniTask.WaitWhile(() => isMoveTween, cancellationToken: ct);
 			_currentPoint = point;
 		}
 	}

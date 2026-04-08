@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
@@ -15,9 +16,9 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			_model = model;
 		}
 
-		virtual public async UniTask<int> UseForDice(PlayerController player, int diceValue)
+		virtual public async UniTask<int> UseForDice(PlayerController player, int diceValue, CancellationToken ct)
 		{
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return diceValue;
 		}
 
@@ -26,9 +27,9 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			return diceValue;
 		}
 
-		virtual public async UniTask<CellType> UseForToken(PlayerController player, CellType tileType)
+		virtual public async UniTask<CellType> UseForToken(PlayerController player, CellType tileType, CancellationToken ct)
 		{
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return tileType;
 		}
 
@@ -37,9 +38,9 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			return tileType;
 		}
 
-		virtual public async UniTask UseForBattle(PlayerController player)
+		virtual public async UniTask UseForBattle(PlayerController player, CancellationToken ct)
 		{
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 		}
 
 		virtual public void ApplyForBattle(PlayerController player)

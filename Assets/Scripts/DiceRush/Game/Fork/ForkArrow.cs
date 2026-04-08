@@ -16,16 +16,16 @@ namespace StepanoffGames.DiceRush.Game.Fork
 		public int Id => _id;
 		private int _id;
 
-		private LevelManager _level;
+		private GameManager _gameManager;
 
 		private void Start()
 		{
-			_level = ServiceLocator.Get<LevelManager>();
+			_gameManager = ServiceLocator.Get<GameManager>();
 		}
 
 		private void OnDestroy()
 		{
-			_level = null;
+			_gameManager = null;
 		}
 
 		public void Init(int id, Vector3 position, Vector3 cellCenter, Material material)
@@ -46,7 +46,7 @@ namespace StepanoffGames.DiceRush.Game.Fork
 			if (Mouse.current.leftButton.wasPressedThisFrame)
 			{
 				Vector2 mousePos = Mouse.current.position.ReadValue();
-				Ray ray = _level.Camera.Camera.ScreenPointToRay(mousePos);
+				Ray ray = _gameManager.Camera.Camera.ScreenPointToRay(mousePos);
 
 				if (Physics.Raycast(ray, out RaycastHit hit))
 				{

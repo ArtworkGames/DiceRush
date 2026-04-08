@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Perks.Perks
 {
@@ -14,15 +15,15 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 			_model = model;
 		}
 
-		virtual public async UniTask<bool> Use(PlayerController player)
+		virtual public async UniTask<bool> Use(PlayerController player, CancellationToken ct)
 		{
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return false;
 		}
 
-		virtual public async UniTask<bool> Apply(PlayerController player)
+		virtual public async UniTask<bool> Apply(PlayerController player, CancellationToken ct)
 		{
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return false;
 		}
 	}

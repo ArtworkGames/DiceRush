@@ -4,6 +4,7 @@ using StepanoffGames.DiceRush.Game.Bag;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
@@ -13,7 +14,7 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 		{
 		}
 
-		override public async UniTask<CellType> UseForToken(PlayerController player, CellType cellType)
+		override public async UniTask<CellType> UseForToken(PlayerController player, CellType cellType, CancellationToken ct)
 		{
 			BagController bag = ServiceLocator.Get<BagController>();
 
@@ -22,7 +23,7 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 			bag.ShowToken(cellType);
 			//bag.Confirm();
 
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(ct);
 
 			return cellType;
 		}

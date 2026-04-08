@@ -3,6 +3,7 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Perks.Perks
 {
@@ -22,12 +23,12 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 			}
 		}
 
-		override public async UniTask<bool> Use(PlayerController player)
+		override public async UniTask<bool> Use(PlayerController player, CancellationToken ct)
 		{
-			return await Apply(player);
+			return await Apply(player, ct);
 		}
 
-		override public async UniTask<bool> Apply(PlayerController player)
+		override public async UniTask<bool> Apply(PlayerController player, CancellationToken ct)
 		{
 			if (player.Model.XpMultiplier >= _xpMultiplier)
 			{
@@ -35,7 +36,7 @@ namespace StepanoffGames.DiceRush.Game.Perks.Perks
 				xpManager.AddMoveXp(player.Model, _xpBonus);
 				return true;
 			}
-			await UniTask.Yield();
+			await UniTask.Yield(ct);
 			return false;
 		}
 	}

@@ -96,6 +96,12 @@ namespace StepanoffGames.DiceRush.Game.Path
 					}
 				}
 
+				if (((Cell)point).Type == CellType.Finish)
+				{
+					cells.Add((Cell)point);
+					return;
+				}
+
 				count++;
 				if (count > maxCount) return;
 			}
@@ -123,6 +129,12 @@ namespace StepanoffGames.DiceRush.Game.Path
 					{
 						cells.Add((Cell)point);
 					}
+				}
+
+				if (((Cell)point).Type == CellType.Start)
+				{
+					cells.Add((Cell)point);
+					return;
 				}
 
 				count++;

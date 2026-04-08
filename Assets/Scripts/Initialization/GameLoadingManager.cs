@@ -29,7 +29,7 @@ namespace StepanoffGames.Initialization
 
 			await _initializationWorker.InitializeAllAsync();
 
-			SignalBus.Publish(new LoadSceneSignal("Game"));
+			SignalBus.Publish(new LoadSceneSignal("MainMenu"));
 		}
 
 		private void Update()

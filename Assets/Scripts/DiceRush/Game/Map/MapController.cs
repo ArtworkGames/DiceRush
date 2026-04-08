@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace StepanoffGames.DiceRush.Game.Map
 {
@@ -135,5 +134,134 @@ namespace StepanoffGames.DiceRush.Game.Map
 		//	}
 		//	return cell;
 		//}
+
+		public List<Cell> GetCellsOnDistance(Cell fromCell, int distance, bool forward)
+		{
+			List<Cell> cells = new List<Cell>();
+
+			if (forward)
+			{
+				int newIndex = fromCell.Index + distance;
+				cells = GetNextCells(fromCell, newIndex);
+			}
+			else
+			{
+				int newIndex = fromCell.Index - distance;
+				cells = GetPrevCells(fromCell, newIndex);
+			}
+
+			return cells;
+		}
+
+		private List<Cell> GetNextCells(MapPoint point, int requiredCellIndex)
+		{
+			List<Cell> cells = new List<Cell>();
+
+			if (point.NextPoints.Count == 0 && point is Cell)
+			{
+				cells.Add((Cell)point);
+			}
+
+			for (int i = 0; i < point.NextPoints.Count; i++)
+			{
+				if (point.NextPoints[i] is Cell)
+				{
+					Cell cell = (Cell)point.NextPoints[i];
+					if (cell.Index == requiredCellIndex)
+					{
+						cells.Add(cell);
+					}
+					else
+					{
+						cells.AddRange(GetNextCells(point.NextPoints[i], requiredCellIndex));
+					}
+				}
+				else
+				{
+					cells.AddRange(GetNextCells(point.NextPoints[i], requiredCellIndex));
+				}
+			}
+
+			return cells;
+		}
+
+		private List<Cell> GetPrevCells(MapPoint point, int requiredCellIndex)
+		{
+			List<Cell> cells = new List<Cell>();
+
+			if (point.PrevPoints.Count == 0 && point is Cell)
+			{
+				cells.Add((Cell)point);
+			}
+
+			for (int i = 0; i < point.PrevPoints.Count; i++)
+			{
+				if (point.PrevPoints[i] is Cell)
+				{
+					Cell cell = (Cell)point.PrevPoints[i];
+					if (cell.Index == requiredCellIndex)
+					{
+						cells.Add(cell);
+					}
+					else
+					{
+						cells.AddRange(GetPrevCells(point.PrevPoints[i], requiredCellIndex));
+					}
+				}
+				else
+				{
+					cells.AddRange(GetPrevCells(point.PrevPoints[i], requiredCellIndex));
+				}
+			}
+
+			return cells;
+		}
+
+		public int GetDirectionToCell(Cell fromCell, Cell toCell, bool forward)
+		{
+			if (forward)
+			{
+				for (int i = 0; i < fromCell.NextPoints.Count; i++)
+				{
+					if (IsNextCellReached(fromCell.NextPoints[i], toCell))
+					{
+						return i;
+					}
+				}
+			}
+			else
+			{
+				for (int i = 0; i < fromCell.PrevPoints.Count; i++)
+				{
+					if (IsPrevCellReached(fromCell.PrevPoints[i], toCell))
+					{
+						return i;
+					}
+				}
+			}
+			return -1;
+		}
+
+		private bool IsNextCellReached(MapPoint fromPoint, Cell toCell)
+		{
+			if (fromPoint == toCell) return true;
+
+			for (int i = 0; i < fromPoint.NextPoints.Count; i++)
+			{
+				if (IsNextCellReached(fromPoint.NextPoints[i], toCell)) return true;
+			}
+			return false;
+		}
+
+		private bool IsPrevCellReached(MapPoint fromPoint, Cell toCell)
+		{
+			if (fromPoint == toCell) return true;
+
+			for (int i = 0; i < fromPoint.PrevPoints.Count; i++)
+			{
+				if (IsPrevCellReached(fromPoint.PrevPoints[i], toCell)) return true;
+			}
+			return false;
+		}
 	}
 }

@@ -3,6 +3,7 @@ using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Fork
@@ -51,7 +52,7 @@ namespace StepanoffGames.DiceRush.Game.Fork
 			_arrows.Clear();
 		}
 
-		public async UniTask<int> SelectNextDirection(MapPoint point, PlayerAvatar player)
+		public async UniTask<int> SelectNextDirection(MapPoint point, PlayerAvatar player, CancellationToken ct)
 		{
 			transform.position = point.transform.position;
 
@@ -64,14 +65,14 @@ namespace StepanoffGames.DiceRush.Game.Fork
 			}
 
 			selectedId = -1;
-			await UniTask.WaitWhile(() => selectedId == -1);
+			await UniTask.WaitWhile(() => selectedId == -1, cancellationToken: ct);
 
 			ClearArrows();
 
 			return selectedId - 1;
 		}
 
-		public async UniTask<int> SelectPrevDirection(MapPoint point, PlayerAvatar player)
+		public async UniTask<int> SelectPrevDirection(MapPoint point, PlayerAvatar player, CancellationToken ct)
 		{
 			transform.position = point.transform.position;
 
@@ -84,7 +85,7 @@ namespace StepanoffGames.DiceRush.Game.Fork
 			}
 
 			selectedId = -1;
-			await UniTask.WaitWhile(() => selectedId == -1);
+			await UniTask.WaitWhile(() => selectedId == -1, cancellationToken: ct);
 
 			ClearArrows();
 

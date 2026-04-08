@@ -3,6 +3,7 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Dice;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.Services;
+using System.Threading;
 
 namespace StepanoffGames.DiceRush.Game.Deck.Cards
 {
@@ -12,14 +13,14 @@ namespace StepanoffGames.DiceRush.Game.Deck.Cards
 		{
 		}
 
-		override public async UniTask<int> UseForDice(PlayerController player, int diceValue)
+		override public async UniTask<int> UseForDice(PlayerController player, int diceValue, CancellationToken ct)
 		{
 			DiceController dice = ServiceLocator.Get<DiceController>();
 			dice.Confirm();
-			await UniTask.NextFrame();
+			await UniTask.NextFrame(ct);
 
 			player.SetState(PlayerState.RollDice);
-			diceValue = await dice.Roll(player);
+			diceValue = await dice.Roll(player, ct);
 			player.SetState(PlayerState.ConfirmDice);
 
 			return diceValue;

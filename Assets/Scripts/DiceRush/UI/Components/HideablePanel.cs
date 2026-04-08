@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.UI.Components
@@ -46,7 +47,7 @@ namespace StepanoffGames.DiceRush.UI.Components
 			isDestroyed = true;
 		}
 
-		public async UniTask Show(bool immediately = false)
+		public async UniTask Show(bool immediately, CancellationToken ct)
 		{
 			_isShown = true;
 			showTween?.Kill();
@@ -74,11 +75,11 @@ namespace StepanoffGames.DiceRush.UI.Components
 							_canvasGroup.blocksRaycasts = true;
 						}
 					});
-				await UniTask.WaitUntil(() => isShowCompleted || !_isShown || isDestroyed);
+				await UniTask.WaitUntil(() => isShowCompleted || !_isShown || isDestroyed, cancellationToken: ct);
 			}
 		}
 
-		public async UniTask Hide(bool immediately = false)
+		public async UniTask Hide(bool immediately, CancellationToken ct)
 		{
 			_isShown = false;
 			showTween?.Kill();
@@ -102,7 +103,7 @@ namespace StepanoffGames.DiceRush.UI.Components
 					{
 						isHideCompleted = true;
 					});
-				await UniTask.WaitUntil(() => isHideCompleted || _isShown || isDestroyed);
+				await UniTask.WaitUntil(() => isHideCompleted || _isShown || isDestroyed, cancellationToken: ct);
 			}
 		}
 	}

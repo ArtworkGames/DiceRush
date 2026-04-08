@@ -3,7 +3,7 @@ using DG.Tweening;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Perks;
 using StepanoffGames.DiceRush.UI.Components;
-using StepanoffGames.DiceRush.UI.Components.Perks;
+using StepanoffGames.DiceRush.UI.Perks;
 using StepanoffGames.DiceRush.UI.Popups.FlyingIconPopup;
 using StepanoffGames.Localization;
 using StepanoffGames.Services;
@@ -101,7 +101,7 @@ namespace StepanoffGames.DiceRush.UI.Windows.SelectPerkWindow
 			iconObject.transform.localScale = Vector3.one * 2.3f;
 		}
 
-		override public void OnClick()
+		override public void DoClick()
 		{
 			OnSelect?.Invoke(this);
 		}

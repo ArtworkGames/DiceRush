@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -12,6 +13,8 @@ namespace StepanoffGames.DiceRush.UI.Components
 
 	public class TweenButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 	{
+		public Action OnClick;
+
 		[SerializeField] protected Transform _content;
 
 		public Transform Content => _content;
@@ -44,6 +47,7 @@ namespace StepanoffGames.DiceRush.UI.Components
 			{
 				scaleTween?.Kill();
 				scaleTween = _content.DOScale(focusedScale, focusTime)
+					.SetUpdate(true)
 					.SetEase(Ease.OutBack);
 			}
 		}
@@ -56,6 +60,7 @@ namespace StepanoffGames.DiceRush.UI.Components
 
 			scaleTween?.Kill();
 			scaleTween = _content.DOScale(1f, unfocusTime)
+				.SetUpdate(true)
 				.SetEase(Ease.OutBack);
 		}
 
@@ -68,6 +73,7 @@ namespace StepanoffGames.DiceRush.UI.Components
 
 			scaleTween?.Kill();
 			scaleTween = _content.DOScale(pressedScale, pressTime)
+				.SetUpdate(true)
 				.SetEase(Ease.OutCubic);
 		}
 
@@ -93,13 +99,14 @@ namespace StepanoffGames.DiceRush.UI.Components
 
 			if (isClicked)
 			{
-				OnClick();
+				DoClick();
 			}
 			isClicked = false;
 		}
 
-		virtual public void OnClick()
+		virtual public void DoClick()
 		{
+			OnClick?.Invoke();
 		}
 	}
 }

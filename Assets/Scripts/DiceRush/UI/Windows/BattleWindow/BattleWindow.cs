@@ -8,6 +8,7 @@ using StepanoffGames.DiceRush.Game.Xp;
 using StepanoffGames.Services;
 using StepanoffGames.UI.Windows;
 using System;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -67,6 +68,15 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 		private bool isPlayerDied;
 		private bool isStatsEnemyAttacked;
 		private bool isStatsPlayerAttacked;
+
+		private CancellationTokenSource cts;
+
+		private void OnDestroy()
+		{
+			cts?.Cancel();
+			cts?.Dispose();
+			cts = null;
+		}
 
 		override protected void BeforeOpen()
 		{
@@ -178,6 +188,11 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 
 		private async void Battle()
 		{
+			cts?.Cancel();
+			cts?.Dispose();
+			cts = new CancellationTokenSource();
+			CancellationToken ct = cts.Token;
+
 			DeckController deckController = ServiceLocator.Get<DeckController>();
 			DiceController diceController = ServiceLocator.Get<DiceController>();
 			PerksManager perksManager = ServiceLocator.Get<PerksManager>();
@@ -192,24 +207,24 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 
 				//SignalBus.Publish(new BattleRoundStartedSignal(Params.Player, Params.Enemy));
 
-				await perksManager.UseForBattleRoundStarted(Params.Player.Model);
+				await perksManager.UseForBattleRoundStarted(Params.Player.Model, ct);
 
 				UpdatePlayerBattleValues();
 				UpdateEnemyDiceValue(0);
-				await deckController.PrepareForBattle(Params.Player);
+				await deckController.PrepareForBattle(Params.Player, ct);
 				UpdatePlayerBattleValues();
 
-				int diceValue = await diceController.Roll(Params.Player);
+				int diceValue = await diceController.Roll(Params.Player, ct);
 				UpdateEnemyDiceValue(diceValue);
 				diceController.Confirm();
 
 				isEnemyAttacked = false;
 				_enemyAnimation.ShowAttack();
-				await UniTask.WaitUntil(() => isEnemyAttacked);
+				await UniTask.WaitUntil(() => isEnemyAttacked, cancellationToken: ct);
 
 				isStatsEnemyAttacked = false;
 				_statsAnimation.ShowEnemyAttack();
-				await UniTask.WaitUntil(() => isStatsEnemyAttacked);
+				await UniTask.WaitUntil(() => isStatsEnemyAttacked, cancellationToken: ct);
 
 				int enemyAttack = Params.Enemy.BaseAttack + diceValue;
 				int playerDamage = Mathf.Max(0, enemyAttack - (Params.Player.Model.Defense + Params.Player.Model.ExtraDefense));
@@ -222,23 +237,23 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				{
 					isPlayerDied = false;
 					_playerAnimation.ShowDeath();
-					await UniTask.WaitUntil(() => isPlayerDied);
+					await UniTask.WaitUntil(() => isPlayerDied, cancellationToken: ct);
 					break;
 				}
 
 				isPlayerDamaged = false;
 				_playerAnimation.ShowDamage();
-				await UniTask.WaitUntil(() => isPlayerDamaged);
+				await UniTask.WaitUntil(() => isPlayerDamaged, cancellationToken: ct);
 
-				await UniTask.WaitForSeconds(0.2f);
+				await UniTask.WaitForSeconds(0.2f, cancellationToken: ct);
 
 				isPlayerAttacked = false;
 				_playerAnimation.ShowAttack();
-				await UniTask.WaitUntil(() => isPlayerAttacked);
+				await UniTask.WaitUntil(() => isPlayerAttacked, cancellationToken: ct);
 
 				isStatsPlayerAttacked = false;
 				_statsAnimation.ShowPlayerAttack();
-				await UniTask.WaitUntil(() => isStatsPlayerAttacked);
+				await UniTask.WaitUntil(() => isStatsPlayerAttacked, cancellationToken: ct);
 
 				int playerAttack = Params.Player.Model.Attack;
 				Params.Enemy.Health = Mathf.Max(0, Params.Enemy.Health - playerAttack);
@@ -250,11 +265,11 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 				{
 					isEnemyDied = false;
 					_enemyAnimation.ShowDeath();
-					await UniTask.WaitUntil(() => isEnemyDied);
+					await UniTask.WaitUntil(() => isEnemyDied, cancellationToken: ct);
 
 					//SignalBus.Publish(new PlayerWonBattleSignal(Params.Player, Params.Enemy));
 
-					await perksManager.UseForPlayerWonBattle(Params.Player.Model);
+					await perksManager.UseForPlayerWonBattle(Params.Player.Model, ct);
 
 					UpdatePlayerBattleValues();
 					break;
@@ -262,13 +277,13 @@ namespace StepanoffGames.DiceRush.UI.Windows.BattleWindow
 
 				isEnemyDamaged = false;
 				_enemyAnimation.ShowDamage();
-				await UniTask.WaitUntil(() => isEnemyDamaged);
+				await UniTask.WaitUntil(() => isEnemyDamaged, cancellationToken: ct);
 
-				await UniTask.WaitForSeconds(0.2f);
+				await UniTask.WaitForSeconds(0.2f, cancellationToken: ct);
 			}
 			while (true);
 
-			await UniTask.WaitForSeconds(0.5f);
+			await UniTask.WaitForSeconds(0.5f, cancellationToken: ct);
 
 			CloseWindow();
 		}
