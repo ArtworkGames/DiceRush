@@ -24,7 +24,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 			SetState(PlayerState.RollDice);
 
-			await UniTask.WaitForSeconds(1.75f, cancellationToken: ct);
+			await UniTask.WaitForSeconds(2f, cancellationToken: ct);
 			_lastDiceValue = _diceController.GetValue(this);
 
 			SetState(PlayerState.ConfirmDice);

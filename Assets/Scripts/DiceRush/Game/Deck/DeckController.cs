@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using StepanoffGames.DiceRush.Data;
 using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Bag;
 using StepanoffGames.DiceRush.Game.Deck.Cards;
@@ -7,8 +8,10 @@ using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.UI.Deck;
 using StepanoffGames.DiceRush.UI.Messages.Signals;
+using StepanoffGames.DiceRush.UI.Popups.DiceAndTokenPopup;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
+using StepanoffGames.UI.Popups.Signals;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,7 +25,12 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 		public DeckPanel Panel => _panel;
 
+		private DataManager _dataManager;
 		private BagController _bagController;
+
+		private bool _showEmptyMessages = true;
+		private bool _isDiceConfirmButtonAlwaysShown;
+		private bool _isTokenConfirmButtonAlwaysShown;
 
 		private void Awake()
 		{
@@ -31,6 +39,7 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 		private void Start()
 		{
+			_dataManager = ServiceLocator.Get<DataManager>();
 			_bagController = ServiceLocator.Get<BagController>();
 		}
 
@@ -38,6 +47,7 @@ namespace StepanoffGames.DiceRush.Game.Deck
 		{
 			ServiceLocator.Unregister<DeckController>();
 
+			_dataManager = null;
 			_bagController = null;
 		}
 
@@ -49,7 +59,6 @@ namespace StepanoffGames.DiceRush.Game.Deck
 
 		public void AddCards(PlayerController player, CardModel[] cards)
 		{
-			Debug.Log($"[DeckController] AddCards: {cards.Length}");
 			for (int i = 0; i < cards.Length; i++)
 			{
 				player.Model.Deck.AddCard(cards[i]);
@@ -83,7 +92,21 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			{
 				if (player.Model.Type == PlayerType.HI)
 				{
-					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForDice"));
+					if (_isDiceConfirmButtonAlwaysShown)
+					{
+						ShowDiceDescriptionPopup();
+						await _panel.SelectCard(cardModels, totalCardsCount, ct);
+						SignalBus.Publish(new CloseAllPopupsSignal());
+					}
+					else
+					{
+						if (_showEmptyMessages)
+						{
+							SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForDice"));
+						}
+						// ???
+						await UniTask.WaitForSeconds(0.2f, cancellationToken: ct);
+					}
 				}
 				return diceValue;
 			}
@@ -160,7 +183,21 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			{
 				if (player.Model.Type == PlayerType.HI)
 				{
-					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBag"));
+					if (_isTokenConfirmButtonAlwaysShown)
+					{
+						ShowTokenDescriptionPopup(tileType);
+						await _panel.SelectCard(cardModels, totalCardsCount, ct);
+						SignalBus.Publish(new CloseAllPopupsSignal());
+					}
+					else
+					{
+						if (_showEmptyMessages)
+						{
+							SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBag"));
+						}
+						// ???
+						await UniTask.WaitForSeconds(0.2f, cancellationToken: ct);
+					}
 				}
 				return tileType;
 			}
@@ -224,7 +261,12 @@ namespace StepanoffGames.DiceRush.Game.Deck
 			{
 				if (player.Model.Type == PlayerType.HI)
 				{
-					SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBattle"));
+					if (_showEmptyMessages)
+					{
+						SignalBus.Publish(new ShowMessageSignal("Message:NoCardsForBattle"));
+					}
+					// ???
+					await UniTask.WaitForSeconds(0.2f, cancellationToken: ct);
 				}
 				return;
 			}
@@ -305,6 +347,74 @@ namespace StepanoffGames.DiceRush.Game.Deck
 				case CardType.Plus3ToAttack: card = new BattleStatsCard(cardModel); break;
 			}
 			return card;
+		}
+
+		public void SetShowEmptyMessages(bool show)
+		{
+			_showEmptyMessages = show;
+		}
+
+		public void SetDiceConfirmButtonAlwaysShown(bool show)
+		{
+			_isDiceConfirmButtonAlwaysShown = show;
+		}
+
+		public void SetTokenConfirmButtonAlwaysShown(bool show)
+		{
+			_isTokenConfirmButtonAlwaysShown = show;
+		}
+
+		private void ShowDiceDescriptionPopup()
+		{
+			if (!_dataManager.Profile.IsDiceDescriptionPopupShown)
+			{
+				_dataManager.Profile.IsDiceDescriptionPopupShown = true;
+				DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.Dice);
+			}
+		}
+
+		private void ShowTokenDescriptionPopup(CellType tileType)
+		{
+			if (tileType == CellType.Reward)
+			{
+				if (!_dataManager.Profile.IsRewardTokenDescriptionPopupShown)
+				{
+					_dataManager.Profile.IsRewardTokenDescriptionPopupShown = true;
+					DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.RewardToken);
+				}
+			}
+			else if (tileType == CellType.Enemy)
+			{
+				if (!_dataManager.Profile.IsEnemyTokenDescriptionPopupShown)
+				{
+					_dataManager.Profile.IsEnemyTokenDescriptionPopupShown = true;
+					DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.EnemyToken);
+				}
+			}
+			else if (tileType == CellType.MoveForward)
+			{
+				if (!_dataManager.Profile.IsMoveForwardTokenDescriptionPopupShown)
+				{
+					_dataManager.Profile.IsMoveForwardTokenDescriptionPopupShown = true;
+					DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.MoveForwardToken);
+				}
+			}
+			else if (tileType == CellType.MoveBackward)
+			{
+				if (!_dataManager.Profile.IsMoveBackwardTokenDescriptionPopupShown)
+				{
+					_dataManager.Profile.IsMoveBackwardTokenDescriptionPopupShown = true;
+					DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.MoveBackwardToken);
+				}
+			}
+			else if (tileType == CellType.Portal)
+			{
+				if (!_dataManager.Profile.IsPortalTokenDescriptionPopupShown)
+				{
+					_dataManager.Profile.IsPortalTokenDescriptionPopupShown = true;
+					DiceAndTokenPopup.Show(_bagController.Panel.BagButton.transform, DescriptionType.PortalToken);
+				}
+			}
 		}
 	}
 }

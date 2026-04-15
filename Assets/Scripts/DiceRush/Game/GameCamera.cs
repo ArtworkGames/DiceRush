@@ -192,5 +192,14 @@ namespace StepanoffGames.DiceRush.Game
 
 			await UniTask.WaitWhile(() => isMoveTween, cancellationToken: ct);
 		}
+
+		public void SetTo(Vector3 pos)
+		{
+			if (isDragging) return;
+
+			moveTween?.Kill();
+
+			transform.position = pos;
+		}
 	}
 }

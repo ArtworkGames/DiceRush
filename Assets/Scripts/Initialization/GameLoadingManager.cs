@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using StepanoffGames.DiceRush.Data;
+using StepanoffGames.DiceRush.Tutorial;
 using StepanoffGames.Localization;
 using StepanoffGames.Scenes.Signals;
 using StepanoffGames.Signals;
@@ -26,6 +27,7 @@ namespace StepanoffGames.Initialization
 			_initializationWorker.Register(new LocalizationManager());
 			//_initializationWorker.Register(new PublicDataManager());
 			_initializationWorker.Register(new DataManager());
+			_initializationWorker.Register(new TutorialManager());
 
 			await _initializationWorker.InitializeAllAsync();
 

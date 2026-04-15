@@ -2,7 +2,6 @@ using Cysharp.Threading.Tasks;
 using StepanoffGames.Services;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Map
@@ -19,6 +18,9 @@ namespace StepanoffGames.DiceRush.Game.Map
 		public Cell[] Cells => _cells;
 		public Cell StartCell => _startCell;
 
+		public Transform PlayerInitialPosition => _playerInitialPosition;
+		private Transform _playerInitialPosition;
+
 		private void Awake()
 		{
 			ServiceLocator.Register(this);
@@ -26,7 +28,14 @@ namespace StepanoffGames.DiceRush.Game.Map
 
 		public async UniTask CreateMap()
 		{
-			await _generator.Generate(80);
+			if (GameManager.GameMode == GameMode.Tutorial)
+			{
+				await _generator.Generate(50);
+			}
+			else
+			{
+				await _generator.Generate(80);
+			}
 
 			_cells = GetComponentsInChildren<Cell>();
 
@@ -43,6 +52,9 @@ namespace StepanoffGames.DiceRush.Game.Map
 			{
 				SetCellIndex(_startCell, 0);
 			}
+
+			PlayerInitialPosition initialPositionComponent = GetComponentInChildren<PlayerInitialPosition>();
+			_playerInitialPosition = initialPositionComponent.transform;
 
 			OnInited?.Invoke();
 		}

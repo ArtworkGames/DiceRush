@@ -4,15 +4,18 @@ using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Ranking.Signals;
+using StepanoffGames.DiceRush.UI.Components;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.UI.Ranking
 {
 	public class RankingPanel : MonoBehaviour
 	{
+		[SerializeField] private HideablePanel _hideablePanel;
 		[SerializeField] private GameObject _sourceItems;
 
 		private List<PlayerItem> _items;
@@ -106,6 +109,16 @@ namespace StepanoffGames.DiceRush.UI.Ranking
 					break;
 				}
 			}
+		}
+
+		public async UniTask Show(bool immediately, CancellationToken ct)
+		{
+			await _hideablePanel.Show(immediately, ct);
+		}
+
+		public async UniTask Hide(bool immediately, CancellationToken ct)
+		{
+			await _hideablePanel.Hide(immediately, ct);
 		}
 	}
 }

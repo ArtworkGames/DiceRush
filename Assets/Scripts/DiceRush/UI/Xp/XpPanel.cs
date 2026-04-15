@@ -36,6 +36,8 @@ namespace StepanoffGames.DiceRush.UI.Xp
 		
 		private PlayerModel _player;
 
+		private bool _alwaysHidden = false;
+
 		private int destMoveXp;
 		private int currMoveXp;
 		private int xpMultiplier;
@@ -97,6 +99,11 @@ namespace StepanoffGames.DiceRush.UI.Xp
 			SignalBus.Unsubscribe<TotalXpChangedSignal>(OnTotalXpChanged);
 		}
 
+		public void SetAlwaysHidden(bool hidden)
+		{
+			_alwaysHidden = hidden;
+		}
+
 		private void Update()
 		{
 			Vector3 posOffset = Vector3.zero;
@@ -135,6 +142,8 @@ namespace StepanoffGames.DiceRush.UI.Xp
 
 		private async UniTask Show(CancellationToken ct)
 		{
+			if (_alwaysHidden) return;
+
 			List<UniTask> tasks = new();
 			tasks.Add(_totalXpPanel.Show(false, ct));
 			tasks.Add(_moveXpPanel.Show(false, ct));

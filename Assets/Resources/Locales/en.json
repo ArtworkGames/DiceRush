@@ -1,12 +1,9 @@
 {
   "texts":[
-    { "key": "ChestWindow:Title", "value": "Chest" },
-    { "key": "FightWindow:Title", "value": "Fight" },
-    { "key": "LevelUpWindow:Title", "value": "Level Up" },
-
-
-    { "key": "Button:Campaign", "value": "Campaign" },
-    { "key": "Button:LocalMultiplayer", "value": "Local Multiplayer" },
+    { "key": "Button:Campaign", "value": "Tutorial" },
+    { "key": "Button:Campaign2", "value": "Campaign" },
+    { "key": "Button:LocalMultiplayer", "value": "Quick Play" },
+    { "key": "Button:LocalMultiplayer2", "value": "Local Multiplayer" },
 
     { "key": "Button:Back", "value": "Back" },
     { "key": "LocalMultiplayer:DifficultyTutle", "value": "Difficulty:" },
@@ -27,6 +24,50 @@
     { "key": "Button:ExitGame", "value": "End Run" },
 
 
+    { "key": "SkeletonKing:Name", "value": "The Skeleton King" },
+    { "key": "LadyMorra:Name", "value": "Lady Morra" },
+    { "key": "Button:NextPhrase", "value": "Next" },
+
+    { "key": "Tutorial:Dialog1:Player1Phrase1", "value": "All the treasures of this dungeon\nwill be mine!" },
+
+    { "key": "Tutorial:Dialog2:Player2Phrase1", "value": "Whoever reaches the treasures first\ngets them." },
+    { "key": "Tutorial:Dialog2:Player1Phrase1", "value": "I accept your challenge!" },
+    { "key": "Tutorial:Dialog2:SkeletonKingPhrase1", "value": "Well then, let’s play.\nThe dice will decide how far you go...\nand the bag how quickly you return." },
+
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase1", "value": "Ha-ha-ha! Have you made it far?" },
+    { "key": "Tutorial:Dialog3:Player1Phrase1", "value": "...not really." },
+    { "key": "Tutorial:Dialog3:LadyMorraPhrase1", "value": "Darling, you’re just wiping them out\nright from the start. That’s no fun." },
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase2", "value": "They’re just unlucky." },
+    { "key": "Tutorial:Dialog3:LadyMorraPhrase2", "value": "Let’s give them a bit of luck...\nI’ll add an extra move and a portal to your bag." },
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase3", "value": "My dear, anything for you." },
+
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase1", "value": "There we go. Now someone will definitely make it to the finish." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase1", "value": "I’m glad you’re pleased." },
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase2", "value": "But it’s not enough. I’ll give them cards. Let’s see how they get out of this." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase2", "value": "Oh, that’s a bit much." },
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase3", "value": "Oh yes... and I’ll add a chest. Let them search." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase3", "value": "You’re condemning me to deal with them all day..." },
+    { "key": "Tutorial:Dialog4:Player1Phrase1", "value": "The further it goes, the more interesting it gets." },
+
+
+    { "key": "DiceAndTokenPopup:DiceDescription:Text1", "value": "At the start of each turn, a die is rolled. The player moves forward a number of cells equal to the result." },
+
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text1", "value": "If the player stops on an empty cell, a token is drawn from the bag to determine its effect." },
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text2", "value": "“Trap” - the player moves backward a number of cells equal to a new die roll." },
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text3", "value": "After the cell is determined, the player resolves its effect. A cell can trigger only once per turn." },
+
+    { "key": "DiceAndTokenPopup:EnemyTokenDescription:Text1", "value": "“Enemy” - the player enters combat with an enemy." },
+    { "key": "DiceAndTokenPopup:EnemyTokenDescription:Text2", "value": "If the player wins, they remain on that cell and end their turn. If the player loses, they are eliminated from the race." },
+
+    { "key": "DiceAndTokenPopup:MoveForwardTokenDescription:Text1", "value": "“Extra Move” - the player makes another forward movement equal to a new die roll." },
+
+    { "key": "DiceAndTokenPopup:PortalTokenDescription:Text1", "value": "“Portal” - the player moves to another active portal closest to the finish." },
+    { "key": "DiceAndTokenPopup:PortalTokenDescription:Text2", "value": "If there are no active portals, the player remains on the current cell. After using a portal, the turn ends." },
+
+    { "key": "DiceAndTokenPopup:RewardTokenDescription:Text1", "value": "“Chest” - the player opens the chest and receives 3 cards." },
+    { "key": "DiceAndTokenPopup:RewardTokenDescription:Text2", "value": "Each chest can be opened only once." },
+
+
     { "key": "Message:StartTurn", "value": "Turn {0}" },
     { "key": "Message:PlayerStartTurn", "value": "Turn of player {0} ({1})" },
     { "key": "Message:NoCardsForDice", "value": "No cards for the dice" },
@@ -34,6 +75,12 @@
     { "key": "Message:NoCardsForBattle", "value": "No cards for the battle" },
 
 
+    { "key": "ChestWindow:Title", "value": "Chest" },
+    { "key": "FightWindow:Title", "value": "Fight" },
+    { "key": "LevelUpWindow:Title", "value": "Level Up" },
+
+
+    { "key": "BagDescriptionPopup:Title", "value": "Bag Contents:" },
     { "key": "BagDescriptionPopup:RewardLabel", "value": "Chests:" },
     { "key": "BagDescriptionPopup:EnemyLabel", "value": "Enemies:" },
     { "key": "BagDescriptionPopup:MoveForwardLabel", "value": "Extra moves:" },

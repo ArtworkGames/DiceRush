@@ -27,6 +27,8 @@ namespace StepanoffGames.DiceRush.UI.Deck
 		public PlayerController Player => _player;
 		private PlayerController _player;
 
+		private bool _alwaysHidden = false;
+
 		private CancellationTokenSource cts;
 
 		private void Awake()
@@ -58,8 +60,14 @@ namespace StepanoffGames.DiceRush.UI.Deck
 			SignalBus.Unsubscribe<PlayerCardsChangedSignal>(OnPlayerCardsChanged);
 		}
 
+		public void SetAlwaysHidden(bool hidden)
+		{
+			_alwaysHidden = hidden;
+		}
+
 		private async UniTask Show(CancellationToken ct)
 		{
+			if (_alwaysHidden) return;
 			await _hideablePanel.Show(false, ct);
 		}
 

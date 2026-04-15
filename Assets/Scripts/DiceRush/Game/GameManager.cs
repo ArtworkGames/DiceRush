@@ -5,6 +5,7 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Map;
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Xp;
+using StepanoffGames.DiceRush.Tutorial;
 using StepanoffGames.DiceRush.UI.Messages.Signals;
 using StepanoffGames.DiceRush.UI.Windows.GamePauseWindow;
 using StepanoffGames.Services;
@@ -20,8 +21,17 @@ using UnityEngine.InputSystem;
 
 namespace StepanoffGames.DiceRush.Game
 {
+	public enum GameMode
+	{
+		Tutorial,
+		Campaign,
+		LocalMultiplayer
+	}
+
 	public class GameManager : MonoBehaviour, IService
 	{
+		public static GameMode GameMode = GameMode.Campaign;
+
 		[SerializeField] private List<Camera> _cameras;
 		[Space]
 		[SerializeField] private GameCamera _camera;
@@ -45,6 +55,7 @@ namespace StepanoffGames.DiceRush.Game
 		private MapController _mapController;
 		private DataManager _dataManager;
 		private XpManager _xpManager;
+		private TutorialManager _tutorialManager;
 
 		private List<PlayerController> _players;
 
@@ -66,35 +77,11 @@ namespace StepanoffGames.DiceRush.Game
 			_mapController = ServiceLocator.Get<MapController>();
 			_dataManager = ServiceLocator.Get<DataManager>();
 			_xpManager = ServiceLocator.Get<XpManager>();
-
-			//if ((_map == null) || !_map.gameObject.activeSelf)
-			//	_map = GetComponentInChildren<MapController>();
-			//_map.OnInited += OnMapInited;
+			_tutorialManager = ServiceLocator.Get<TutorialManager>();
 
 			await _mapController.CreateMap();
 
-			for (int i = 0; i < _avatars.Length; i++)
-			{
-				_avatars[i].gameObject.SetActive(i < _dataManager.Players.Count);
-			}
-
-			_players = new List<PlayerController>();
-			PlayerController prevHiPlayer = null;
-			for (int i = 0; i < _dataManager.Players.Count; i++)
-			{
-				switch (_dataManager.Players[i].Type)
-				{
-					case PlayerType.HI:
-						PlayerController hiPlayer = new HIPlayerController(_dataManager.Players[i], _avatars[i], prevHiPlayer);
-						_players.Add(hiPlayer);
-						prevHiPlayer = hiPlayer;
-						_hiPlayersCount++;
-						break;
-					case PlayerType.AI:
-						_players.Add(new AIPlayerController(_dataManager.Players[i], _avatars[i]));
-						break;
-				}
-			}
+			InitPlayers();
 
 			startTime = Time.time;
 			//Time.timeScale = 50f;
@@ -102,6 +89,15 @@ namespace StepanoffGames.DiceRush.Game
 			cts?.Cancel();
 			cts?.Dispose();
 			cts = new CancellationTokenSource();
+
+			if (GameMode == GameMode.Tutorial)
+			{
+				await _tutorialManager.RunChapter(TutorialChapterId.FirstRun, cts.Token);
+			}
+			else
+			{
+				await ShowPlayers(cts.Token);
+			}
 
 			GameLoop(cts.Token).Forget();
 		}
@@ -125,53 +121,65 @@ namespace StepanoffGames.DiceRush.Game
 			}
 		}
 
-		private void Update()
+		private void InitPlayers()
 		{
-			float time = Time.time - startTime;
-			string timeStr = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
-			_timeLabel.text = timeStr;
-
-			if (_windowManager != null && _windowManager.CanUseHotkeysExternal())
+			for (int i = 0; i < _avatars.Length; i++)
 			{
-				if (Keyboard.current.escapeKey.wasPressedThisFrame)
+				_avatars[i].gameObject.SetActive(i < _dataManager.Players.Count);
+			}
+
+			_players = new List<PlayerController>();
+			PlayerController prevHiPlayer = null;
+			for (int i = 0; i < _dataManager.Players.Count; i++)
+			{
+				switch (_dataManager.Players[i].Type)
 				{
-					SignalBus.Publish(new OpenWindowSignal(GamePauseWindow.PrefabName));
+					case PlayerType.HI:
+						PlayerController hiPlayer = new HIPlayerController(_dataManager.Players[i], _avatars[i], prevHiPlayer);
+						_players.Add(hiPlayer);
+						prevHiPlayer = hiPlayer;
+						_hiPlayersCount++;
+						break;
+					case PlayerType.AI:
+						_players.Add(new AIPlayerController(_dataManager.Players[i], _avatars[i]));
+						break;
 				}
+			}
+
+			Cell startCell = _mapController.StartCell;
+			for (int i = 0; i < _players.Count; i++)
+			{
+				_avatars[i].SetToPosition(_mapController.PlayerInitialPosition.position, startCell);
+				_avatars[i].gameObject.SetActive(false);
+				_players[i].Model.IsFinished = false;
 			}
 		}
 
-		public PlayerController GetPlayer(PlayerModel playerModel)
+		private async UniTask ShowPlayers(CancellationToken ct)
 		{
+			_camera.SetTo(_mapController.StartCell.transform.position);
+
+			List<UniTask> tasks = new();
 			for (int i = 0; i < _players.Count; i++)
 			{
-				if (_players[i].Model == playerModel)
-				{
-					return _players[i];
-				}
+				tasks.Add(ShowPlayer(_players[i], 0.5f + i * 0.25f, ct));
 			}
-			return null;
+			await UniTask.WhenAll(tasks);
+
+			await UniTask.WaitForSeconds(0.5f, cancellationToken: ct);
+		}
+
+		private async UniTask ShowPlayer(PlayerController player, float delay, CancellationToken ct)
+		{
+			await UniTask.WaitForSeconds(delay, cancellationToken: ct);
+
+			player.Avatar.gameObject.SetActive(true);
+			await player.Avatar.MoveToPoint(_mapController.StartCell, ct);
+			await player.Avatar.MoveToCurrentCellPlayerPosition(ct);
 		}
 
 		private async UniTask GameLoop(CancellationToken ct)
 		{
-			await UniTask.NextFrame(ct);
-			await UniTask.NextFrame(ct);
-
-			Cell startCell = _mapController.StartCell;
-			//Cell startCell = _map.GetCell(70);
-			for (int i = 0; i < _players.Count; i++)
-			{
-				_avatars[i].SetToCellPlayerPosition(startCell);
-				_players[i].Model.IsFinished = false;
-			}
-			//_avatars[0].SetToCellPlayerPosition(_map.GetCell(79));
-			//_avatars[1].SetToCellPlayerPosition(_map.GetCell(60));
-			//_avatars[2].SetToCellPlayerPosition(_map.GetCell(0));
-			//_avatars[3].SetToCellPlayerPosition(_map.GetCell(0));
-
-			await UniTask.NextFrame(ct);
-			await UniTask.NextFrame(ct);
-
 			turnsCount = 0;
 			do
 			{
@@ -243,6 +251,33 @@ namespace StepanoffGames.DiceRush.Game
 					cell.SetType(cellType);
 				}
 			}
+		}
+
+		private void Update()
+		{
+			float time = Time.time - startTime;
+			string timeStr = TimeSpan.FromSeconds(time).ToString(@"mm\:ss");
+			_timeLabel.text = timeStr;
+
+			if (_windowManager != null && _windowManager.CanUseHotkeysExternal())
+			{
+				if (Keyboard.current.escapeKey.wasPressedThisFrame)
+				{
+					SignalBus.Publish(new OpenWindowSignal(GamePauseWindow.PrefabName));
+				}
+			}
+		}
+
+		public PlayerController GetPlayer(PlayerModel playerModel)
+		{
+			for (int i = 0; i < _players.Count; i++)
+			{
+				if (_players[i].Model == playerModel)
+				{
+					return _players[i];
+				}
+			}
+			return null;
 		}
 
 		private bool IsFinished()

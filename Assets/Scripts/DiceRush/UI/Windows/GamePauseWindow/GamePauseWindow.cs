@@ -3,6 +3,7 @@ using StepanoffGames.Scenes.Signals;
 using StepanoffGames.Signals;
 using StepanoffGames.UI.Windows;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace StepanoffGames.DiceRush.UI.Windows.GamePauseWindow
 {
@@ -19,6 +20,8 @@ namespace StepanoffGames.DiceRush.UI.Windows.GamePauseWindow
 
 		private float _oldTimeScale;
 
+		private bool isWindowOpened;
+
 		override protected void BeforeOpen()
 		{
 			_oldTimeScale = Time.timeScale;
@@ -29,10 +32,14 @@ namespace StepanoffGames.DiceRush.UI.Windows.GamePauseWindow
 		{
 			_continueButton.OnClick += OnContinueButtonClick;
 			_exitButton.OnClick += OnExitButtonClick;
+
+			isWindowOpened = true;
 		}
 
 		override protected void BeforeClose()
 		{
+			isWindowOpened = false;
+
 			_continueButton.OnClick -= OnContinueButtonClick;
 			_exitButton.OnClick -= OnExitButtonClick;
 		}
@@ -42,9 +49,16 @@ namespace StepanoffGames.DiceRush.UI.Windows.GamePauseWindow
 			Time.timeScale = _oldTimeScale;
 		}
 
+		private void Update()
+		{
+			if (isWindowOpened && Keyboard.current.escapeKey.wasPressedThisFrame)
+			{
+				CloseWindow();
+			}
+		}
+
 		private void OnContinueButtonClick()
 		{
-			Debug.Log($"[GamePauseWindow] OnContinueButtonClick");
 			CloseWindow();
 		}
 

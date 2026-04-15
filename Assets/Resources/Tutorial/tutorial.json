@@ -1,0 +1,50 @@
+{
+  "chapters": [
+    {
+      "trigger": { "type": "DirectCall", "id": "FirstRun" },
+      "steps": [
+        {
+          "commands": [
+            { "type": "ShowTouchMask" },
+            { "type": "WaitForRocketAnimationCompleted" },
+            { "type": "HideTouchMask" }
+          ]
+        },
+        {
+          "commands": [
+            { "type": "WaitForCloseAllWindows" },
+            { "type": "ShowTouchMask" }
+          ]
+        },
+        {
+          "commands": [
+            { "type": "WaitForSelectTile", "position": { "x": 3, "y": 0 }, "showFinger": true },
+            { "type": "WaitForPlayerActionPopupOpened" },
+            { "type": "WaitForSeconds", "time": 0.2, "ignoreTimescale": true },
+            { "type": "PressButton", "buttonId": "PlayerAction_TurnSouth", "showFinger": true },
+            { "type": "WaitForSeconds", "time": 0.2, "ignoreTimescale": true }
+          ]
+        },
+        {
+          "commands": [
+            { "type": "WaitForSelectTile", "position": { "x": 3, "y": -2 }, "showFinger": true },
+            { "type": "WaitForPlayerActionPopupOpened" },
+            { "type": "WaitForSeconds", "time": 0.2, "ignoreTimescale": true },
+            { "type": "PressButton", "buttonId": "PlayerAction_TurnEast", "showFinger": true },
+            { "type": "WaitForSeconds", "time": 0.2, "ignoreTimescale": true }
+          ]
+        },
+        {
+          "commands": [
+            { "type": "WaitForPressButton", "buttonId": "MoveButton", "showFinger": true, "flipFinger": true }
+          ]
+        },
+        {
+          "commands": [
+            { "type": "HideTouchMask" }
+          ]
+        }
+      ]
+    }
+  ]
+}

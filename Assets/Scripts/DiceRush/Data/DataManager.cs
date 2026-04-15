@@ -11,6 +11,9 @@ namespace StepanoffGames.DiceRush.Data
 		public List<PlayerModel> Players => _players;
 		private List<PlayerModel> _players;
 
+		public ProfileModel Profile => _profile;
+		private ProfileModel _profile;
+
 		public DataManager()
 		{
 			ServiceLocator.Register(this);
@@ -18,20 +21,22 @@ namespace StepanoffGames.DiceRush.Data
 
 		override public async UniTask InitializeAsync()
 		{
+			_profile = new ProfileModel();
+
 			_players = new List<PlayerModel>();
 
-			AddPlayer(new PlayerModel("Player 1", PlayerColor.Red, PlayerType.HI));
-			AddPlayer(new PlayerModel("Player 2", PlayerColor.Blue, PlayerType.AI, AIBrainType.Medium));
-			AddPlayer(new PlayerModel("Player 3", PlayerColor.Green, PlayerType.AI, AIBrainType.Medium));
-			AddPlayer(new PlayerModel("Player 4", PlayerColor.Yellow, PlayerType.AI, AIBrainType.Medium));
+			//AddPlayer(new PlayerModel("Player 1", PlayerColor.Red, PlayerType.HI));
+			//AddPlayer(new PlayerModel("Player 2", PlayerColor.Blue, PlayerType.AI, AIBrainType.Medium));
+			//AddPlayer(new PlayerModel("Player 3", PlayerColor.Green, PlayerType.AI, AIBrainType.Medium));
+			//AddPlayer(new PlayerModel("Player 4", PlayerColor.Yellow, PlayerType.AI, AIBrainType.Medium));
 
 			await UniTask.Yield();
 		}
 
-		public void AddPlayer(PlayerModel player)
-		{
-			_players.Add(player);
-		}
+		//public void AddPlayer(PlayerModel player)
+		//{
+		//	_players.Add(player);
+		//}
 
 		public void SetPlayers(List<PlayerModel> players)
 		{

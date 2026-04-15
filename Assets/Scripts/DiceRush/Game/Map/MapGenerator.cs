@@ -1,32 +1,13 @@
 using Cysharp.Threading.Tasks;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using static StepanoffGames.DiceRush.Game.Map.MapSectionsConfig;
 
 namespace StepanoffGames.DiceRush.Game.Map
 {
 	public class MapGenerator : MonoBehaviour
 	{
-		public enum MapSectionSide
-		{
-			Top,
-			Right,
-			Bottom,
-			Left
-		}
-
-		[Serializable]
-		public class MapSectionData
-		{
-			public string Name;
-			[Space]
-			public MapSectionSide EnterSide;
-			public MapSectionSide ExitSide;
-			[Space]
-			public int Length;
-		}
-
 		public class SelectedSectionData
 		{
 			public MapSectionData SectionData;
@@ -36,7 +17,7 @@ namespace StepanoffGames.DiceRush.Game.Map
 			public Vector2Int NextPos;
 		}
 
-		[SerializeField] private MapSectionData[] _sectionsData;
+		[SerializeField] private MapSectionsConfig _sectionsConfig;
 
 		public List<MapSection> Sections => _sections;
 		private List<MapSection> _sections;
@@ -89,26 +70,55 @@ namespace StepanoffGames.DiceRush.Game.Map
 			int totalLength = 0;
 			string lastSectionName = "";
 
-			for (int i = 0; i < _sectionsData.Length; i++)
+			for (int i = 0; i < _sectionsConfig.SectionsData.Length; i++)
 			{
-				if (_sectionsData[i].Name == "SectionStart")
+				if (_sectionsConfig.SectionsData[i].Name == "SectionStart")
 				{
-					Vector2Int nextPos = GetNextSectionPos(currPos, _sectionsData[i].ExitSide);
+					Vector2Int nextPos = GetNextSectionPos(currPos, _sectionsConfig.SectionsData[i].ExitSide);
 
 					_selectedSectionsData.Add(new SelectedSectionData
 					{
-						SectionData = _sectionsData[i],
+						SectionData = _sectionsConfig.SectionsData[i],
 						Pos = currPos,
 						SideShift = 0,
-						ExitSide = _sectionsData[i].ExitSide,
+						ExitSide = _sectionsConfig.SectionsData[i].ExitSide,
 						NextPos = nextPos
 					});
 
 					currPos = nextPos;
-					currEnterSide = InvertSide(_sectionsData[i].ExitSide);
-					totalLength += _sectionsData[i].Length;
+					currEnterSide = InvertSide(_sectionsConfig.SectionsData[i].ExitSide);
+					totalLength += _sectionsConfig.SectionsData[i].Length;
 
 					break;
+				}
+			}
+
+			if (GameManager.GameMode == GameMode.Tutorial)
+			{
+				for (int i = 0; i < _sectionsConfig.SectionsData.Length; i++)
+				{
+					if (_sectionsConfig.SectionsData[i].Name == "Section1")
+					{
+						for (int j = 0; j < 3; j++)
+						{
+							Vector2Int nextPos = GetNextSectionPos(currPos, _sectionsConfig.SectionsData[i].ExitSide);
+
+							_selectedSectionsData.Add(new SelectedSectionData
+							{
+								SectionData = _sectionsConfig.SectionsData[i],
+								Pos = currPos,
+								SideShift = 0,
+								ExitSide = _sectionsConfig.SectionsData[i].ExitSide,
+								NextPos = nextPos
+							});
+
+							currPos = nextPos;
+							currEnterSide = InvertSide(_sectionsConfig.SectionsData[i].ExitSide);
+							totalLength += _sectionsConfig.SectionsData[i].Length;
+						}
+
+						break;
+					}
 				}
 			}
 
@@ -119,15 +129,16 @@ namespace StepanoffGames.DiceRush.Game.Map
 				List < SelectedSectionData> currentSelectedSections = new List<SelectedSectionData>();
 				if (totalLength >= (targetLength - 3))
 				{
-					for (int i = 0; i < _sectionsData.Length; i++)
+					for (int i = 0; i < _sectionsConfig.SectionsData.Length; i++)
 					{
-						if (_sectionsData[i].Name == "SectionFinish")
+						if (_sectionsConfig.SectionsData[i].Name == "SectionFinish")
 						{
-							(bool canPlace, int sideShift, MapSectionSide exitSide, Vector2Int nextPos) = CanPlaceSection(_sectionsData[i], currPos, currEnterSide);
+							(bool canPlace, int sideShift, MapSectionSide exitSide, Vector2Int nextPos) =
+								CanPlaceSection(_sectionsConfig.SectionsData[i], currPos, currEnterSide);
 
 							currentSelectedSections.Add(new SelectedSectionData
 							{
-								SectionData = _sectionsData[i],
+								SectionData = _sectionsConfig.SectionsData[i],
 								Pos = currPos,
 								SideShift = sideShift,
 								ExitSide = exitSide,
@@ -140,13 +151,14 @@ namespace StepanoffGames.DiceRush.Game.Map
 				}
 				else
 				{
-					for (int i = 0; i < _sectionsData.Length; i++)
+					for (int i = 0; i < _sectionsConfig.SectionsData.Length; i++)
 					{
-						if (_sectionsData[i].Name == "SectionStart" ||
-							_sectionsData[i].Name == "SectionFinish" ||
-							_sectionsData[i].Name == lastSectionName) continue;
+						if (_sectionsConfig.SectionsData[i].Name == "SectionStart" ||
+							_sectionsConfig.SectionsData[i].Name == "SectionFinish" ||
+							_sectionsConfig.SectionsData[i].Name == lastSectionName) continue;
 
-						(bool canPlace, int sideShift, MapSectionSide exitSide, Vector2Int nextPos) = CanPlaceSection(_sectionsData[i], currPos, currEnterSide);
+						(bool canPlace, int sideShift, MapSectionSide exitSide, Vector2Int nextPos) =
+							CanPlaceSection(_sectionsConfig.SectionsData[i], currPos, currEnterSide);
 
 						//Debug.Log($"[MapGenerator] CanPlaceSection: {_sectionsData[i].Name}, " +
 						//	$"pos: {currPos}, " +
@@ -158,7 +170,7 @@ namespace StepanoffGames.DiceRush.Game.Map
 						{
 							currentSelectedSections.Add(new SelectedSectionData
 							{
-								SectionData = _sectionsData[i],
+								SectionData = _sectionsConfig.SectionsData[i],
 								Pos = currPos,
 								SideShift = sideShift,
 								ExitSide = exitSide,

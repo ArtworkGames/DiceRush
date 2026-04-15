@@ -11,6 +11,8 @@ namespace StepanoffGames.DiceRush.UI.Bag.DescriptionPopup
 
 		public void ShowTokens(TokensSetDescription tokensSetDescription)
 		{
+			gameObject.SetActive(tokensSetDescription.IsAccepted);
+
 			_regularTokensGroup.ShowTokens(tokensSetDescription.RegularCount);
 			_removedTokensGroup.ShowTokens(tokensSetDescription.RemovedCount);
 			_addedTokensGroup.ShowTokens(tokensSetDescription.AddedCount);

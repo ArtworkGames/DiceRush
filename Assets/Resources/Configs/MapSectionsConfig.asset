@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774dcd13cc4f66443a590669ba2dbefe, type: 3}
+  m_Name: MapSectionsConfig
+  m_EditorClassIdentifier: Assembly-CSharp::StepanoffGames.DiceRush.Game.Map.MapSectionsConfig
+  _sectionsData:
+  - Name: SectionStart
+    EnterSide: 3
+    ExitSide: 1
+    Length: 3
+  - Name: SectionFinish
+    EnterSide: 3
+    ExitSide: 1
+    Length: 3
+  - Name: Section1
+    EnterSide: 3
+    ExitSide: 1
+    Length: 5
+  - Name: Section2
+    EnterSide: 3
+    ExitSide: 2
+    Length: 5
+  - Name: Section3
+    EnterSide: 3
+    ExitSide: 0
+    Length: 5
+  - Name: Section4
+    EnterSide: 3
+    ExitSide: 2
+    Length: 15
+  - Name: Section5
+    EnterSide: 3
+    ExitSide: 1
+    Length: 15
+  - Name: Section6
+    EnterSide: 3
+    ExitSide: 0
+    Length: 13
+  - Name: Section7
+    EnterSide: 3
+    ExitSide: 1
+    Length: 9
+  - Name: Section8
+    EnterSide: 3
+    ExitSide: 1
+    Length: 9
+  - Name: Section9
+    EnterSide: 3
+    ExitSide: 1
+    Length: 7

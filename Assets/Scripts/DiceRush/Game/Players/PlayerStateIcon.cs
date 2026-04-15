@@ -30,6 +30,8 @@ namespace StepanoffGames.DiceRush.Game.Players
 		private void Start()
 		{
 			SignalBus.Subscribe<PlayerStateChangedSignal>(OnPlayerStateChanged);
+
+			UpdateIcon(PlayerState.Undefined, 1, CellType.Empty);
 		}
 
 		private void OnDestroy()
@@ -52,6 +54,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 		private void UpdateIcon(PlayerState playerState, int lastDiceValue, CellType lastCellType)
 		{
 			_content.gameObject.SetActive(
+				playerState != PlayerState.Undefined &&
 				playerState != PlayerState.MoveForward &&
 				playerState != PlayerState.MoveBackward &&
 				playerState != PlayerState.MoveToPosition &&

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using StepanoffGames.Cameras.Signals;
+using StepanoffGames.UI.Popups.Signals;
 
 namespace StepanoffGames.Scenes
 {
@@ -62,6 +63,7 @@ namespace StepanoffGames.Scenes
 			await _fade.ShowAsync();
 
 			SignalBus.Publish(new CloseAllWindowsSignal(true));
+			SignalBus.Publish(new CloseAllPopupsSignal());
 			SignalBus.Publish(new ClearCamerasSignal());
 
 			AsyncOperation operation = SceneManager.LoadSceneAsync("Empty");

@@ -20,6 +20,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 
 	public class TokensSetDescription
 	{
+		public bool IsAccepted = true;
 		public int RegularCount = 0;
 		public int RemovedCount = 0;
 		public int AddedCount = 0;

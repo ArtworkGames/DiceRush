@@ -17,6 +17,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 	{
 		[SerializeField] private XpPanel _panel;
 
+		public XpPanel Panel => _panel;
+
+		public bool IsActive => _isActive;
+		private bool _isActive = true;
+
 		private DataManager _dataManager;
 		private GameManager _gameManager;
 		private DeckController _deckController;
@@ -60,6 +65,11 @@ namespace StepanoffGames.DiceRush.Game.Xp
 			SignalBus.Unsubscribe<PlayerMoveStartedSignal>(OnPlayerMoveStarted);
 			SignalBus.Unsubscribe<PlayerCellPassedSignal>(OnPlayerCellPassed);
 			SignalBus.Unsubscribe<PlayerPortalPassedSignal>(OnPlayerPortalPassed);
+		}
+
+		public void SetActive(bool active)
+		{
+			_isActive = active;
 		}
 
 		private void OnTurnStarted(TurnStartedSignal signal)
@@ -108,11 +118,13 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		public void IncMovesCount(PlayerModel playerModel)
 		{
+			if (!_isActive) return;
 			playerModel.MovesCount += 1;
 		}
 
 		public void IncMultiplier(PlayerModel playerModel)
 		{
+			if (!_isActive) return;
 			playerModel.XpMultiplier += 1;
 
 			SignalBus.Publish(new XpMultiplierChangedSignal(playerModel));
@@ -120,6 +132,7 @@ namespace StepanoffGames.DiceRush.Game.Xp
 
 		public void AddMoveXp(PlayerModel playerModel, int xp)
 		{
+			if (!_isActive) return;
 			if (xp == 0) return;
 
 			playerModel.MoveXp += xp;

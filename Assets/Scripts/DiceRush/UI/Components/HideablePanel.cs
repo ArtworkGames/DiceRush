@@ -28,16 +28,16 @@ namespace StepanoffGames.DiceRush.UI.Components
 				shownPos.y + _hideDelta.y,
 				shownPos.z);
 
+			_canvasGroup = GetComponent<CanvasGroup>();
+
 			if (_initHidden)
 			{
 				transform.localPosition = hiddenPos;
-			}
-
-			_canvasGroup = GetComponent<CanvasGroup>();
-			if (_canvasGroup != null)
-			{
-				_canvasGroup.interactable = false;
-				_canvasGroup.blocksRaycasts = false;
+				if (_canvasGroup != null)
+				{
+					_canvasGroup.interactable = false;
+					_canvasGroup.blocksRaycasts = false;
+				}
 			}
 		}
 

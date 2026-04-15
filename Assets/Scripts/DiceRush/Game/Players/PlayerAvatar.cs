@@ -20,6 +20,12 @@ namespace StepanoffGames.DiceRush.Game.Players
 
 		private float speed = 12f;
 
+		public void SetToPosition(Vector3 pos, Cell cell)
+		{
+			transform.position = pos;
+			_currentPoint = cell;
+		}
+
 		public void SetToCellCenterPosition(Cell cell)
 		{
 			transform.position = cell.transform.position;

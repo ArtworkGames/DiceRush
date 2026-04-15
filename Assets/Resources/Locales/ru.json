@@ -1,12 +1,9 @@
 {
   "texts":[
-    { "key": "ChestWindow:Title", "value": "Сундук" },
-    { "key": "FightWindow:Title", "value": "Бой" },
-    { "key": "LevelUpWindow:Title", "value": "Новый уровень" },
-
-
-    { "key": "Button:Campaign", "value": "Кампания" },
-    { "key": "Button:LocalMultiplayer", "value": "Локальный мультиплеер" },
+    { "key": "Button:Campaign", "value": "Обучение" },
+    { "key": "Button:Campaign2", "value": "Кампания" },
+    { "key": "Button:LocalMultiplayer", "value": "Быстрая игра" },
+    { "key": "Button:LocalMultiplayer2", "value": "Локальный мультиплеер" },
 
     { "key": "Button:Back", "value": "Назад" },
     { "key": "LocalMultiplayer:DifficultyTutle", "value": "Сложность:" },
@@ -27,6 +24,50 @@
     { "key": "Button:ExitGame", "value": "Закончить забег" },
 
 
+    { "key": "SkeletonKing:Name", "value": "Король Скелетов" },
+    { "key": "LadyMorra:Name", "value": "Леди Морра" },
+    { "key": "Button:NextPhrase", "value": "Дальше" },
+
+    { "key": "Tutorial:Dialog1:Player1Phrase1", "value": "Все сокровища этого подземелья\nбудут моими!" },
+
+    { "key": "Tutorial:Dialog2:Player2Phrase1", "value": "Кто первым доберется до сокровищ,\nтот их и получит." },
+    { "key": "Tutorial:Dialog2:Player1Phrase1", "value": "Я принимаю вызов!" },
+    { "key": "Tutorial:Dialog2:SkeletonKingPhrase1", "value": "Ну что ж, сыграем.\nКубик покажет, как далеко вы уйдёте...\nа мешок - как быстро вернётесь." },
+
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase1", "value": "А-ха-ха! Далеко ушли?" },
+    { "key": "Tutorial:Dialog3:Player1Phrase1", "value": "...не очень." },
+    { "key": "Tutorial:Dialog3:LadyMorraPhrase1", "value": "Милый, ты их просто убиваешь на старте.\nТак неинтересно." },
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase2", "value": "Им не повезло." },
+    { "key": "Tutorial:Dialog3:LadyMorraPhrase2", "value": "Подари им немного удачи...\nЯ добавлю в твой мешок дополнительный ход и портал." },
+    { "key": "Tutorial:Dialog3:SkeletonKingPhrase3", "value": "Дорогая, для тебя всё что угодно." },
+
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase1", "value": "Ну вот. Теперь кто-то точно дойдёт до финиша." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase1", "value": "Я рад, что ты довольна." },
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase2", "value": "Но этого мало. Дам им карты. Посмотрим, как они будут выкручиваться." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase2", "value": "Ох, это уже лишнее." },
+    { "key": "Tutorial:Dialog4:LadyMorraPhrase3", "value": "Да-да, и сундук добавлю. Пусть ищут." },
+    { "key": "Tutorial:Dialog4:SkeletonKingPhrase3", "value": "Ты обрекаешь меня возиться с ними весь день..." },
+    { "key": "Tutorial:Dialog4:Player1Phrase1", "value": "Чем дальше - тем интереснее." },
+
+
+    { "key": "DiceAndTokenPopup:DiceDescription:Text1", "value": "В начале каждого хода бросается кубик. Игрок перемещается вперёд на выпавшее число клеток." },
+
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text1", "value": "Если игрок останавливается на пустой клетке, из мешка вытягивается токен, который определяет её действие." },
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text2", "value": "«Ловушка» – игрок перемещается назад на число клеток, равное новому броску кубика." },
+    { "key": "DiceAndTokenPopup:MoveBackwardTokenDescription:Text3", "value": "После определения клетки игрок выполняет её действие. Клетка может сработать только один раз за ход." },
+
+    { "key": "DiceAndTokenPopup:EnemyTokenDescription:Text1", "value": "«Враг» – игрок вступает в бой с врагом." },
+    { "key": "DiceAndTokenPopup:EnemyTokenDescription:Text2", "value": "При победе игрок остаётся на этой клетке и завершает ход. При поражении игрок выбывает из гонки." },
+
+    { "key": "DiceAndTokenPopup:MoveForwardTokenDescription:Text1", "value": "«Дополнительный ход» – игрок выполняет ещё одно перемещение вперёд на число клеток, равное новому броску кубика." },
+
+    { "key": "DiceAndTokenPopup:PortalTokenDescription:Text1", "value": "«Портал» – игрок перемещается к другому активному порталу, ближайшему к финишу." },
+    { "key": "DiceAndTokenPopup:PortalTokenDescription:Text2", "value": "Если активных порталов нет, игрок остается на этой клетке. После использования портала ход завершается." },
+
+    { "key": "DiceAndTokenPopup:RewardTokenDescription:Text1", "value": "«Сундук» – игрок открывает сундук и получает 3 карты." },
+    { "key": "DiceAndTokenPopup:RewardTokenDescription:Text2", "value": "Каждый сундук может быть открыт только один раз." },
+
+
     { "key": "Message:StartTurn", "value": "Ход {0}" },
     { "key": "Message:PlayerStartTurn", "value": "Ход игрока {0} ({1})" },
     { "key": "Message:NoCardsForDice", "value": "Нет карт для кубика" },
@@ -34,6 +75,12 @@
     { "key": "Message:NoCardsForBattle", "value": "Нет карт для битвы" },
 
 
+    { "key": "ChestWindow:Title", "value": "Сундук" },
+    { "key": "FightWindow:Title", "value": "Бой" },
+    { "key": "LevelUpWindow:Title", "value": "Новый уровень" },
+
+
+    { "key": "BagDescriptionPopup:Title", "value": "Содержимое мешка:" },
     { "key": "BagDescriptionPopup:RewardLabel", "value": "Сундуки:" },
     { "key": "BagDescriptionPopup:EnemyLabel", "value": "Враги:" },
     { "key": "BagDescriptionPopup:MoveForwardLabel", "value": "Доп.ходы:" },

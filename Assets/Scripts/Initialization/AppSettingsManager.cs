@@ -15,6 +15,8 @@ namespace StepanoffGames.Initialization
 
 			Application.targetFrameRate = 120;
 
+			//UnityEngine.Random.
+
 #if UNITY_ANDROID
 			Application.runInBackground = true;
 			Input.multiTouchEnabled = false;

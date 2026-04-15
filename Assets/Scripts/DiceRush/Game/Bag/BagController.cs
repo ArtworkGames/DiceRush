@@ -14,12 +14,17 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		[SerializeField] private BagAnimation _animation;
 		[SerializeField] private BagPanel _panel;
 
+		public BagPanel Panel => _panel;
+
 		public CellType CurrentCellType => _currentCellType;
 		private CellType _currentCellType;
 
 		private GameManager _gameManager;
 
-		private bool animationFinished;
+		private bool _animationFinished;
+
+		private List<CellType> _acceptedCellTypes = new List<CellType>();
+		private List<CellType> _predefinedCellTypes = new List<CellType>();
 
 		private void Awake()
 		{
@@ -32,6 +37,8 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		{
 			_animation.OnShowToken += OnAnimationShowToken;
 			_animation.OnAnimationFinished += OnAnimationFinished;
+
+			ResetAcceptedCellTypes();
 		}
 
 		private void OnDestroy()
@@ -48,10 +55,10 @@ namespace StepanoffGames.DiceRush.Game.Bag
 
 			_panel.BagButton.DescriptionPopup.SetDescription(bagDescription);
 
-			animationFinished = false;
+			_animationFinished = false;
 			_animation.Draw();
 
-			await UniTask.WaitUntil(() => animationFinished, cancellationToken: ct);
+			await UniTask.WaitUntil(() => _animationFinished, cancellationToken: ct);
 			_panel.BagButton.Show();
 
 			return _currentCellType;
@@ -120,96 +127,122 @@ namespace StepanoffGames.DiceRush.Game.Bag
 			cellTypes = new List<CellType>();
 			bagDescription = new BagDescription();
 
-			cellTypes.Add(CellType.Reward);
-			cellTypes.Add(CellType.Reward);
-			cellTypes.Add(CellType.Reward);
-			bagDescription.Tokens[CellType.Reward].RegularCount = 3;
+			bagDescription.Tokens[CellType.Reward].IsAccepted = _acceptedCellTypes.Contains(CellType.Reward);
+			if (_acceptedCellTypes.Contains(CellType.Reward))
+			{
+				cellTypes.Add(CellType.Reward);
+				cellTypes.Add(CellType.Reward);
+				cellTypes.Add(CellType.Reward);
+				bagDescription.Tokens[CellType.Reward].RegularCount = 3;
+			}
 
-			cellTypes.Add(CellType.Enemy);
-			cellTypes.Add(CellType.Enemy);
-			cellTypes.Add(CellType.Enemy);
-			//cellTypes.Add(CellType.Enemy); // ???
-			bagDescription.Tokens[CellType.Enemy].RegularCount = 3;
+			bagDescription.Tokens[CellType.Enemy].IsAccepted = _acceptedCellTypes.Contains(CellType.Enemy);
+			if (_acceptedCellTypes.Contains(CellType.Enemy))
+			{
+				cellTypes.Add(CellType.Enemy);
+				cellTypes.Add(CellType.Enemy);
+				cellTypes.Add(CellType.Enemy);
+				//cellTypes.Add(CellType.Enemy); // ???
+				bagDescription.Tokens[CellType.Enemy].RegularCount = 3;
+			}
 
-			cellTypes.Add(CellType.MoveForward);
-			cellTypes.Add(CellType.MoveForward);
-			bagDescription.Tokens[CellType.MoveForward].RegularCount = 2;
-			if (!hasNearMoveForwardCell)
+			bagDescription.Tokens[CellType.MoveForward].IsAccepted = _acceptedCellTypes.Contains(CellType.MoveForward);
+			if (_acceptedCellTypes.Contains(CellType.MoveForward))
 			{
 				cellTypes.Add(CellType.MoveForward);
 				cellTypes.Add(CellType.MoveForward);
-				bagDescription.Tokens[CellType.MoveForward].RegularCount += 2;
-			}
-            else
-            {
-				bagDescription.Tokens[CellType.MoveForward].RemovedCount = 2;
-			}
-			if (isPlayerInBackOfAll)
-			{
-				for (int i = 0; i < backCount; i++)
+				bagDescription.Tokens[CellType.MoveForward].RegularCount = 2;
+				if (!hasNearMoveForwardCell)
 				{
 					cellTypes.Add(CellType.MoveForward);
+					cellTypes.Add(CellType.MoveForward);
+					bagDescription.Tokens[CellType.MoveForward].RegularCount += 2;
 				}
-				bagDescription.Tokens[CellType.MoveForward].AddedCount = backCount;
+				else
+				{
+					bagDescription.Tokens[CellType.MoveForward].RemovedCount = 2;
+				}
+				if (isPlayerInBackOfAll)
+				{
+					for (int i = 0; i < backCount; i++)
+					{
+						cellTypes.Add(CellType.MoveForward);
+					}
+					bagDescription.Tokens[CellType.MoveForward].AddedCount = backCount;
+				}
 			}
 
-			if (!hasNearMoveBackwardCell)
+			bagDescription.Tokens[CellType.MoveBackward].IsAccepted = _acceptedCellTypes.Contains(CellType.MoveBackward);
+			if (_acceptedCellTypes.Contains(CellType.MoveBackward))
 			{
-				cellTypes.Add(CellType.MoveBackward);
-				cellTypes.Add(CellType.MoveBackward);
-				cellTypes.Add(CellType.MoveBackward);
-				cellTypes.Add(CellType.MoveBackward);
-				//cellTypes.Add(CellType.MoveBackward);
-				bagDescription.Tokens[CellType.MoveBackward].RegularCount = 4;
+				if (!hasNearMoveBackwardCell)
+				{
+					cellTypes.Add(CellType.MoveBackward);
+					cellTypes.Add(CellType.MoveBackward);
+					cellTypes.Add(CellType.MoveBackward);
+					cellTypes.Add(CellType.MoveBackward);
+					//cellTypes.Add(CellType.MoveBackward);
+					bagDescription.Tokens[CellType.MoveBackward].RegularCount = 4;
+					if (isPlayerInFrontOfAll)
+					{
+						for (int i = 0; i < frontCount; i++)
+						{
+							cellTypes.Add(CellType.MoveBackward);
+						}
+						bagDescription.Tokens[CellType.MoveBackward].AddedCount = frontCount;
+					}
+				}
+				else
+				{
+					bagDescription.Tokens[CellType.MoveBackward].RemovedCount = 4;
+					if (isPlayerInFrontOfAll)
+					{
+						bagDescription.Tokens[CellType.MoveBackward].RemovedCount += frontCount;
+					}
+				}
+			}
+
+			bagDescription.Tokens[CellType.Portal].IsAccepted = _acceptedCellTypes.Contains(CellType.Portal);
+			if (_acceptedCellTypes.Contains(CellType.Portal))
+			{
+				cellTypes.Add(CellType.Portal);
+				bagDescription.Tokens[CellType.Portal].RegularCount = 1;
+				if (!hasNearPortalCell)
+				{
+					cellTypes.Add(CellType.Portal);
+					cellTypes.Add(CellType.Portal);
+					bagDescription.Tokens[CellType.Portal].RegularCount += 2;
+				}
+				else
+				{
+					bagDescription.Tokens[CellType.Portal].RemovedCount = 2;
+				}
 				if (isPlayerInFrontOfAll)
 				{
 					for (int i = 0; i < frontCount; i++)
 					{
-						cellTypes.Add(CellType.MoveBackward);
+						cellTypes.Add(CellType.Portal);
 					}
-					bagDescription.Tokens[CellType.MoveBackward].AddedCount = frontCount;
+					bagDescription.Tokens[CellType.Portal].AddedCount = frontCount;
 				}
-			}
-			else
-			{
-				bagDescription.Tokens[CellType.MoveBackward].RemovedCount = 4;
-				if (isPlayerInFrontOfAll)
+				if (isPlayerInBackOfAll)
 				{
-					bagDescription.Tokens[CellType.MoveBackward].RemovedCount += frontCount;
+					for (int i = 0; i < backCount; i++)
+					{
+						cellTypes.Add(CellType.Portal);
+					}
+					bagDescription.Tokens[CellType.Portal].AddedCount = backCount;
 				}
-			}
-
-			cellTypes.Add(CellType.Portal);
-			bagDescription.Tokens[CellType.Portal].RegularCount = 1;
-			if (!hasNearPortalCell)
-			{
-				cellTypes.Add(CellType.Portal);
-				cellTypes.Add(CellType.Portal);
-				bagDescription.Tokens[CellType.Portal].RegularCount += 2;
-			}
-			else
-			{
-				bagDescription.Tokens[CellType.Portal].RemovedCount = 2;
-			}
-			if (isPlayerInFrontOfAll)
-			{
-				for (int i = 0; i < frontCount; i++)
-				{
-					cellTypes.Add(CellType.Portal);
-				}
-				bagDescription.Tokens[CellType.Portal].AddedCount = frontCount;
-			}
-			if (isPlayerInBackOfAll)
-			{
-				for (int i = 0; i < backCount; i++)
-				{
-					cellTypes.Add(CellType.Portal);
-				}
-				bagDescription.Tokens[CellType.Portal].AddedCount = backCount;
 			}
 
 			int index = Random.Range(0, cellTypes.Count);
 			CellType cellType = cellTypes[index];
+
+			if (_predefinedCellTypes.Count > 0)
+			{
+				cellType = _predefinedCellTypes[0];
+				_predefinedCellTypes.RemoveAt(0);
+			}
 
 			return cellType;
 		}
@@ -226,7 +259,37 @@ namespace StepanoffGames.DiceRush.Game.Bag
 
 		private void OnAnimationFinished()
 		{
-			animationFinished = true;
+			_animationFinished = true;
+		}
+
+		public void AddAcceptedCellType(CellType cellType)
+		{
+			_acceptedCellTypes.Add(cellType);
+		}
+
+		public void ClearAcceptedCellTypes()
+		{
+			_acceptedCellTypes.Clear();
+		}
+
+		public void ResetAcceptedCellTypes()
+		{
+			_acceptedCellTypes.Clear();
+			_acceptedCellTypes.Add(CellType.Reward);
+			_acceptedCellTypes.Add(CellType.Enemy);
+			_acceptedCellTypes.Add(CellType.MoveForward);
+			_acceptedCellTypes.Add(CellType.MoveBackward);
+			_acceptedCellTypes.Add(CellType.Portal);
+		}
+
+		public void AddPredefinedCellType(CellType cellType)
+		{
+			_predefinedCellTypes.Add(cellType);
+		}
+
+		public void ClearPredefinedCellTypes()
+		{
+			_predefinedCellTypes.Clear();
 		}
 	}
 }

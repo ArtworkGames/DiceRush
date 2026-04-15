@@ -5,6 +5,7 @@ using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using System;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace StepanoffGames.Localization
 {
@@ -68,6 +69,7 @@ namespace StepanoffGames.Localization
 				}
 			}
 
+			//localeCode = "ru";
 			LoadLocale(localeCode);
 
 			await UniTask.Yield();

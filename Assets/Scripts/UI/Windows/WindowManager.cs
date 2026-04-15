@@ -17,6 +17,9 @@ namespace StepanoffGames.UI.Windows
 		[SerializeField] private GameObject _uiRoot;
 		[SerializeField] private Transform _windowsParent;
 
+		public bool CanCloseWindowByEsc => _canCloseWindowByEsc;
+		private bool _canCloseWindowByEsc = true;
+
 		private WindowsQueue _queue;
 
 		private bool _openingLock;
@@ -49,17 +52,22 @@ namespace StepanoffGames.UI.Windows
 			return !HasOpenWindow() && !_escPressed;
 		}
 
-		private void Update()
+		public void SetCanCloseWindowByEsc(bool can)
 		{
-			if (HasOpenWindow())
-			{
-				//if (!_escPressed && Input.GetKeyDown(KeyCode.Escape))
-				if (!_escPressed && Keyboard.current.escapeKey.wasPressedThisFrame)
-				{
-					CloseLastWindow();
-				}
-			}
+			_canCloseWindowByEsc = can;
 		}
+
+		//private void Update()
+		//{
+		//	if (HasOpenWindow() && _canCloseWindowByEsc)
+		//	{
+		//		//if (!_escPressed && Input.GetKeyDown(KeyCode.Escape))
+		//		if (!_escPressed && Keyboard.current.escapeKey.wasPressedThisFrame)
+		//		{
+		//			CloseLastWindow();
+		//		}
+		//	}
+		//}
 
 		private async void CloseLastWindow()
 		{

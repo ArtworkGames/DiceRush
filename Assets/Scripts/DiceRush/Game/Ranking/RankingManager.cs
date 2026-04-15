@@ -1,6 +1,7 @@
 using StepanoffGames.DiceRush.Game.Players;
 using StepanoffGames.DiceRush.Game.Players.Signals;
 using StepanoffGames.DiceRush.Game.Ranking.Signals;
+using StepanoffGames.DiceRush.UI.Ranking;
 using StepanoffGames.Services;
 using StepanoffGames.Signals;
 using System.Collections.Generic;
@@ -10,6 +11,10 @@ namespace StepanoffGames.DiceRush.Game.Ranking
 {
 	public class RankingManager : MonoBehaviour, IService
 	{
+		[SerializeField] private RankingPanel _panel;
+
+		public RankingPanel Panel => _panel;
+
 		private GameManager _gameManager;
 
 		private void Awake()
