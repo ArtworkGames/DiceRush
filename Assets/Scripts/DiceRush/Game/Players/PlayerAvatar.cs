@@ -4,6 +4,7 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.DiceRush.Game.Map;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace StepanoffGames.DiceRush.Game.Players
 {
@@ -18,7 +19,29 @@ namespace StepanoffGames.DiceRush.Game.Players
 		public MapPoint CurrentPoint => _currentPoint;
 		private MapPoint _currentPoint;
 
+		public PlayerSkin Skin => _skin;
+		private PlayerSkin _skin;
+
 		private float speed = 12f;
+
+		private void Start()
+		{
+			LoadSkin().Forget();
+		}
+
+		private async UniTask LoadSkin()
+		{
+			string skinName = $"Knight_1_{_color}";
+			string skinPath = $"Game/Players/{skinName}.prefab";
+			var handle = Addressables.LoadAssetAsync<GameObject>(skinPath);
+			await UniTask.WaitUntil(() => handle.IsDone);
+
+			GameObject skinObject = Instantiate(handle.Result, transform, false);
+			skinObject.name = skinName;
+			skinObject.transform.localPosition = Vector3.zero;
+
+			_skin = skinObject.GetComponent<PlayerSkin>();
+		}
 
 		public void SetToPosition(Vector3 pos, Cell cell)
 		{
@@ -43,6 +66,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 			if (!(_currentPoint is Cell)) return;
 
 			bool isMoveTween = true;
+			if (_skin != null) _skin.ShowRun();
 
 			Vector3 pos = ((Cell)_currentPoint).PlayerPositions[_id - 1].position;
 			float time = Vector3.Distance(transform.position, pos) / speed;
@@ -52,6 +76,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 				.OnComplete(() =>
 				{
 					isMoveTween = false;
+					if (_skin != null) _skin.ShowIdle();
 				});
 
 			await UniTask.WaitWhile(() => isMoveTween, cancellationToken: ct);
@@ -60,6 +85,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 		public async UniTask MoveToPoint(MapPoint point, CancellationToken ct)
 		{
 			bool isMoveTween = true;
+			if (_skin != null) _skin.ShowRun();
 
 			float time = Vector3.Distance(transform.position, point.transform.position) / speed;
 
@@ -68,6 +94,7 @@ namespace StepanoffGames.DiceRush.Game.Players
 				.OnComplete(() =>
 				{
 					isMoveTween = false;
+					if (_skin != null) _skin.ShowIdle();
 				});
 
 			await UniTask.WaitWhile(() => isMoveTween, cancellationToken: ct);
