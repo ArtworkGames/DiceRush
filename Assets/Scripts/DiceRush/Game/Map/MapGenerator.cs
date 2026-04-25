@@ -35,10 +35,10 @@ namespace StepanoffGames.DiceRush.Game.Map
 				MapSection section = await LoadSection(_selectedSectionsData[i].SectionData.Name);
 				_sections.Add(section);
 
-				Vector3 angles = new Vector3(0f, _selectedSectionsData[i].SideShift * 90f, 0f);
+				Vector3 angles = new Vector3(0f, 0f, -_selectedSectionsData[i].SideShift * 90f);
 				section.transform.eulerAngles = angles;
 
-				Vector3 pos = new Vector3(_selectedSectionsData[i].Pos.x * 25f, 0f, _selectedSectionsData[i].Pos.y * 25f);
+				Vector3 pos = new Vector3(_selectedSectionsData[i].Pos.x * 20f, _selectedSectionsData[i].Pos.y * 20f, 0f);
 				section.transform.position = pos;
 			}
 

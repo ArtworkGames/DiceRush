@@ -37,7 +37,7 @@ namespace StepanoffGames.DiceRush.Game.Path
 			_yellowMarker.SetActive(color == PlayerColor.Yellow);
 
 			_marker.localScale = Vector3.zero;
-			_marker.DOScale(1.5f, 0.5f)
+			_marker.DOScale(1f, 0.5f)
 				.SetEase(Ease.OutBack);
 
 			//_projectionMeshRenderer.transform.localScale = Vector3.zero;

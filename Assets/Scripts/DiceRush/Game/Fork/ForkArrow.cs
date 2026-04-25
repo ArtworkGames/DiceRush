@@ -35,25 +35,36 @@ namespace StepanoffGames.DiceRush.Game.Fork
 			transform.position = position;
 			
 			Vector3 direction = (position - cellCenter).normalized;
-			float angle = Mathf.Atan2(-direction.z, direction.x) * Mathf.Rad2Deg;
-			transform.localEulerAngles = new Vector3(0f, angle, 0f);
+			float angle = Mathf.Atan2(-direction.y, direction.x) * Mathf.Rad2Deg;
+			transform.localEulerAngles = new Vector3(0f, 0f, -angle);
 
-			_meshRenderer.material = material;
+			//_meshRenderer.material = material;
 		}
 
 		private void Update()
 		{
+			//if (Mouse.current.leftButton.wasPressedThisFrame)
+			//{
+			//	Vector2 mousePos = Mouse.current.position.ReadValue();
+			//	Ray ray = _gameManager.Camera.Camera.ScreenPointToRay(mousePos);
+
+			//	if (Physics.Raycast(ray, out RaycastHit hit))
+			//	{
+			//		if (hit.collider.gameObject == _meshRenderer.gameObject)
+			//		{
+			//			OnSelect?.Invoke(this);
+			//		}
+			//	}
+			//}
 			if (Mouse.current.leftButton.wasPressedThisFrame)
 			{
 				Vector2 mousePos = Mouse.current.position.ReadValue();
-				Ray ray = _gameManager.Camera.Camera.ScreenPointToRay(mousePos);
+				Vector2 worldPos = _gameManager.Camera.Camera.ScreenToWorldPoint(mousePos);
 
-				if (Physics.Raycast(ray, out RaycastHit hit))
+				RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
+				if (hit.collider != null && hit.collider.gameObject == gameObject)
 				{
-					if (hit.collider.gameObject == _meshRenderer.gameObject)
-					{
-						OnSelect?.Invoke(this);
-					}
+					OnSelect?.Invoke(this);
 				}
 			}
 		}

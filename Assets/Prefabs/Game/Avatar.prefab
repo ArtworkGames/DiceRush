@@ -470,7 +470,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4685439693486077352
 Transform:
   m_ObjectHideFlags: 0
@@ -533,7 +533,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: e9d212baf7a319143bb8054ea0c65159, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1428,6 +1428,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5915069373351452948}
   - component: {fileID: 430345288931707563}
+  - component: {fileID: 7545945511136062559}
   m_Layer: 0
   m_Name: Popup
   m_TagString: Untagged
@@ -1510,6 +1511,19 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!210 &7545945511136062559
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5315575003805618623}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 101
+  m_SortAtRoot: 0
+  m_Sort3DAs2D: 0
 --- !u!1 &5879400815776627639
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,7 +1632,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &897647594550673906
 Transform:
   m_ObjectHideFlags: 0

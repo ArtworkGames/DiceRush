@@ -64,17 +64,27 @@ namespace StepanoffGames.DiceRush.Game.Map
 			{
 				if (_playerPositions == null) _playerPositions = new List<Transform>();
 
-				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 0f, 1f), 1));
-				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 0f, 1f), 2));
-				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 0f, -1f), 3));
-				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 0f, -1f), 4));
+				//_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 0f, 1f), 1));
+				//_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 0f, 1f), 2));
+				//_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 0f, -1f), 3));
+				//_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 0f, -1f), 4));
+
+				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, 1f, 0), 1));
+				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, 1f, 0f), 2));
+				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(-1f, -1f, 0f), 3));
+				_playerPositions.Add(CreatePlayerPosition(transform.position + new Vector3(1f, -1f, 0f), 4));
 			}
 
-			float pDist = 1.3f;
-			_playerPositions[0].localPosition = new Vector3(-pDist, 0f, pDist);
-			_playerPositions[1].localPosition = new Vector3(pDist, 0f, pDist);
-			_playerPositions[2].localPosition = new Vector3(-pDist, 0f, -pDist);
-			_playerPositions[3].localPosition = new Vector3(pDist, 0f, -pDist);
+			float pDist = 1f;
+			//_playerPositions[0].localPosition = new Vector3(-pDist, 0f, pDist);
+			//_playerPositions[1].localPosition = new Vector3(pDist, 0f, pDist);
+			//_playerPositions[2].localPosition = new Vector3(-pDist, 0f, -pDist);
+			//_playerPositions[3].localPosition = new Vector3(pDist, 0f, -pDist);
+
+			_playerPositions[0].localPosition = new Vector3(-pDist, pDist, 0f);
+			_playerPositions[1].localPosition = new Vector3(pDist, pDist, 0f);
+			_playerPositions[2].localPosition = new Vector3(-pDist, -pDist, 0f);
+			_playerPositions[3].localPosition = new Vector3(pDist, -pDist, 0f);
 		}
 
 		private async void InitCellDrawer()

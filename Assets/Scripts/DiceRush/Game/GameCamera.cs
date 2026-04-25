@@ -35,13 +35,14 @@ namespace StepanoffGames.DiceRush.Game
 		private Plane dragPlane;
 		private Tween moveTween;
 
-		private Vector3 positionDelta = new Vector3(0f, 0f, -2f);
+		private Vector3 positionDelta = Vector3.zero;// new Vector3(0f, 0f, -2f);
 
 		private void Start()
 		{
 			_pathController = ServiceLocator.Get<PathController>();
 
-			dragPlane = new Plane(Vector3.up, Vector3.zero);
+			//dragPlane = new Plane(Vector3.up, Vector3.zero);
+			dragPlane = new Plane(Vector3.back, Vector3.zero);
 		}
 
 		private void OnDestroy()
@@ -88,7 +89,7 @@ namespace StepanoffGames.DiceRush.Game
 				return;
 
 			Vector3 delta = lastWorldPoint - currentWorldPoint;
-			delta.y = 0f;
+			delta.z = 0f;
 
 			if (_invert)
 				delta = -delta;
