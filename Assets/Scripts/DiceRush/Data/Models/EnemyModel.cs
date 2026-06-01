@@ -27,7 +27,7 @@ namespace StepanoffGames.DiceRush.Data.Models
 			new EnemyModel(EnemyType.Skeleton, health: 7,  baseAttack: 1, fromPosition: 0.4f, toPosition: 0.7f),
 			new EnemyModel(EnemyType.Ghost,    health: 8,  baseAttack: 2, fromPosition: 0.5f, toPosition: 0.8f),
 			new EnemyModel(EnemyType.Goblin,   health: 11, baseAttack: 1, fromPosition: 0.6f, toPosition: 0.9f),
-			new EnemyModel(EnemyType.Orc,      health: 12, baseAttack: 2, fromPosition: 0.7f, toPosition: 1f),
+			new EnemyModel(EnemyType.Orc,      health: 12, baseAttack: 2, fromPosition: 0.7f, toPosition: 1.1f),
 		};
 
 		public static EnemyModel GetEnemy(EnemyType type)

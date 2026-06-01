@@ -155,7 +155,8 @@ namespace StepanoffGames.DiceRush.Game.Map
 					{
 						if (_sectionsConfig.SectionsData[i].Name == "SectionStart" ||
 							_sectionsConfig.SectionsData[i].Name == "SectionFinish" ||
-							_sectionsConfig.SectionsData[i].Name == lastSectionName) continue;
+							_sectionsConfig.SectionsData[i].Name == lastSectionName ||
+							!_sectionsConfig.SectionsData[i].Included) continue;
 
 						(bool canPlace, int sideShift, MapSectionSide exitSide, Vector2Int nextPos) =
 							CanPlaceSection(_sectionsConfig.SectionsData[i], currPos, currEnterSide);

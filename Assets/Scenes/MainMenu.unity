@@ -976,6 +976,7 @@ MonoBehaviour:
   - {fileID: 1309082774}
   _campaignButton: {fileID: 1211356774}
   _localMultiplayerButton: {fileID: 1956996975}
+  _localMultiplayerButtonCanvasGroup: {fileID: 1956996976}
 --- !u!1 &1725929944
 GameObject:
   m_ObjectHideFlags: 0
@@ -1064,6 +1065,7 @@ GameObject:
   - component: {fileID: 1956996975}
   - component: {fileID: 1956996974}
   - component: {fileID: 1956996973}
+  - component: {fileID: 1956996976}
   m_Layer: 5
   m_Name: LocalMultiplayerButton
   m_TagString: Untagged
@@ -1142,6 +1144,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StepanoffGames.DiceRush.UI.Components.TweenButton
   _content: {fileID: 574542282}
+--- !u!225 &1956996976
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1956996970}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

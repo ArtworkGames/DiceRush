@@ -17,6 +17,7 @@ namespace StepanoffGames.DiceRush.MainMenu
 		[Space]
 		[SerializeField] private TweenButton _campaignButton;
 		[SerializeField] private TweenButton _localMultiplayerButton;
+		[SerializeField] private CanvasGroup _localMultiplayerButtonCanvasGroup;
 
 		private DataManager _dataManager;
 
@@ -30,7 +31,17 @@ namespace StepanoffGames.DiceRush.MainMenu
 			_dataManager = ServiceLocator.Get<DataManager>();
 
 			_campaignButton.OnClick += OnCampaignButtonClick;
-			_localMultiplayerButton.OnClick += OnLocalMultiplayerButtonClick;
+
+			if (_dataManager.Profile.IsTutorialCompleted)
+			{
+				_localMultiplayerButton.OnClick += OnLocalMultiplayerButtonClick;
+			}
+			else
+			{
+				_localMultiplayerButtonCanvasGroup.alpha = 0.5f;
+				_localMultiplayerButtonCanvasGroup.interactable = false;
+				_localMultiplayerButtonCanvasGroup.blocksRaycasts = false;
+			}
 		}
 
 		private void OnDestroy()

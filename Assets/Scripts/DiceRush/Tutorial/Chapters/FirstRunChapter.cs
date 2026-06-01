@@ -104,6 +104,9 @@ namespace StepanoffGames.DiceRush.Tutorial.Chapters
 
 		private void Clear()
 		{
+			_dataManager.Profile.IsTutorialCompleted = true;
+			_dataManager.SaveProfile();
+
 			_deckController.SetShowEmptyMessages(true);
 			_xpManager.SetActive(true);
 			_xpManager.Panel.SetAlwaysHidden(false);

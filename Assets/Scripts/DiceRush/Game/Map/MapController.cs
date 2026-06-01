@@ -6,8 +6,17 @@ using UnityEngine;
 
 namespace StepanoffGames.DiceRush.Game.Map
 {
+	public enum MapLength
+	{
+		Short,
+		Medium,
+		Long
+	}
+
 	public class MapController : MonoBehaviour, IService
 	{
+		public static MapLength MapLength = MapLength.Medium;
+
 		public Action OnInited;
 
 		[SerializeField] private MapGenerator _generator;
@@ -30,11 +39,22 @@ namespace StepanoffGames.DiceRush.Game.Map
 		{
 			if (GameManager.GameMode == GameMode.Tutorial)
 			{
-				await _generator.Generate(50);
+				await _generator.Generate(30);
 			}
 			else
 			{
-				await _generator.Generate(80);
+				switch (MapLength)
+				{
+					case MapLength.Short:
+						await _generator.Generate(60);
+						break;
+					case MapLength.Medium:
+						await _generator.Generate(80);
+						break;
+					case MapLength.Long:
+						await _generator.Generate(100);
+						break;
+				}
 			}
 
 			_cells = GetComponentsInChildren<Cell>();

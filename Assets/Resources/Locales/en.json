@@ -5,16 +5,25 @@
     { "key": "Button:LocalMultiplayer", "value": "Quick Play" },
     { "key": "Button:LocalMultiplayer2", "value": "Local Multiplayer" },
 
+
     { "key": "Button:Back", "value": "Back" },
-    { "key": "LocalMultiplayer:DifficultyTutle", "value": "Difficulty:" },
+
+    { "key": "LocalMultiplayer:DifficultyTitle", "value": "Difficulty:" },
     { "key": "Button:EasyDifficulty", "value": "Easy" },
     { "key": "Button:MediumDifficulty", "value": "Medium" },
     { "key": "Button:HardDifficulty", "value": "Hard" },
+
+    { "key": "LocalMultiplayer:LengthTitle", "value": "Map Length:" },
+    { "key": "Button:ShortLength", "value": "Short\n60 cells\n5-7 min" },
+    { "key": "Button:MediumLength", "value": "Medium\n80 cells\n7-9 min" },
+    { "key": "Button:LongLength", "value": "Long\n100 cells\n9-11 min" },
+
     { "key": "LocalMultiplayer:DefaultPlayerName", "value": "Player {0}" },
     { "key": "Button:HIPlayer", "value": "Human" },
     { "key": "Button:AIPlayer", "value": "Computer" },
     { "key": "Button:NoPlayer", "value": "No" },
     { "key": "Button:Play", "value": "Play" },
+
 
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Confirm" },
@@ -100,6 +109,13 @@
 
     { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} cards in the deck:" },
     { "key": "DeckDescriptionPopup:CardsOffer", "value": "Offer: {0} cards" },
+
+
+    { "key": "Token:Reward", "value": "Chest" },
+    { "key": "Token:MoveForward", "value": "Extra Move" },
+    { "key": "Token:MoveBackward", "value": "Trap" },
+    { "key": "Token:Portal", "value": "Portal" },
+    { "key": "Token:Enemy", "value": "Enemy" },
 
 
     { "key": "Card:RerollDice", "value": "Reroll The Dice" },

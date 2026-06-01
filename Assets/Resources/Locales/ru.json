@@ -5,16 +5,25 @@
     { "key": "Button:LocalMultiplayer", "value": "Быстрая игра" },
     { "key": "Button:LocalMultiplayer2", "value": "Локальный мультиплеер" },
 
+
     { "key": "Button:Back", "value": "Назад" },
-    { "key": "LocalMultiplayer:DifficultyTutle", "value": "Сложность:" },
+
+    { "key": "LocalMultiplayer:DifficultyTitle", "value": "Сложность:" },
     { "key": "Button:EasyDifficulty", "value": "Низкая" },
     { "key": "Button:MediumDifficulty", "value": "Средняя" },
     { "key": "Button:HardDifficulty", "value": "Высокая" },
+
+    { "key": "LocalMultiplayer:LengthTitle", "value": "Длина карты:" },
+    { "key": "Button:ShortLength", "value": "Короткая\n60 ячеек\n5-7 мин." },
+    { "key": "Button:MediumLength", "value": "Средняя\n80 ячеек\n7-9 мин." },
+    { "key": "Button:LongLength", "value": "Длинная\n100 ячеек\n9-11 мин." },
+
     { "key": "LocalMultiplayer:DefaultPlayerName", "value": "Игрок {0}" },
     { "key": "Button:HIPlayer", "value": "Человек" },
     { "key": "Button:AIPlayer", "value": "Компьютер" },
     { "key": "Button:NoPlayer", "value": "Нет" },
     { "key": "Button:Play", "value": "Играть" },
+
 
     { "key": "Button:Ok", "value": "OK" },
     { "key": "Button:ConfirmDice", "value": "Принять" },
@@ -100,6 +109,13 @@
 
     { "key": "DeckDescriptionPopup:CardsCount", "value": "{0} карт в колоде:" },
     { "key": "DeckDescriptionPopup:CardsOffer", "value": "Выбор: {0} карты" },
+
+
+    { "key": "Token:Reward", "value": "Сундук" },
+    { "key": "Token:MoveForward", "value": "Дополнительный ход" },
+    { "key": "Token:MoveBackward", "value": "Ловушка" },
+    { "key": "Token:Portal", "value": "Портал" },
+    { "key": "Token:Enemy", "value": "Враг" },
 
 
     { "key": "Card:RerollDice", "value": "Перебросить кубик" },

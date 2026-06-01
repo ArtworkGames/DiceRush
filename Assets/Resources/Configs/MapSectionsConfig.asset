@@ -14,46 +14,57 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StepanoffGames.DiceRush.Game.Map.MapSectionsConfig
   _sectionsData:
   - Name: SectionStart
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 3
   - Name: SectionFinish
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 3
   - Name: Section1
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 5
   - Name: Section2
+    Included: 1
     EnterSide: 3
     ExitSide: 2
     Length: 5
   - Name: Section3
+    Included: 1
     EnterSide: 3
     ExitSide: 0
     Length: 5
   - Name: Section4
+    Included: 1
     EnterSide: 3
     ExitSide: 2
     Length: 15
   - Name: Section5
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 15
   - Name: Section6
+    Included: 1
     EnterSide: 3
     ExitSide: 0
     Length: 13
   - Name: Section7
+    Included: 0
     EnterSide: 3
     ExitSide: 1
     Length: 9
   - Name: Section8
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 9
   - Name: Section9
+    Included: 1
     EnterSide: 3
     ExitSide: 1
     Length: 7

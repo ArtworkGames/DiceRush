@@ -18,6 +18,7 @@ namespace StepanoffGames.DiceRush.Game.Map
 		public class MapSectionData
 		{
 			public string Name;
+			public bool Included = true;
 			[Space]
 			public MapSectionSide EnterSide;
 			public MapSectionSide ExitSide;

@@ -3,6 +3,10 @@ using StepanoffGames.DiceRush.Data.Models;
 using StepanoffGames.Initialization;
 using StepanoffGames.Services;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using UnityEngine;
+using StepanoffGames.DiceRush.Data.Schemes;
+using SRF;
 
 namespace StepanoffGames.DiceRush.Data
 {
@@ -21,7 +25,7 @@ namespace StepanoffGames.DiceRush.Data
 
 		override public async UniTask InitializeAsync()
 		{
-			_profile = new ProfileModel();
+			LoadProfile();
 
 			_players = new List<PlayerModel>();
 
@@ -37,6 +41,32 @@ namespace StepanoffGames.DiceRush.Data
 		//{
 		//	_players.Add(player);
 		//}
+
+		private void LoadProfile()
+		{
+			if (PlayerPrefs.HasKey("Profile"))
+			{
+				string profileJson = PlayerPrefs.GetString("Profile");
+				if (!string.IsNullOrEmpty(profileJson))
+				{
+					ProfileScheme profileScheme = JsonUtility.FromJson<ProfileScheme>(profileJson);
+					_profile = new ProfileModel(profileScheme);
+				}
+			}
+			if (_profile == null)
+			{
+				_profile = new ProfileModel();
+			}
+		}
+
+		public void SaveProfile()
+		{
+			ProfileScheme profileScheme = _profile.GetScheme();
+			string profileJson = JsonUtility.ToJson(profileScheme);
+
+			PlayerPrefs.SetString("Profile", profileJson);
+			PlayerPrefs.Save();
+		}
 
 		public void SetPlayers(List<PlayerModel> players)
 		{

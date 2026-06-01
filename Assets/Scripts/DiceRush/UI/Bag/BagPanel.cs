@@ -1,3 +1,4 @@
+using StepanoffGames.UI.Components;
 using UnityEngine;
 
 namespace StepanoffGames.DiceRush.UI.Bag
@@ -5,8 +6,24 @@ namespace StepanoffGames.DiceRush.UI.Bag
 	public class BagPanel : MonoBehaviour
 	{
 		[SerializeField] private BagButton _bagButton;
+		[SerializeField] private TMPTextLocalizer _titleLocalizer;
 
 		public BagButton BagButton => _bagButton;
+
+		private void Start()
+		{
+			HideTitle();
+		}
+
+		public void ShowTitle(string key)
+		{
+			_titleLocalizer.Localize(key);
+		}
+
+		public void HideTitle()
+		{
+			_titleLocalizer.SetText("");
+		}
 
 		//[SerializeField] private GameObject _sourceToken;
 

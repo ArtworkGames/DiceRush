@@ -60,6 +60,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 
 			await UniTask.WaitUntil(() => _animationFinished, cancellationToken: ct);
 			_panel.BagButton.Show();
+			_panel.ShowTitle($"Token:{_currentCellType}");
 
 			return _currentCellType;
 		}
@@ -68,6 +69,7 @@ namespace StepanoffGames.DiceRush.Game.Bag
 		{
 			_animation.Confirm();
 			_panel.BagButton.Hide();
+			_panel.HideTitle();
 			//_panel.HideTokens();
 		}
 
